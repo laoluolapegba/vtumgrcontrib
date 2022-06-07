@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="AzureAuthentication\**" />
+    <EmbeddedResource Remove="AzureAuthentication\**" />
+    <None Remove="AzureAuthentication\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Evc\ILightEvcService.cs" />
+    <Compile Remove="Evc\LightEvcService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.0.0" />
+    <PackageReference Include="Marvin.StreamExtensions" Version="1.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.9" />
+    <PackageReference Include="System.DirectoryServices" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Chams.Vtumanager.Provisioning.Core\Chams.Vtumanager.Provisioning.Core.csproj" />
+    <ProjectReference Include="..\Chams.Vtumanager.Provisioning.Data\Chams.Vtumanager.Provisioning.Data.csproj" />
+    <ProjectReference Include="..\Chams.Vtumanager.Provisioning.Entities\Chams.Vtumanager.Provisioning.Entities.csproj" />
+    <ProjectReference Include="..\Chams.Vtumanager.Provisioning.Infrastructure\Chams.Vtumanager.Provisioning.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Evc\" />
+    <Folder Include="Models\" />
+  </ItemGroup>
+
+</Project>

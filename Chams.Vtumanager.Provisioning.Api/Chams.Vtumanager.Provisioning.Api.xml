@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Chams.Vtumanager.Provisioning.Api</name>
+    </assembly>
+    <members>
+        <member name="T:Sales_Mgmt.Services.Simplex.Api.Controllers.HpinOrdersController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Sales_Mgmt.Services.Simplex.Api.Controllers.HpinOrdersController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Sales_Mgmt.Services.Simplex.Api.Controllers.HpinOrdersController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory)">
+            <summary>
+            Submits a hybrid PIN order to simplex for processing fulfillment
+            </summary>
+            <param name="simplexService"></param>
+            <param name="logger"></param>
+            <param name="mapper"></param>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Sales_Mgmt.Services.Simplex.Api.Controllers.HpinOrdersController.QueryOrder(System.String,System.Threading.CancellationToken)" -->
+        <member name="T:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.transId">
+            <summary>
+            unique transaction identifier
+            </summary>
+        </member>
+        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.OrderNo">
+            <summary>
+            related order number
+            </summary>
+        </member>
+        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.PartnerEvcAcctCode">
+            <summary>
+            evc acct code to debit
+            </summary>
+        </member>
+        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.SubscriberMsisdn">
+            <summary>
+            subscriber phone number to credit
+            </summary>
+        </member>
+        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.TranAmount">
+            <summary>
+            Amount of etopup to purchase
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions.#ctor(Microsoft.AspNetCore.Mvc.ApiExplorer.IApiVersionDescriptionProvider,Microsoft.Extensions.Options.IOptions{Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings})">
+            <summary>
+            Initializes a new instance of the <see cref="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions"/> class.
+            </summary>
+            <param name="versionDescriptionProvider">IApiVersionDescriptionProvider</param>
+            <param name="swaggerSettings">App Settings for Swagger</param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions.Configure(Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerOptions.#ctor(Microsoft.Extensions.Options.IOptions{Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings})">
+            <inheritdoc />
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerOptions.Configure(Swashbuckle.AspNetCore.Swagger.SwaggerOptions)">
+            <inheritdoc />
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerUiOptions.#ctor(Microsoft.AspNetCore.Mvc.ApiExplorer.IApiVersionDescriptionProvider,Microsoft.Extensions.Options.IOptions{Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings})">
+            <inheritdoc />
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerUiOptions.Configure(Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIOptions)">
+            <summary>
+            Configure
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.MiddlewareExtensions.UseSwaggerDocuments(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Enabling Swagger UI.
+            Excluding from test environment
+            </summary>
+            <param name="app">IApplicationBuilder</param>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ServicesExtensions">
+            <summary>
+            Service Collection(IServiceCollection) Extensions
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ServicesExtensions.AddApiVersionWithExplorer(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Add AddVersionedApiExplorer and AddApiVersioning middlewares
+            </summary>
+            <param name="services"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ServicesExtensions.AddSwaggerOptions(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Add swagger services
+            </summary>
+            <param name="services"><see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>/></param>
+            <returns>IServiceCollection</returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerDefaultValues">
+            <summary>
+            Represents the Swagger/Swashbuckle operation filter used to document the implicit API version parameter.
+            </summary>
+            <remarks>This <see cref="T:Swashbuckle.AspNetCore.SwaggerGen.IOperationFilter"/> is only required due to bugs in the <see cref="T:Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenerator"/>.
+            Once they are fixed and published, this class can be removed.</remarks>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerDefaultValues.Apply(Microsoft.OpenApi.Models.OpenApiOperation,Swashbuckle.AspNetCore.SwaggerGen.OperationFilterContext)">
+            <summary>
+            Applies the filter to the specified operation using the given context.
+            </summary>
+            <param name="operation">The operation to apply the filter to.</param>
+            <param name="context">The current operation filter context.</param>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings">
+            <summary>
+            Swagger Configuration
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings"/> class.
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings.Name">
+            <summary>
+            Gets or sets document Name.
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings.Info">
+            <summary>
+            Gets or sets swagger Info.
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings.RoutePrefix">
+            <summary>
+            Gets or sets RoutePrefix.
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings.RoutePrefixWithSlash">
+            <summary>
+            Gets Route Prefix with tailing slash.
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.YamlDocumentFilter">
+            <summary>
+            To use YAML serializer to generate YAML
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.YamlDocumentFilter.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.YamlDocumentFilter"/> class.
+            </summary>
+            <param name="hostingEnvironment">IHostingEnvironment</param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.YamlDocumentFilter.Apply(Microsoft.OpenApi.Models.OpenApiDocument,Swashbuckle.AspNetCore.SwaggerGen.DocumentFilterContext)">
+            <summary>
+            Apply YAML Serializer
+            </summary>
+            <param name="swaggerDoc">SwaggerDocument</param>
+            <param name="context">DocumentFilterContext</param>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Program">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.Program.Configuration">
+            <summary>
+            Initialize configuration
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Program.Main(System.String[])">
+            <summary>
+            main entry point
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Program.CreateWebHostBuilder(System.String[])">
+            <summary>
+            
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Startup">
+            <summary>
+            runtime startup
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            
+            </summary>
+            <param name="configuration"></param>
+            <param name="environment"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.AspNetCore.Mvc.ApiExplorer.IApiVersionDescriptionProvider)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app">IApplicationBuilder</param>
+            <param name="env">IHostingEnvironment</param>
+            <param name="provider">Inject temporary IApiVersionDescriptionProvider</param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Startup.IsOriginAllowed(System.String)">
+            <summary>
+            validate allowable origins
+            </summary>
+            <param name="host"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,77 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{F7DF9A0C-7C55-4C96-8B8A-BB862023A63E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Business", "Business", "{8E78C23F-3339-48AA-B668-EF1C3DFBEEB3}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Architecture", "Architecture", "{16DB33A6-7F29-4E76-8E89-5CA4E2E84E69}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{E1CCBA30-1100-4BE9-9C77-D55631764B25}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{65E4AC16-1A76-4352-A4C1-277EF5F893DB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentation", "{D1C24FEF-6D51-4211-995E-CB13AEDE2909}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{4BE6D453-2E89-43FC-94A4-EEFE2F39B71C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chams.Vtumanager.Provisioning.Core", "Chams.Vtumanager.Provisioning.Core\Chams.Vtumanager.Provisioning.Core.csproj", "{7CF464C1-CECE-49BB-AE66-4AC2A628AE82}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chams.Vtumanager.Provisioning.Entities", "Chams.Vtumanager.Provisioning.Entities\Chams.Vtumanager.Provisioning.Entities.csproj", "{44D890DC-037F-49F8-AA59-9EB72D92816B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chams.Vtumanager.Provisioning.Infrastructure", "Chams.Vtumanager.Provisioning.Infrastructure\Chams.Vtumanager.Provisioning.Infrastructure.csproj", "{5B30302C-8A01-495B-B6DA-4380572D6658}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chams.Vtumanager.Provisioning.Data", "Chams.Vtumanager.Provisioning.Data\Chams.Vtumanager.Provisioning.Data.csproj", "{B86396D7-6ECA-44E7-BAB5-82D7F6D2645B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chams.Vtumanager.Provisioning.Services", "Chams.Vtumanager.Provisioning.Services\Chams.Vtumanager.Provisioning.Services.csproj", "{59E99522-E37E-4FB6-B232-1CE329248EBA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chams.Vtumanager.Provisioning.Api", "Chams.Vtumanager.Provisioning.Api\Chams.Vtumanager.Provisioning.Api.csproj", "{C4A72680-4BD7-426B-9DBB-8CDB8CE10F84}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7CF464C1-CECE-49BB-AE66-4AC2A628AE82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CF464C1-CECE-49BB-AE66-4AC2A628AE82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CF464C1-CECE-49BB-AE66-4AC2A628AE82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CF464C1-CECE-49BB-AE66-4AC2A628AE82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44D890DC-037F-49F8-AA59-9EB72D92816B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44D890DC-037F-49F8-AA59-9EB72D92816B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44D890DC-037F-49F8-AA59-9EB72D92816B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44D890DC-037F-49F8-AA59-9EB72D92816B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B30302C-8A01-495B-B6DA-4380572D6658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B30302C-8A01-495B-B6DA-4380572D6658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B30302C-8A01-495B-B6DA-4380572D6658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B30302C-8A01-495B-B6DA-4380572D6658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B86396D7-6ECA-44E7-BAB5-82D7F6D2645B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B86396D7-6ECA-44E7-BAB5-82D7F6D2645B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B86396D7-6ECA-44E7-BAB5-82D7F6D2645B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B86396D7-6ECA-44E7-BAB5-82D7F6D2645B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59E99522-E37E-4FB6-B232-1CE329248EBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59E99522-E37E-4FB6-B232-1CE329248EBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59E99522-E37E-4FB6-B232-1CE329248EBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59E99522-E37E-4FB6-B232-1CE329248EBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4A72680-4BD7-426B-9DBB-8CDB8CE10F84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4A72680-4BD7-426B-9DBB-8CDB8CE10F84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4A72680-4BD7-426B-9DBB-8CDB8CE10F84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4A72680-4BD7-426B-9DBB-8CDB8CE10F84}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7CF464C1-CECE-49BB-AE66-4AC2A628AE82} = {65E4AC16-1A76-4352-A4C1-277EF5F893DB}
+		{44D890DC-037F-49F8-AA59-9EB72D92816B} = {65E4AC16-1A76-4352-A4C1-277EF5F893DB}
+		{5B30302C-8A01-495B-B6DA-4380572D6658} = {65E4AC16-1A76-4352-A4C1-277EF5F893DB}
+		{B86396D7-6ECA-44E7-BAB5-82D7F6D2645B} = {F7DF9A0C-7C55-4C96-8B8A-BB862023A63E}
+		{59E99522-E37E-4FB6-B232-1CE329248EBA} = {E1CCBA30-1100-4BE9-9C77-D55631764B25}
+		{C4A72680-4BD7-426B-9DBB-8CDB8CE10F84} = {D1C24FEF-6D51-4211-995E-CB13AEDE2909}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {93D9F34B-0516-475C-833C-25095575037F}
+	EndGlobalSection
+EndGlobal
