@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Chams.Vtumanager.Fulfillment.NineMobile</name>
+    </assembly>
+    <members>
+        <member name="P:Sales_Mgmt.Services.Smtp.Hangfire.Program.Configuration">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Sales_Mgmt.Services.Smtp.Hangfire.Startup">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Sales_Mgmt.Services.Smtp.Hangfire.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            
+            </summary>
+            <param name="configuration"></param>
+            <param name="environment"></param>
+        </member>
+        <member name="M:Sales_Mgmt.Services.Smtp.Hangfire.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:Sales_Mgmt.Services.Smtp.Hangfire.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+            <param name="configuration"></param>
+        </member>
+        <member name="M:Sales_Mgmt.Services.Smtp.Hangfire.Startup.MinuteInterval(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="interval"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Sales_Mgmt.Services.Smtp.Hangfire.MyAuthorizationFilter">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Sales_Mgmt.Services.Smtp.Hangfire.MyAuthorizationFilter.Authorize(Hangfire.Dashboard.DashboardContext)">
+            <summary>
+            
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.Envelope">
+            <remarks/>
+        </member>
+        <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.Envelope.Body">
+            <remarks/>
+        </member>
+        <member name="T:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.EnvelopeBody">
+            <remarks/>
+        </member>
+        <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.EnvelopeBody.ModifyEVCInventoryResultMsg">
+            <remarks/>
+        </member>
+        <member name="T:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ModifyEVCInventoryResultMsg">
+            <remarks/>
+        </member>
+        <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ModifyEVCInventoryResultMsg.ResultHeader">
+            <remarks/>
+        </member>
+        <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ModifyEVCInventoryResultMsg.ModifyEVCInventoryResult">
+            <remarks/>
+        </member>
+        <member name="T:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ResultHeader">
+            <remarks/>
+        </member>
+        <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ResultHeader.CommandId">
+            <remarks/>
+        </member>
+        <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ResultHeader.ResultCode">
+            <remarks/>
+        </member>
+        <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ResultHeader.SerialNo">
+            <remarks/>
+        </member>
+        <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ResultHeader.ResultDesc">
+            <remarks/>
+        </member>
+    </members>
+</doc>

@@ -15,8 +15,8 @@ namespace Chams.Vtumanager.Provisioning.Api.Helpers.Swagger
             Name = "Chams.Vtumanager.Provisioning API";
             Info = new OpenApiInfo
             {
-                Title = "SMS API",
-                Description = "API for SMS trigger"
+                Title = "Chams Vtumanager Provisioning",
+                Description = "Accepts VTU Topup requests"
             };
         }
 

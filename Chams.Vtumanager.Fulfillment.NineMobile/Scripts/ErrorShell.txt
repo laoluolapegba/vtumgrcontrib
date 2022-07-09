@@ -1,0 +1,29 @@
+Oracle.ManagedDataAccess.Client.OracleException (0x80004005): ORA-01882: timezone region not found
+ORA-02063: preceding line from TEST.ETS
+   at OracleInternal.ServiceObjects.OracleConnectionImpl.VerifyExecution(Int32& cursorId, Boolean bThrowArrayBindRelatedErrors, SqlStatementType sqlStatementType, Int32 arrayBindCount, OracleException& exceptionForArrayBindDML, Boolean& hasMoreRowsInDB, Boolean bFirstIterationDone)
+   at OracleInternal.ServiceObjects.OracleCommandImpl.VerifyExecution(OracleConnectionImpl connectionImpl, Int32& cursorId, Boolean bThrowArrayBindRelatedErrors, OracleException& exceptionForArrayBindDML, Boolean& hasMoreRowsInDB, Boolean bFirstIterationDone)
+   at OracleInternal.ServiceObjects.OracleCommandImpl.ExecuteReader(String commandText, OracleParameterCollection paramColl, CommandType commandType, OracleConnectionImpl connectionImpl, OracleDataReaderImpl& rdrImpl, Int32 longFetchSize, Int64 clientInitialLOBFS, OracleDependencyImpl orclDependencyImpl, Int64[] scnForExecution, Int64[]& scnFromExecution, OracleParameterCollection& bindByPositionParamColl, Boolean& bBindParamPresent, Int64& internalInitialLOBFS, OracleException& exceptionForArrayBindDML, OracleConnection connection, OracleLogicalTransaction& oracleLogicalTransaction, IEnumerable`1 adrianParsedStmt, Boolean isDescribeOnly, Boolean isFromEF)
+   at Oracle.ManagedDataAccess.Client.OracleCommand.ExecuteReader(Boolean requery, Boolean fillRequest, CommandBehavior behavior)
+   at Oracle.ManagedDataAccess.Client.OracleCommand.ExecuteReader()
+   at SalesMgmt.Services.Smtp.Hangfire.Services.SmtCpmsTask.GetOrderHeaders()+MoveNext() in C:\\Users\\Bluechip\\source\\repos\\sales-mgmt.services\\Sales-Mgmt.Services.Api\\Sales-Mgmt.Services.Smtp.Hangfire\\Services\\SmtCpmsTask.cs:line 75
+   at SalesMgmt.Services.Smtp.Hangfire.Services.SmtCpmsTask.GetOrderHeaders()+System.Threading.Tasks.Sources.IValueTaskSource<System.Boolean>.GetResult()
+   at SalesMgmt.Services.Smtp.Hangfire.Services.SmtCpmsTask.AddOrderHeaders(IAsyncEnumerable`1 headers, Int32 batchSize) in C:\\Users\\Bluechip\\source\\repos\\sales-mgmt.services\\Sales-Mgmt.Services.Api\\Sales-Mgmt.Services.Smtp.Hangfire\\Services\\SmtCpmsTask.cs:line 348
+   at SalesMgmt.Services.Smtp.Hangfire.Services.SmtCpmsTask.AddOrderHeaders(IAsyncEnumerable`1 headers, Int32 batchSize) in C:\\Users\\Bluechip\\source\\repos\\sales-mgmt.services\\Sales-Mgmt.Services.Api\\Sales-Mgmt.Services.Smtp.Hangfire\\Services\\SmtCpmsTask.cs:line 348
+   at SalesMgmt.Services.Smtp.Hangfire.Services.SmtCpmsTask.ProcessPendingOrders() in C:\\Users\\Bluechip\\source\\repos\\sales-mgmt.services\\Sales-Mgmt.Services.Api\\Sales-Mgmt.Services.Smtp.Hangfire\\Services\\SmtCpmsTask.cs:line 635
+   at System.Runtime.CompilerServices.TaskAwaiter.HandleNonSuccessAndDebuggerNotification(Task task)
+
+
+
+Error checking uniqueness of Order Header with SMTOrderNumber: 100000000173.
+The order header will be skipped during insert.
+
+Message: 	 There is already an open DataReader associated with this Command which must be closed first.\
+Source: 	 System.Data.SqlClient\
+Stack trace: 	    at System.Data.SqlClient.SqlInternalConnectionTds.ValidateConnectionForExecute(SqlCommand command)
+   at System.Data.SqlClient.SqlConnection.ValidateConnectionForExecute(String method, SqlCommand command)
+   at System.Data.SqlClient.SqlCommand.ValidateCommand(Boolean async, String method)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean asyncWrite, String method)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader()
+   at SalesMgmt.Services.Smtp.Hangfire.Services.SmtCpmsTask.AddOrderHeaders(IAsyncEnumerable`1 headers, Int32 batchSize) in C:\\Users\\Bluechip\\source\\repos\\sales-mgmt.services\\Sales-Mgmt.Services.Api\\Sales-Mgmt.Services.Smtp.Hangfire\\Services\\SmtCpmsTask.cs:line 353

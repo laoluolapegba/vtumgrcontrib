@@ -21,12 +21,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Oracle.ManagedDataAccess.Client;
+//using MySql.Data.MySqlClient;
 using Chams.Vtumanager.Provisioning.Api.Helpers.Swagger;
 using Chams.Vtumanager.Provisioning.Data;
 using Chams.Vtumanager.Provisioning.Infrastructure;
 using Chams.Vtumanager.Provisioning.Infrastructure.Filters;
 using Chams.Vtumanager.Provisioning.Infrastructure.Middleware;
+using Chams.Vtumanager.Provisioning.Services.QueService;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Core.DependencyInjection;
+using MySql.Data.MySqlClient;
+using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Chams.Vtumanager.Provisioning.Api
 {
@@ -57,16 +65,46 @@ namespace Chams.Vtumanager.Provisioning.Api
         {
 
             services.AddSingleton(_config);
+            
             services.AddDbContext<ChamsProvisioningDbContext>(options =>
             {
-                options.UseOracle(_config.GetConnectionString("DefaultConnection"), options => options
-                .UseOracleSQLCompatibility("11"));
-                //serverOptions => serverOptions.MigrationsAssembly("Epccos")); ;
+                options.UseMySql(_config.GetConnectionString("DefaultConnection"));
+                //options.UseOracle(_config.GetConnectionString("DefaultConnection"), options => options
+                //.UseOracleSQLCompatibility("11"));
+                
             });
             services.Configure<KestrelServerOptions>(
             _config.GetSection("Kestrel"));
 
             services.AddSingleton<IScopeInformation, ScopeInformation>();
+
+            //_settings = _config.GetSection("AmqpServerSettings").Get<AmqpServerSettings>();
+            //Uri uri = new Uri("amqp://vtuadmin:Vtu@adm1na@139.59.174.247:5672");
+            var rabbitMqSection = _config.GetSection("AmqpServerSettings");
+            var exchangeSection = _config.GetSection("AmqpExchange");
+            services
+            .AddSingleton<IConnection>(sp =>
+            {
+                var factory = new ConnectionFactory()
+                {
+                    HostName = _config.GetSection("AmqpServerSettings:HostName").Value,
+                    Port = int.Parse(_config.GetSection("AmqpServerSettings:Port").Value),
+                    UserName = _config.GetSection("AmqpServerSettings:UserName").Value,
+                    Password = _config.GetSection("AmqpServerSettings:Password").Value,
+                    VirtualHost = _config.GetSection("AmqpServerSettings:VirtualHost").Value,
+                    AutomaticRecoveryEnabled = true
+                };
+
+                return factory.CreateConnection();
+            }).AddHealthChecks()
+            .Services.AddRabbitMqProducer(rabbitMqSection)
+                .AddProductionExchange("amq.direct", exchangeSection);
+
+            //var rabbitMqSection = _config.GetSection("AmqpServerSettings");
+            //var exchangeSection = _config.GetSection("AmqpExchange");
+
+            //services.AddRabbitMqServices(rabbitMqSection)
+            //    .AddProductionExchange("mtn_exchange", exchangeSection);
 
             services.Configure<SwaggerSettings>(_config.GetSection(nameof(SwaggerSettings)));
 
@@ -79,14 +117,10 @@ namespace Chams.Vtumanager.Provisioning.Api
             IMapper mapper = mappingConfig.CreateMapper();
             services.AddSingleton(mapper);
 
-
+            services.AddScoped<IAMQService, AMQService>();
+            services.AddScoped<ITransactionRecordService, TransactionRecordService>();
             services.AddScoped<IUnitOfWork, UnitOfWork<ChamsProvisioningDbContext>>();
-
-            services.AddHttpClient("EVC", client =>
-            {
-                client.BaseAddress = new Uri(_config["EVC:Url"]);
-                client.DefaultRequestHeaders.Add("Accept", "application/json");
-            });
+           
             services
                 .AddMvc(options =>
                 {
@@ -102,43 +136,30 @@ namespace Chams.Vtumanager.Provisioning.Api
                     options.InputFormatters.Add(new XmlSerializerInputFormatter(options));
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
-            var clientCertificate =
-            new X509Certificate2(
-              Path.Combine(_environment.ContentRootPath, _config["EVC:Certname"]), _config["EVC:CertPassphrase"]);
 
-            var handler = new HttpClientHandler
+
+            services.AddAuthentication(options =>
             {
-                AllowAutoRedirect = false,
-                ServerCertificateCustomValidationCallback = (message, certificate2, arg3, arg4) => true,
-                SslProtocols = SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12
-            };
-            handler.ClientCertificates.Add(clientCertificate);
-
-            services.AddHttpClient("EVCClient", c =>
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
             {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidAudience = _config["JWT:ValidAudience"],
+                    ValidIssuer = _config["JWT:ValidIssuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]))
 
-            }).ConfigurePrimaryHttpMessageHandler(() => handler);
-
-            //services.AddAuthentication(options =>
-            //{
-            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            //})
-            //.AddJwtBearer(options =>
-            //{
-            //    options.SaveToken = true;
-            //    options.RequireHttpsMetadata = false;
-            //    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
-            //    {
-            //        ValidateIssuer = true,
-            //        ValidateAudience = true,
-            //        ValidAudience = _config["JWT:ValidAudience"],
-            //        ValidIssuer = _config["JWT:ValidIssuer"],
-            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]))
-
-            //    };
-            //});
+                };
+            });
 
 
 
@@ -231,7 +252,7 @@ namespace Chams.Vtumanager.Provisioning.Api
         }
         private void UpdateApiErrorResponse(HttpContext context, Exception ex, ApiError error)
         {
-            if (ex.GetType().Name == nameof(OracleException)) //|| ex.GetType().Name == nameof(OracleException)
+            if (ex.GetType().Name == nameof(MySqlException)) //|| ex.GetType().Name == nameof(OracleException)
             {
                 error.Detail = "Exception was a database exception!";
             }

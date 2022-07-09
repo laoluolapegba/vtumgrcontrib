@@ -4,49 +4,46 @@
         <name>Chams.Vtumanager.Provisioning.Api</name>
     </assembly>
     <members>
-        <member name="T:Sales_Mgmt.Services.Simplex.Api.Controllers.HpinOrdersController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController">
             <summary>
             
             </summary>
         </member>
-        <member name="M:Sales_Mgmt.Services.Simplex.Api.Controllers.HpinOrdersController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Sales_Mgmt.Services.Simplex.Api.Controllers.HpinOrdersController},AutoMapper.IMapper,System.Net.Http.IHttpClientFactory)">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Chams.Vtumanager.Provisioning.Services.Authentication.IAuthenticationService)">
             <summary>
-            Submits a hybrid PIN order to simplex for processing fulfillment
+            
             </summary>
-            <param name="simplexService"></param>
+            <param name="config"></param>
+            <param name="authenticationService"></param>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController},Chams.Vtumanager.Provisioning.Services.QueService.IAMQService,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
+            <summary>
+            
+            </summary>
             <param name="logger"></param>
-            <param name="mapper"></param>
+            <param name="aMQService"></param>
+            <param name="transactionRecordService"></param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Sales_Mgmt.Services.Simplex.Api.Controllers.HpinOrdersController.QueryOrder(System.String,System.Threading.CancellationToken)" -->
-        <member name="T:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController.VtuTopUp(Chams.Vtumanager.Provisioning.Entities.ViewModels.RechargeRequest,System.Threading.CancellationToken)">
             <summary>
-            
+            Submit a Virtual Top Up service request
             </summary>
+            <param name="rechargeRequest"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
         </member>
-        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.transId">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController.GetTransactionbyId(System.String,System.Threading.CancellationToken)">
             <summary>
-            unique transaction identifier
+            Query the status of a transaction
             </summary>
-        </member>
-        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.OrderNo">
-            <summary>
-            related order number
-            </summary>
-        </member>
-        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.PartnerEvcAcctCode">
-            <summary>
-            evc acct code to debit
-            </summary>
-        </member>
-        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.SubscriberMsisdn">
-            <summary>
-            subscriber phone number to credit
-            </summary>
-        </member>
-        <member name="P:Sales_Mgmt.Services.Simplex.Api.ViewModels.EtopupOrder.TranAmount">
-            <summary>
-            Amount of etopup to purchase
-            </summary>
+            <param name="transactionReference"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
         </member>
         <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions.#ctor(Microsoft.AspNetCore.Mvc.ApiExplorer.IApiVersionDescriptionProvider,Microsoft.Extensions.Options.IOptions{Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings})">
             <summary>
@@ -216,6 +213,76 @@
             </summary>
             <param name="host"></param>
             <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1.TransactionReference">
+            <summary>
+            Unique Transaction identifier
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1.ServiceProviderId">
+            <summary>
+            Telecommunication Operator 
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1.TransactionType">
+            <summary>
+            Airtime or Data 1= airtime , 2 = data
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1.ProductId">
+            <summary>
+            Product Id defined by service provider
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1.PhoneNumber">
+            <summary>
+            Subscriber phonenumber
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1.rechargeAmount">
+            <summary>
+            Recharge amount
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1.ChannelId">
+            <summary>
+            Source channel - ussd, sms, web, mobile
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1.SourceSystemId">
+            <summary>
+            Assigned source system identifier
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeResponse1">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeResponse1.ResponseCode">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeResponse1.ResponseDescription">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeResponse1.TransactionReference">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel">
+            <summary>
+            
+            </summary>
         </member>
     </members>
 </doc>

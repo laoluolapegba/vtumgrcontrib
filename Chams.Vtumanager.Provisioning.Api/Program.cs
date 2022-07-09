@@ -39,8 +39,9 @@ namespace Chams.Vtumanager.Provisioning.Api
 
             try
             {
-                Log.Information("Starting  Simplex API web host");
+                Log.Information("Starting Chamsswitch Provisioning API web host");
                 CreateWebHostBuilder(args)
+                
 
                 .UseIISIntegration()
                 .Build()
@@ -48,7 +49,7 @@ namespace Chams.Vtumanager.Provisioning.Api
             }
             catch (Exception ex)
             {
-                Log.Fatal(ex, "Simplex API Host terminated unexpectedly");
+                Log.Fatal(ex, "Chamsswitch Provisioning API Host terminated unexpectedly");
             }
             finally
             {
@@ -62,9 +63,9 @@ namespace Chams.Vtumanager.Provisioning.Api
         /// <returns></returns>
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
            WebHost.CreateDefaultBuilder(args)
-
-            
-           // .ConfigureAppConfiguration(SetupConfiguration)
+           .UseContentRoot(Directory.GetCurrentDirectory())
+           .UseIISIntegration()
+           
            .UseStartup<Startup>()
            // .UseKestrel(options => options.ConfigureEndpoints())
             .UseSerilog();

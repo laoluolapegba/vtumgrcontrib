@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Sales_Mgmt.Services.Simplex.Api.ViewModels;
+using Chams.Vtumanager.Provisioning.Api.ViewModels;
 
 
 namespace Chams.Vtumanager.Provisioning.Api

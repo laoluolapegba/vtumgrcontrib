@@ -7,13 +7,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Configuration;
 using Microsoft.Extensions.Configuration;
-
+using Chams.Vtumanager.Provisioning.Entities.Common;
 
 namespace Chams.Vtumanager.Provisioning.Data
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ChamsProvisioningDbContext :DbContext
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly string _connectionString;
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly  IConfiguration _config;
 
         public ChamsProvisioningDbContext(DbContextOptions<ChamsProvisioningDbContext> options) : base(options)
@@ -25,8 +34,9 @@ namespace Chams.Vtumanager.Provisioning.Data
 
         public ChamsProvisioningDbContext()
         {
-           
+          
         }
+        public DbSet<TopUpTransactionLog> TopUpRequests { get; set; }
         private void OnEntityUpdating()
         {
             var entries = ChangeTracker.Entries();
