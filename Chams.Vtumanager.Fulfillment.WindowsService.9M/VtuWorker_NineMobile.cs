@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace Chams.Vtumanager.Fulfillment.WindowsService._9M
 {
-    public partial class Service1 : ServiceBase
+    public partial class VtuWorker_NineMobile : ServiceBase
     {
-        public Service1()
+        public VtuWorker_NineMobile()
         {
             InitializeComponent();
         }

@@ -1,7 +1,7 @@
 ﻿
 namespace Chams.Vtumanager.Fulfillment.WindowsService._9M
 {
-    partial class Service1
+    partial class VtuWorker_NineMobile
     {
         /// <summary> 
         /// Required designer variable.

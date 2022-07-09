@@ -17,7 +17,7 @@ namespace Chams.Vtumanager.Fulfillment.WindowsService._9M
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                new VtuWorker_NineMobile()
             };
             ServiceBase.Run(ServicesToRun);
         }
