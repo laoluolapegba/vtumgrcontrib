@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Chams.Vtumanager.Provisioning.Entities.EtopUp 
+namespace Chams.Vtumanager.Provisioning.Entities.EtopUp.NineMobile
 {
 
     [Table("INV_EVC_TRANSACTION_LOG")]

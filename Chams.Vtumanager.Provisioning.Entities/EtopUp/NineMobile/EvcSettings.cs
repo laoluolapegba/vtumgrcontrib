@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SalesMgmt.Services.Evc.Worker.Entities.Common
+namespace Chams.Vtumanager.Provisioning.Entities.EtopUp.NineMobile
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public  class EvcSettings
     {
         public PinlessRecharge pinlessRecharge { get; set; }
         public ModifyInventory modifyInventory { get; set; }
         public QueryBalance queryBalance { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public class PinlessRecharge        {
             public string Url { get; set; }
             public string SoapAction { get; set; }

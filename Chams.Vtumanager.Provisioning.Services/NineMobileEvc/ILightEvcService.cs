@@ -1,14 +1,14 @@
 ﻿using Chams.Vtumanager.Provisioning.Entities.EtopUp;
+using Chams.Vtumanager.Provisioning.Entities.EtopUp.NineMobile;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SalesMgmt.Services.Evc.Worker.Entities.EtopUp;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chams.Vtumanager.Provisioning.Hangfire.Services
+namespace Chams.Vtumanager.Provisioning.Services.NineMobileEvc
 {
     public interface ILightEvcService
     {

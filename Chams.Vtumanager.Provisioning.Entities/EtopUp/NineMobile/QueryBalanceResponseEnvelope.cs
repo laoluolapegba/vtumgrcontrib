@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Chams.Vtumanager.Provisioning.Entities.EtopUp
+namespace Chams.Vtumanager.Provisioning.Entities.EtopUp.NineMobile
 {
     public   class QueryBalanceResponseEnvelope
     {

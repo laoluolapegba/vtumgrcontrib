@@ -10,10 +10,17 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
-namespace Chams.Vtumanager.Provisioning.Api
+namespace Chams.Vtumanager.Web.Api
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class KestrelServerOptionsExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
         public static void ConfigureEndpoints(this KestrelServerOptions options)
         {
             var configuration = options.ApplicationServices.GetRequiredService<IConfiguration>();
@@ -90,7 +97,9 @@ namespace Chams.Vtumanager.Provisioning.Api
 
             throw new InvalidOperationException("No valid certificate configuration found for the current endpoint.");
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public class EndpointConfiguration
         {
             public string Host { get; set; }

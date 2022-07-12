@@ -11,11 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Evc\ILightEvcService.cs" />
-    <Compile Remove="Evc\LightEvcService.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.0.0" />
     <PackageReference Include="Marvin.StreamExtensions" Version="1.2.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.9" />
@@ -35,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Evc\" />
+    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

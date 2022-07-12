@@ -10,6 +10,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.EtopUp
         public decimal Amount { get; set; }
         public string transId { get; set; }
         public int rechargeType { get; set; }
+        public string ProductCode { get; set; }
 
     }
 }

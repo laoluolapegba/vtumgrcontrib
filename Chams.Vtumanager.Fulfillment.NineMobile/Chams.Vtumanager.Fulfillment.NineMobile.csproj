@@ -47,6 +47,7 @@
  
   <ItemGroup>
     <Folder Include="EmailTemplate\" />
+    <Folder Include="Entities\Common\" />
     <Folder Include="Views\Emails\" />
   </ItemGroup>
 

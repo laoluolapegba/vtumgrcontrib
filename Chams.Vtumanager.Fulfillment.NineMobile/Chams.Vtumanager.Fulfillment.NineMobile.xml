@@ -90,5 +90,11 @@
         <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ResultHeader.ResultDesc">
             <remarks/>
         </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.ProcessPendingRequests">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
     </members>
 </doc>

@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Chams.Vtumanager.Provisioning.Hangfire.Services;
+using Chams.Vtumanager.Provisioning.Services.NineMobileEvc;
 
 namespace Sales_Mgmt.Services.Smtp.Hangfire
 {
@@ -91,6 +92,31 @@ namespace Sales_Mgmt.Services.Smtp.Hangfire
             services.AddHttpClient("PinlessRechargeClient", c =>
             {
                 c.BaseAddress = new Uri(_config["EvcSettings:PinlessRecharge:Url"]);
+            }).ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                };
+                return handler;
+
+            });
+            services.AddHttpClient("PretupsRechargeClient", c =>
+            {
+                c.BaseAddress = new Uri(_config["PretupsSettings:Url"]);
+            }).ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                };
+                return handler;
+
+            });
+
+            services.AddHttpClient("GloRechargeClient", c =>
+            {
+                c.BaseAddress = new Uri(_config["PretupsSettings:Url"]);
             }).ConfigurePrimaryHttpMessageHandler(() =>
             {
                 var handler = new HttpClientHandler

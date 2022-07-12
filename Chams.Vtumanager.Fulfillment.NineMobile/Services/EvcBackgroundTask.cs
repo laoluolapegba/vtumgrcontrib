@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using SalesMgmt.Services.Evc.Worker.Entities.EtopUp;
 using Chams.Vtumanager.Provisioning.Services;
 using System;
 using System.Collections.Generic;
@@ -12,9 +11,14 @@ using Chams.Vtumanager.Provisioning.Data;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp;
 using Chams.Vtumanager.Provisioning.Services.Models.Evc;
 using Chams.Vtumanager.Provisioning.Entities.Common;
+using Chams.Vtumanager.Provisioning.Entities.EtopUp.NineMobile;
+using Chams.Vtumanager.Provisioning.Services.NineMobileEvc;
 
 namespace Chams.Vtumanager.Provisioning.Hangfire.Services
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class EvcBackgroundTask : IEvcBackgroundTask
     {
         private readonly ILogger<EvcBackgroundTask> _logger;
@@ -23,6 +27,16 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
         private readonly IRepository<TopUpTransactionLog> _topupLogRepo;
         private readonly ILightEvcService _evcService;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="unitOfWork"></param>
+        /// <param name="mapper"></param>
+        /// <param name="configuration"></param>
+        /// <param name="logger"></param>
+        /// <param name="evcService"></param>
+        /// <param name="config"></param>
+        /// <param name="_httpClientFactory"></param>
         public EvcBackgroundTask(
             IUnitOfWork unitOfWork,
             IMapper mapper, IConfiguration configuration,
@@ -38,6 +52,10 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
             _topupLogRepo = unitOfWork.GetRepository<TopUpTransactionLog>();
             _evcService = evcService;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async Task ProcessPendingRequests()
         {
             // we just print this message               
@@ -54,36 +72,52 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                 {
                     try
                     {
-                        PinlessRechargeRequest pinlessRechargeRequest = new PinlessRechargeRequest
+                        switch (item.serviceproviderid)
                         {
-                            Amount = item.transamount,
-                            Msisdn = item.msisdn,
-                            transId = item.transref
-                        };
-                        RechargeResponseEnvelope.Envelope env1 = new RechargeResponseEnvelope.Envelope();
-                        env1 = await _evcService.PinlessRecharge(pinlessRechargeRequest);
-                        if (env1.Body != null)
-                        {
-                            if (env1.Body.SDF_Data.result.statusCode == "0")
-                            {
-                                await UpdateTaskStatusAsync(item.RecordId,
-                                    env1.Body.SDF_Data.result.statusCode.ToString(),
-                                    env1.Body.SDF_Data.result.errorDescription
-                                    );
-                                evctransId = env1.Body.SDF_Data.result.instanceId;
-                            }
-                            else
-                            {
-                                await UpdateFailedTaskStatusAsync(item.RecordId,
-                                    env1.Body.SDF_Data.result.statusCode.ToString(),
-                                    env1.Body.SDF_Data.result.errorDescription
-                                    );
-                            }
+                            case (int)ServiceProvider.Mtn:
+
+                                break;
+                            case (int)ServiceProvider.Airtel:
+                                break;
+                            case (int)ServiceProvider.GLO:
+                                break;
+                            case (int)ServiceProvider.NineMobile:
+                                PinlessRechargeRequest pinlessRechargeRequest = new PinlessRechargeRequest
+                                {
+                                    Amount = item.transamount,
+                                    Msisdn = item.msisdn,
+                                    transId = item.transref,
+                                    ProductCode = item.productid
+                                };
+                                RechargeResponseEnvelope.Envelope env1 = new RechargeResponseEnvelope.Envelope();
+                                env1 = await _evcService.PinlessRecharge(pinlessRechargeRequest);
+                                if (env1.Body != null)
+                                {
+                                    if (env1.Body.SDF_Data.result.statusCode == "0")
+                                    {
+                                        await UpdateTaskStatusAsync(item.RecordId,
+                                            env1.Body.SDF_Data.result.statusCode.ToString(),
+                                            env1.Body.SDF_Data.result.errorDescription
+                                            );
+                                        evctransId = env1.Body.SDF_Data.result.instanceId;
+                                    }
+                                    else
+                                    {
+                                        await UpdateFailedTaskStatusAsync(item.RecordId,
+                                            env1.Body.SDF_Data.result.statusCode.ToString(),
+                                            env1.Body.SDF_Data.result.errorDescription
+                                            );
+                                    }
+                                }
+                                else
+                                {
+                                    await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
+                                }
+                                break;
+                            default:
+                                break;
                         }
-                        else
-                        {
-                            await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
-                        }
+                       
 
                     }
                     catch (Exception ex)
