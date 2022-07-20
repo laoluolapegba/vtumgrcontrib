@@ -8,7 +8,7 @@ namespace Chams.Vtumanager.Web.Api.ViewModels
     /// <summary>
     /// 
     /// </summary>
-    public class StockTopUpResponse
+    public class EpurseTopUpResponse
     {
         /// <summary>
         /// 

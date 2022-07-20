@@ -4,8 +4,9 @@ using System.Text;
 
 namespace Chams.Vtumanager.Provisioning.Entities.EtopUp.Pretups
 {
-    public class RechargeResponseEnvelope
+    public class PretupsRechargeResponseEnvelope
     {
+
 
         // NOTE: Generated code may require at least .NET Framework 4.5 or .NET Core/Standard 2.0.
         /// <remarks/>

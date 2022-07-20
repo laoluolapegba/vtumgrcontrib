@@ -15,13 +15,14 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Xml;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp.Pretups;
+using Microsoft.Extensions.Primitives;
 
 namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
 {
     /// <summary>
     /// 
     /// </summary>
-    public class AirtelPretupsService
+    public class AirtelPretupsService : IAirtelPretupsService
     {
         private readonly IConfiguration _config;
         private readonly ILogger<AirtelPretupsService> _logger;
@@ -65,35 +66,57 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
         /// </summary>
         /// <param name="pinRechargeRequest"></param>
         /// <returns></returns>
-        public async Task<RechargeResponseEnvelope> AirtimeRecharge(PinlessRechargeRequest pinRechargeRequest)
+        public async Task<PretupsRechargeResponseEnvelope.COMMAND> AirtimeRecharge(PinlessRechargeRequest pinRechargeRequest)
         {
 
             _logger.LogInformation($"calling AirtimeRecharge svc for transId : {pinRechargeRequest.transId}");
 
-            RechargeResponseEnvelope resultEnvelope = new RechargeResponseEnvelope();
+            PretupsRechargeResponseEnvelope.COMMAND resultEnvelope = new PretupsRechargeResponseEnvelope.COMMAND();
             try
             {
                 string rechargeType = pinRechargeRequest.rechargeType == 2 ? _settings.transactionType.DataPurchase : _settings.transactionType.AirtimePurchase;
 
                 string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                var sb = new System.Text.StringBuilder(440);
-                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
-                sb.AppendLine(@"<COMMAND>");
-                sb.AppendLine(@"   <TYPE>"+ rechargeType  + "</TYPE>");
-                sb.AppendLine(@"   <DATE>" + tranDate +"</DATE>");
-                sb.AppendLine(@"   <EXTNWCODE>NG</EXTNWCODE>");
-                sb.AppendLine(@"   <MSISDN>"+ _settings.PartnerMsisdn + "</MSISDN>");
-                sb.AppendLine(@"   <PIN>"+ _settings.PIN + "</PIN>");
-                sb.AppendLine(@"   <LOGINID />");
-                sb.AppendLine(@"   <PASSWORD />");
-                sb.AppendLine(@"   <EXTCODE />");
-                sb.AppendLine(@"   <EXTREFNUM>" + _settings.PartnerCode + "</EXTREFNUM>");
-                sb.AppendLine(@"   <MSISDN2>"+ pinRechargeRequest.Msisdn +"</MSISDN2>");
-                sb.AppendLine(@"   <AMOUNT>" +  pinRechargeRequest.Amount+ "</AMOUNT>");
-                sb.AppendLine(@"   <LANGUAGE1>1</LANGUAGE1>");
-                sb.AppendLine(@"   <LANGUAGE2>1</LANGUAGE2>");
-                sb.AppendLine(@"   <SELECTOR>1</SELECTOR>");
-                sb.AppendLine(@"</COMMAND>");
+               
+                //sb.AppendLine(@"<?xml version=""1.0""?><COMMAND><TYPE>EXRCTRFREQ</TYPE><DATE>19/07/2022 13:17:10</DATE><EXTNWCODE>NG</EXTNWCODE><MSISDN>8087397977</MSISDN><PIN>4477</PIN><LOGINID></LOGINID><PASSWORD></PASSWORD><EXTCODE></EXTCODE><EXTREFNUM>2022071631355013</EXTREFNUM><MSISDN2>8022226516</MSISDN2><AMOUNT>50</AMOUNT><LANGUAGE1>1</LANGUAGE1><LANGUAGE2>1</LANGUAGE2><SELECTOR>1</SELECTOR></COMMAND>");
+                
+                var sb = new System.Text.StringBuilder(444);
+                sb.Append(@"<?xml version=""1.0""?>");
+                sb.Append(@"<COMMAND>");
+                sb.Append(@"<TYPE>EXRCTRFREQ</TYPE>");
+                sb.Append(@"<DATE>" + tranDate + "</DATE>");
+                sb.Append(@"<EXTNWCODE>NG</EXTNWCODE>");
+                sb.Append(@"<MSISDN>" + _settings.PartnerMsisdn + "</MSISDN>");
+                sb.Append(@"<PIN>" + _settings.PIN + "</PIN>");
+                sb.Append(@"<LOGINID></LOGINID>");
+                sb.Append(@"<PASSWORD></PASSWORD>");
+                sb.Append(@"<EXTCODE></EXTCODE>");
+                sb.Append(@"<EXTREFNUM>"+ pinRechargeRequest.transId + "</EXTREFNUM>");
+                sb.Append(@"<MSISDN2>" + pinRechargeRequest.Msisdn + "</MSISDN2>");
+                sb.Append(@"<AMOUNT>" + pinRechargeRequest.Amount + "</AMOUNT>");
+                sb.Append(@"<LANGUAGE1>1</LANGUAGE1>");
+                sb.Append(@"<LANGUAGE2>1</LANGUAGE2>");
+                sb.Append(@"<SELECTOR>1</SELECTOR>");
+                sb.Append(@"</COMMAND>");
+
+                //var sb = new System.Text.StringBuilder(440);
+                //sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
+                //sb.AppendLine(@"<COMMAND>");
+                //sb.AppendLine(@"   <TYPE>" + rechargeType + "</TYPE>");
+                //sb.AppendLine(@"   <DATE>" + tranDate + "</DATE>");
+                //sb.AppendLine(@"   <EXTNWCODE>NG</EXTNWCODE>");
+                //sb.AppendLine(@"   <MSISDN>" + _settings.PartnerMsisdn + "</MSISDN>");
+                //sb.AppendLine(@"   <PIN>" + _settings.PIN + "</PIN>");
+                //sb.AppendLine(@"   <LOGINID />");
+                //sb.AppendLine(@"   <PASSWORD />");
+                //sb.AppendLine(@"   <EXTCODE />");
+                //sb.AppendLine(@"   <EXTREFNUM>" + _settings.PartnerCode + "</EXTREFNUM>");
+                //sb.AppendLine(@"   <MSISDN2>" + pinRechargeRequest.Msisdn + "</MSISDN2>");
+                //sb.AppendLine(@"   <AMOUNT>" + pinRechargeRequest.Amount + "</AMOUNT>");
+                //sb.AppendLine(@"   <LANGUAGE1>1</LANGUAGE1>");
+                //sb.AppendLine(@"   <LANGUAGE2>1</LANGUAGE2>");
+                //sb.AppendLine(@"   <SELECTOR>1</SELECTOR>");
+                //sb.AppendLine(@"</COMMAND>");
 
                 _logger.LogInformation($"AirtimeRecharge soap request = {sb.ToString()}");  //
 
@@ -134,8 +157,8 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                     {
                         using (XmlReader reader = new XmlTextReader(stringReader))
                         {
-                            var serializer = new XmlSerializer(typeof(RechargeResponseEnvelope));
-                            resultEnvelope = serializer.Deserialize(reader) as RechargeResponseEnvelope;
+                            var serializer = new XmlSerializer(typeof(PretupsRechargeResponseEnvelope.COMMAND));
+                            resultEnvelope = serializer.Deserialize(reader) as PretupsRechargeResponseEnvelope.COMMAND;
                         }
                     }
 
@@ -158,38 +181,38 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
         /// </summary>
         /// <param name="pinRechargeRequest"></param>
         /// <returns></returns>
-        public async Task<RechargeResponseEnvelope> DataRecharge(PinlessRechargeRequest pinRechargeRequest)
+        public async Task<PretupsRechargeResponseEnvelope.COMMAND> DataRecharge(PinlessRechargeRequest pinRechargeRequest)
         {
 
             _logger.LogInformation($"calling DataRecharge svc for transId : {pinRechargeRequest.transId}");
 
-            RechargeResponseEnvelope resultEnvelope = new RechargeResponseEnvelope();
+            PretupsRechargeResponseEnvelope.COMMAND resultEnvelope = new PretupsRechargeResponseEnvelope.COMMAND();
             try
             {
                 string rechargeType = pinRechargeRequest.rechargeType == 2 ? _settings.transactionType.DataPurchase : _settings.transactionType.AirtimePurchase;
 
                 string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                
+
 
                 var sb = new System.Text.StringBuilder(468);
                 sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
                 sb.AppendLine(@"<!DOCTYPE COMMAND PUBLIC ""-//Ocam//DTD XML Command1.0//EN"" ""xml/command.dtd"">");
                 sb.AppendLine(@"<COMMAND>");
-                sb.AppendLine(@"   <TYPE>" + rechargeType  + "</TYPE>");
-                sb.AppendLine(@"   <DATE>" + tranDate+ "</DATE>");
+                sb.AppendLine(@"   <TYPE>" + rechargeType + "</TYPE>");
+                sb.AppendLine(@"   <DATE>" + tranDate + "</DATE>");
                 sb.AppendLine(@"   <EXTNWCODE>NG</EXTNWCODE>");
-                sb.AppendLine(@"   <MSISDN>"+ _settings.PartnerMsisdn +"</MSISDN>");
-                sb.AppendLine(@"   <PIN>"+ _settings.PIN +"</PIN>");
+                sb.AppendLine(@"   <MSISDN>" + _settings.PartnerMsisdn + "</MSISDN>");
+                sb.AppendLine(@"   <PIN>" + _settings.PIN + "</PIN>");
                 sb.AppendLine(@"   <LOGINID />");
                 sb.AppendLine(@"   <PASSWORD />");
                 sb.AppendLine(@"   <EXTCODE />");
-                sb.AppendLine(@"   <EXTREFNUM>"+ _settings.PartnerCode +"</EXTREFNUM>");
+                sb.AppendLine(@"   <EXTREFNUM>" + _settings.PartnerCode + "</EXTREFNUM>");
                 sb.AppendLine(@"   <SUBSMSISDN>" + pinRechargeRequest.Msisdn + "</SUBSMSISDN>");
-                sb.AppendLine(@"   <AMT>" + pinRechargeRequest .Amount + "</AMT>");
-                sb.AppendLine(@"   <SUBSERVICE>" + pinRechargeRequest.ProductCode +"</SUBSERVICE>");
+                sb.AppendLine(@"   <AMT>" + pinRechargeRequest.Amount + "</AMT>");
+                sb.AppendLine(@"   <SUBSERVICE>" + pinRechargeRequest.ProductCode + "</SUBSERVICE>");
                 sb.AppendLine(@"</COMMAND>");
 
-                _logger.LogInformation($"DataRecharge soap request = {sb.ToString()}");  
+                _logger.LogInformation($"DataRecharge soap request = {sb.ToString()}");
 
 
                 var httpClient = _clientFactory.CreateClient("PretupsRechargeClient");
@@ -228,8 +251,8 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                     {
                         using (XmlReader reader = new XmlTextReader(stringReader))
                         {
-                            var serializer = new XmlSerializer(typeof(RechargeResponseEnvelope));
-                            resultEnvelope = serializer.Deserialize(reader) as RechargeResponseEnvelope;
+                            var serializer = new XmlSerializer(typeof(PretupsRechargeResponseEnvelope.COMMAND));
+                            resultEnvelope = serializer.Deserialize(reader) as PretupsRechargeResponseEnvelope.COMMAND;
                         }
                     }
 
@@ -262,7 +285,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
             {
 
                 var sb = new System.Text.StringBuilder(1244);
-                    
+
 
                 _logger.LogInformation($"QueryTransactionStatus soap request = {sb.ToString()}");  //
 
@@ -277,7 +300,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                 _logger.LogInformation($"Calling QueryBalanceRequest URL  {request.RequestUri}");
                 //request.Headers.Clear();
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
-                
+
 
                 using (var response = await httpClient.SendAsync(request,
                     HttpCompletionOption.ResponseHeadersRead))
@@ -313,7 +336,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                     }
                     var contentStream = await response.Content.ReadAsStringAsync();
 
-                    _logger.LogInformation($"QueryTransactionStatus response = {contentStream}"); 
+                    _logger.LogInformation($"QueryTransactionStatus response = {contentStream}");
                     using (var stringReader = new StringReader(contentStream))
                     {
                         using (XmlReader reader = new XmlTextReader(stringReader))

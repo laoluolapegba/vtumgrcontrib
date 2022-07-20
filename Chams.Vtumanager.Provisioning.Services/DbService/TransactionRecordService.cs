@@ -1,6 +1,8 @@
 ﻿using Chams.Vtumanager.Provisioning.Data;
 using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
 using Chams.Vtumanager.Provisioning.Entities.Common;
+using Chams.Vtumanager.Provisioning.Entities.Epurse;
+using Chams.Vtumanager.Provisioning.Entities.Inventory;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.Authentication;
 using Chams.Vtumanager.Provisioning.Services.QueService;
@@ -20,16 +22,18 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         private readonly IRepository<TopUpTransactionLog> _requestsRepo;
         private readonly IRepository<EpurseAccount> _epurserepo;
         private readonly IRepository<BusinessAccount> _partnerRepo;
+        private readonly IRepository<Stock_Details> _stockRepo;
 
         public TransactionRecordService(
             ILogger<TransactionRecordService> logger,
-            
+
             IUnitOfWork unitOfWork)
         {
             _logger = logger;
             _requestsRepo = unitOfWork.GetRepository<TopUpTransactionLog>();
             _epurserepo = unitOfWork.GetRepository<EpurseAccount>();
             _partnerRepo = unitOfWork.GetRepository<BusinessAccount>();
+            _stockRepo = unitOfWork.GetRepository<Stock_Details>();
         }
         /// <summary>
         /// 
@@ -69,7 +73,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                 sourcesystem = rechargeRequest.SourceSystemId,
                 serviceprovidername = serviceprovidername,
                 CountRetries = 0,
-                
+
 
             };
             var requestObkect = await _requestsRepo.AddAsync(topUpRequest);
@@ -78,67 +82,53 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             return transactionStatus;
 
         }
-        public async Task<bool> TopUpBusinessAccount(AccountTopUpRequest accountTopUpRequest)
+        public async Task<EpurseAccount> CreditEpurseAccount(AccountTopUpRequest accountTopUpRequest)
         {
-            bool successful = false;
 
-            int acctcount = _epurserepo.GetQueryable()
-                .Where(a => a.partner_id == accountTopUpRequest.PartnerId && a.serviceprovider_id == accountTopUpRequest.ServiceProviderId).Count();
-            if(acctcount > 0)
+
+            //int acctcount = _epurserepo.GetQueryable()
+            //    .Where(a => a.PartnerId == accountTopUpRequest.PartnerId).Count();
+            var epurseacct = _epurserepo.GetQueryable()
+                .Where(a => a.PartnerId == accountTopUpRequest.PartnerId && a.TenantId == accountTopUpRequest.TenantId).FirstOrDefault();
+            if(epurseacct != null)
             {
-                var epurseacct = _epurserepo.GetQueryable()
-                .Where(a => a.partner_id == accountTopUpRequest.PartnerId && a.serviceprovider_id == accountTopUpRequest.ServiceProviderId).FirstOrDefault();
-
                 epurseacct.LastCreditDate = DateTime.Now;
                 epurseacct.CreatedBy = accountTopUpRequest.CreatedBy;
                 epurseacct.AuthorisedBy = epurseacct.AuthorisedBy;
-                epurseacct.main_account_balance = epurseacct.main_account_balance + accountTopUpRequest.Amount;
+                epurseacct.MainAcctBalance = epurseacct.MainAcctBalance + accountTopUpRequest.Amount;
 
                 await _epurserepo.UpdateAsync(epurseacct);
+                await _epurserepo.SaveAsync();
             }
-            else
-            {
-                EpurseAccount epurseAcct = new EpurseAccount
-                {
-                    LastCreditDate = DateTime.Now,
-                    CreatedBy = accountTopUpRequest.CreatedBy,
-                    AuthorisedBy = accountTopUpRequest.AuthorisedBy,
-                    main_account_balance =  accountTopUpRequest.Amount,
-                    serviceprovider_id = accountTopUpRequest.ServiceProviderId,
-                    partner_id = accountTopUpRequest.PartnerId
-                 };
-
-                await _epurserepo.AddAsync(epurseAcct);
-            }
-
-            return successful;
+            
+            return epurseacct;
         }
+
+
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="partnerId"></param>
-        /// <param name="serviceProviderId"></param>
+        /// <param name="PartnerId"></param>
         /// <returns></returns>
-        public async Task<EpurseAccount> GetEpurseAccountBal(AccountBalRequest accountBalRequest)
+        public async Task<EpurseAccount> GetEpurseByPartnerId(int PartnerId)
         {
-            
+
             EpurseAccount epurseAccount = _epurserepo.GetQueryable()
-                .Where(a => a.partner_id == accountBalRequest.PartnerId && a.serviceprovider_id == accountBalRequest.ServiceProviderId).FirstOrDefault();
-            
+                .Where(a => a.PartnerId == PartnerId).FirstOrDefault();
+
 
             return epurseAccount;
         }
-       
-
-        public async Task<List<EpurseAccount>> GetAllEpurseAccounts(string partnerId)
+        public async Task<IEnumerable<EpurseAccount>> GetEpurseAccounts()
         {
 
-             var epurseAccounts = _epurserepo.GetQueryable()
-                .Where(a => a.partner_id == partnerId).ToList();
-
+            var epurseAccounts = _epurserepo.GetAll();
 
             return epurseAccounts;
         }
+
+
+
         public bool IsPartnerExist(string partnerId)
         {
             _logger.LogInformation($"Checking if IspartnerExists from Database : {partnerId}");
@@ -147,6 +137,63 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                 .Where(a => a.AccountCode == partnerId); ;
             return requestObkect.Count() > 0;
 
+        }
+        public bool IsEpurseExist(int partnerId, int tenantId)
+        {
+            _logger.LogInformation($"Checking if IsEpurseExist from Database : {partnerId}");
+            var requestObkect = _epurserepo.GetQueryable()
+
+                .Where(a => a.PartnerId == partnerId && a.TenantId == tenantId); 
+            return requestObkect.Count() > 0;
+
+        }
+        public async Task<EpurseAccount> CreateEpurseAccount(EpurseAccount epurseAccount)
+        {
+            epurseAccount.MainAcctBalance = 0;
+            epurseAccount.RewardPoints = 0;
+            epurseAccount.CommissionAcctBalance = 0;
+            epurseAccount.CreatedBy = epurseAccount.CreatedBy;
+            epurseAccount.AuthorisedBy = epurseAccount.AuthorisedBy;
+
+
+            await _epurserepo.AddAsync(epurseAccount);
+            await _epurserepo.SaveAsync();
+
+
+            var acctcount = _epurserepo.GetQueryable()
+                .Where(a => a.PartnerId == epurseAccount.PartnerId && a.TenantId == epurseAccount.TenantId).FirstOrDefault();
+
+
+            return acctcount;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="partnerId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<StockBalanceView>> GetStockbalancesbyPartnerId(int partnerId)
+        {
+            //var list1 = dbEntities.People.
+            //GroupBy(m => m.PersonType).
+            //Select(c =>
+            //    new
+            //    {
+            //        Type = c.Key,
+            //        Max = c.Max(),
+            //    });
+
+            var balances = _stockRepo.GetQueryable()
+                .Where(a => a.partner_id == partnerId)
+                .GroupBy(a => a.service_provider_id)
+                .Select( g => 
+                new StockBalanceView
+                { 
+                    ServiceProviderId = g.Key,
+                    PartnerId = partnerId,
+                    Qoh = g.Sum( a=>a.quantity)
+                });
+
+            return balances;
         }
     }
 }

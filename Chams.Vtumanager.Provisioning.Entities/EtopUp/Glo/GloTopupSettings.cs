@@ -12,6 +12,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.EtopUp.Glo
             public string Id { get; set; }
             public string UserId { get; set; }
             public string Password { get; set; }
+            public string DealerNo { get; set; }
         }
         public string Url { get; set; }
     }

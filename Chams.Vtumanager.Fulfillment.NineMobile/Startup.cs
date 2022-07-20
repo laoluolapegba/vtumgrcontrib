@@ -28,6 +28,9 @@ using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using Chams.Vtumanager.Provisioning.Hangfire.Services;
 using Chams.Vtumanager.Provisioning.Services.NineMobileEvc;
+using Chams.Vtumanager.Provisioning.Services.Mtn;
+using Chams.Vtumanager.Provisioning.Services.GloTopup;
+using Chams.Vtumanager.Fulfillment.NineMobile.Services;
 
 namespace Sales_Mgmt.Services.Smtp.Hangfire
 {
@@ -64,14 +67,10 @@ namespace Sales_Mgmt.Services.Smtp.Hangfire
             services.AddDbContext<ChamsProvisioningDbContext>(options =>
             {
                 options.UseMySql(_config.GetConnectionString("DefaultConnection"));
-                //serverOptions => serverOptions.MigrationsAssembly("Epccos")); ;
+                
             });
 
-
-
-            /* services.AddDbContext<SmtCpmsDbContext>(options => {
-                options.UseSqlServer(_config.GetConnectionString("DestinationSqlServerForOrder"));
-            }); */
+            
 
             services.AddControllersWithViews();
 
@@ -116,7 +115,19 @@ namespace Sales_Mgmt.Services.Smtp.Hangfire
 
             services.AddHttpClient("GloRechargeClient", c =>
             {
-                c.BaseAddress = new Uri(_config["PretupsSettings:Url"]);
+                c.BaseAddress = new Uri(_config["GloTopupSettings:Url"]);
+            }).ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; }
+                };
+                return handler;
+
+            });
+            services.AddHttpClient("MtnTopupClient", c =>
+            {
+                c.BaseAddress = new Uri(_config["MtnTopupSettings:V1:Url"]);
             }).ConfigurePrimaryHttpMessageHandler(() =>
             {
                 var handler = new HttpClientHandler
@@ -194,8 +205,11 @@ namespace Sales_Mgmt.Services.Smtp.Hangfire
             
 
             services.AddScoped<ILightEvcService, LightEvcService>();
-           
-            
+            services.AddScoped<IMtnTopupService, MtnTopupService>();
+            services.AddScoped<IGloTopupService, GloTopupService>();
+            services.AddScoped<IAirtelPretupsService, AirtelPretupsService>();
+
+
         }
 
         /// <summary>

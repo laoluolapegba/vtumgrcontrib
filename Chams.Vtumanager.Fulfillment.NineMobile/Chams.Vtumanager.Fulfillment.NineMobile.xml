@@ -90,10 +90,133 @@
         <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ResultHeader.ResultDesc">
             <remarks/>
         </member>
+        <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.IServiceProvider">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.IServiceProvider.DoProcessing">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.MtnProcessor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.MtnProcessor.#ctor(Chams.Vtumanager.Provisioning.Entities.EtopUp.PinlessRechargeRequest,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService)">
+            <summary>
+            
+            </summary>
+            <param name="pinlessRechargeRequest"></param>
+            <param name="gloTopupService"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.MtnProcessor.DoProcessing">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.NineMobileProcessor">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.NineMobileProcessor.#ctor(Chams.Vtumanager.Provisioning.Entities.EtopUp.PinlessRechargeRequest,Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService)">
+            <summary>
+            
+            </summary>
+            <param name="pinlessRechargeRequest"></param>
+            <param name="evcService"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.NineMobileProcessor.DoProcessing">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask},Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService,Chams.Vtumanager.Fulfillment.NineMobile.Services.IAirtelPretupsService,Chams.Vtumanager.Provisioning.Services.Mtn.IMtnTopupService,Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory)">
+            <summary>
+            
+            </summary>
+            <param name="unitOfWork"></param>
+            <param name="mapper"></param>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="evcService"></param>
+            <param name="gloTopupService"></param>
+            <param name="airtelPreupsService"></param>
+            <param name="mtnToupService"></param>
+            <param name="config"></param>
+            <param name="_httpClientFactory"></param>
+        </member>
         <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.ProcessPendingRequests">
             <summary>
             
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.GetPendingJobs">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask.GetPendingJobs">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask.ProcessPendingRequests">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
             <returns></returns>
         </member>
     </members>

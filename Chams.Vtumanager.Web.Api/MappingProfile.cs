@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Chams.Vtumanager.Provisioning.Entities.Epurse;
 using Chams.Vtumanager.Web.Api.ViewModels;
 
 
@@ -8,7 +9,8 @@ namespace Chams.Vtumanager.Web.Api
     {
         public MappingProfile()
         {
-           
+            CreateMap<EpurseAccountModel, EpurseAccount>()
+                .ReverseMap();
         }
     }
 }

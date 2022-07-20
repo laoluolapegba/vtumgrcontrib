@@ -10,7 +10,7 @@ namespace Sales_Mgmt.Services.Smtp.Hangfire
     {
         public MappingProfile()
         {
-
+             
         }
     }
 }

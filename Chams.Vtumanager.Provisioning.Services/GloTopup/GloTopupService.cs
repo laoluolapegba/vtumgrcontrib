@@ -19,7 +19,7 @@ using Chams.Vtumanager.Provisioning.Entities.EtopUp.Glo;
 
 namespace Chams.Vtumanager.Provisioning.Services.GloTopup
 {
-    public class GloTopupService
+    public class GloTopupService : IGloTopupService
     {
 
         private readonly IConfiguration _config;
@@ -37,8 +37,8 @@ namespace Chams.Vtumanager.Provisioning.Services.GloTopup
             IConfiguration config,
             ILogger<GloTopupService> logger,
 IHttpClientFactory clientFactory)
-{
-_config = config;
+        {
+            _config = config;
             _logger = logger;
             _clientFactory = clientFactory;
             _settings = new GloTopupSettings();
@@ -50,60 +50,47 @@ _config = config;
         /// </summary>
         /// <param name="pinRechargeRequest"></param>
         /// <returns></returns>
-        public async Task<GloAirtimeResultEnvelope> GloAirtimeRecharge(PinlessRechargeRequest pinRechargeRequest)
+        public async Task<GloAirtimeResultEnvelope.Envelope> GloAirtimeRecharge(PinlessRechargeRequest pinRechargeRequest)
         {
 
             _logger.LogInformation($"calling GloAirtimeRecharge svc for transId : {pinRechargeRequest.transId}");
-
-            GloAirtimeResultEnvelope resultEnvelope = new GloAirtimeResultEnvelope();
+            string dealerNo = _config["GloTopupSettings:InitiatorPrincipal:DealerNo"];
+            string password = _config["GloTopupSettings:InitiatorPrincipal:Password"];
+            GloAirtimeResultEnvelope.Envelope resultEnvelope = new GloAirtimeResultEnvelope.Envelope();
             try
             {
 
-                string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                var sb = new System.Text.StringBuilder(1951);
-                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
-                sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:ext=""http://external.interfaces.ers.seamless.com/"">");
-                sb.AppendLine(@"   <soapenv:Header />");
+                //string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                var sb = new System.Text.StringBuilder(487);
+                sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:vtu=""http://vtu.glo.com"">");
+                sb.AppendLine(@"   <soapenv:Header/>");
                 sb.AppendLine(@"   <soapenv:Body>");
-                sb.AppendLine(@"      <ext:requestTopup> ");
-                sb.AppendLine(@"         <context>");
-                sb.AppendLine(@"            <channel>WSClient</channel> ");
-                sb.AppendLine(@"            <clientComment>"+ pinRechargeRequest.transId + "</clientComment> ");
-                sb.AppendLine(@"            <clientId>ERS</clientId> ");
-                sb.AppendLine(@"            <clientReference>" + pinRechargeRequest.transId + "</clientReference>");
-                sb.AppendLine(@"            <clientRequestTimeout>500</clientRequestTimeout>");
-                sb.AppendLine(@"            <initiatorPrincipalId>");
-                sb.AppendLine(@"               <id>" + _settings.Initiator.Id + "</id> ");
-                sb.AppendLine(@"               <type>RESELLERUSER</type> ");
-                sb.AppendLine(@"               <userId>"+ _settings.Initiator.UserId  + "</userId>");
-                sb.AppendLine(@"            </initiatorPrincipalId> ");
-                sb.AppendLine(@"            <password>" + _settings.Initiator.Password  + "</password>");
-                sb.AppendLine(@"         </context>");
-                sb.AppendLine(@"         <senderPrincipalId>");
-                sb.AppendLine(@"            <id>" + _settings.Initiator.Id + "</id>");
-                sb.AppendLine(@"            <type>RESELLERUSER</type>            ");
-                sb.AppendLine(@"            <userId>" + _settings.Initiator.UserId + "</userId>");
-                sb.AppendLine(@"         </senderPrincipalId>         ");
-                sb.AppendLine(@"         <topupPrincipalId>            ");
-                sb.AppendLine(@"            <id>"+ pinRechargeRequest.Msisdn + "</id>");
-                sb.AppendLine(@"            <type>SUBSCRIBERMSISDN</type>");
-                sb.AppendLine(@"            <userId>?</userId>");
-                sb.AppendLine(@"         </topupPrincipalId>");
-                sb.AppendLine(@"         <senderAccountSpecifier>");
-                sb.AppendLine(@"            <accountId>" + _settings.Initiator.Id +"</accountId>");
-                sb.AppendLine(@"            <accountTypeId>RESELLER</accountTypeId>");
-                sb.AppendLine(@"         </senderAccountSpecifier> ");
-                sb.AppendLine(@"            <accountId>"+ pinRechargeRequest.Msisdn + "</accountId>");
-                sb.AppendLine(@"            <accountTypeId>AIRTIME</accountTypeId>");
-                sb.AppendLine(@"         </topupAccountSpecifier>");
-                sb.AppendLine(@"         <productId>TOPUP</productId>");
-                sb.AppendLine(@"         <amount>");
-                sb.AppendLine(@"            <currency>NGN</currency>");
-                sb.AppendLine(@"            <value>" + pinRechargeRequest.Amount + "</value>");
-                sb.AppendLine(@"         </amount>");
-                sb.AppendLine(@"      </ext:requestTopup>");
+                sb.AppendLine(@"      <vtu:Vend>");
+                sb.AppendLine(@"         <DestAccount>" + pinRechargeRequest.Msisdn + "</DestAccount>");
+                sb.AppendLine(@"         <Amount>" + pinRechargeRequest.Amount + "</Amount>");
+                sb.AppendLine(@"         <Msg>Airtime Purchase</Msg>");
+                sb.AppendLine(@"         <SequenceNo>"+ pinRechargeRequest.transId + "</SequenceNo>");
+                sb.AppendLine(@"         <DealerNo>" + dealerNo + "</DealerNo>");
+                sb.AppendLine(@"         <Password>"+ password + "</Password>");
+                sb.AppendLine(@"      </vtu:Vend>");
                 sb.AppendLine(@"   </soapenv:Body>");
                 sb.AppendLine(@"</soapenv:Envelope>");
+
+                //var sb = new System.Text.StringBuilder(487);
+                //sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:vtu=""http://vtu.glo.com"">");
+                //sb.AppendLine(@"   <soapenv:Header/>");
+                //sb.AppendLine(@"   <soapenv:Body>");
+                //sb.AppendLine(@"      <vtu:Vend>");
+                //sb.AppendLine(@"         <DestAccount>08055555108</DestAccount>");
+                //sb.AppendLine(@"         <Amount>50</Amount>");
+                //sb.AppendLine(@"         <Msg>Airtiem Purchase</Msg>");
+                //sb.AppendLine(@"         <SequenceNo>202207151848453</SequenceNo>");
+                //sb.AppendLine(@"         <DealerNo>05720150819131328AG</DealerNo>");
+                //sb.AppendLine(@"         <Password>mmt10mmt10</Password>");
+                //sb.AppendLine(@"      </vtu:Vend>");
+                //sb.AppendLine(@"   </soapenv:Body>");
+                //sb.AppendLine(@"</soapenv:Envelope>");
+
 
                 _logger.LogInformation($"GloAirtimeRecharge soap request = {sb.ToString()}");  //
 
@@ -144,8 +131,8 @@ _config = config;
                     {
                         using (XmlReader reader = new XmlTextReader(stringReader))
                         {
-                            var serializer = new XmlSerializer(typeof(GloAirtimeResultEnvelope));
-                            resultEnvelope = serializer.Deserialize(reader) as GloAirtimeResultEnvelope;
+                            var serializer = new XmlSerializer(typeof(GloAirtimeResultEnvelope.Envelope));
+                            resultEnvelope = serializer.Deserialize(reader) as GloAirtimeResultEnvelope.Envelope;
                         }
                     }
 
@@ -163,15 +150,15 @@ _config = config;
             return resultEnvelope;
         }
 
-        public async Task<GloDataResultEnvelope> GloDataRecharge(PinlessRechargeRequest pinRechargeRequest)
+        public async Task<GloDataResultEnvelope.Envelope> GloDataRecharge(PinlessRechargeRequest pinRechargeRequest)
         {
 
             _logger.LogInformation($"calling GloDataRecharge svc for transId : {pinRechargeRequest.transId}");
 
-            GloDataResultEnvelope resultEnvelope = new GloDataResultEnvelope();
+            GloDataResultEnvelope.Envelope resultEnvelope = new GloDataResultEnvelope.Envelope();
             try
             {
-               
+
                 string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
                 var sb = new System.Text.StringBuilder(2079);
                 sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:ext=""http://external.interfaces.ers.seamless.com/"">");
@@ -221,7 +208,7 @@ _config = config;
                 sb.AppendLine(@"          <accountTypeId>DATA_BUNDLE</accountTypeId>");
                 sb.AppendLine(@"       </topupAccountSpecifier>");
                 sb.AppendLine(@"       <!--Optional:-->");
-                sb.AppendLine(@"       <productId>" + pinRechargeRequest.ProductCode +  "</productId>");
+                sb.AppendLine(@"       <productId>" + pinRechargeRequest.ProductCode + "</productId>");
                 sb.AppendLine(@"       <!--Optional:-->");
                 sb.AppendLine(@"       <amount>");
                 sb.AppendLine(@"          <currency>NGN</currency>");
@@ -270,8 +257,8 @@ _config = config;
                     {
                         using (XmlReader reader = new XmlTextReader(stringReader))
                         {
-                            var serializer = new XmlSerializer(typeof(GloDataResultEnvelope));
-                            resultEnvelope = serializer.Deserialize(reader) as GloDataResultEnvelope;
+                            var serializer = new XmlSerializer(typeof(GloDataResultEnvelope.Envelope));
+                            resultEnvelope = serializer.Deserialize(reader) as GloDataResultEnvelope.Envelope;
                         }
                     }
 

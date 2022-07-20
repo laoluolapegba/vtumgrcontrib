@@ -4,40 +4,54 @@
         <name>Chams.Vtumanager.Web.Api</name>
     </assembly>
     <members>
-        <member name="T:Chams.Vtumanager.Web.Api.Controllers.v1.TopupTransController">
+        <member name="T:Chams.Vtumanager.Web.Api.Controllers.v1.EpurseController">
             <summary>
             
             </summary>
         </member>
-        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.TopupTransController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Web.Api.Controllers.v1.TopupTransController},Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
+        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.EpurseController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Web.Api.Controllers.v1.EpurseController},Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService,AutoMapper.IMapper)">
+            <summary>
+            
+            </summary>
+            <param name="logger"></param>
+            <param name="transactionRecordService"></param>
+            <param name="mapper"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.EpurseController.GetAccountbyPartnerId(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            
+            </summary>
+            <param name="partnerId"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Chams.Vtumanager.Web.Api.Controllers.v1.EpurseController.EpurseTopUp(Chams.Vtumanager.Web.Api.ViewModels.EpurseTopUpRequest,System.Threading.CancellationToken)" -->
+        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.EpurseController.Epurse(Chams.Vtumanager.Web.Api.ViewModels.EpurseAccountModel,System.Threading.CancellationToken)">
+            <summary>
+            
+            </summary>
+            <param name="epurseAccountModel"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Web.Api.Controllers.v1.InventoryController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.InventoryController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Web.Api.Controllers.v1.InventoryController},Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
             <summary>
             
             </summary>
             <param name="logger"></param>
             <param name="transactionRecordService"></param>
         </member>
-        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.TopupTransController.VtuTopUp(Chams.Vtumanager.Web.Api.ViewModels.StockTopUpRequest,System.Threading.CancellationToken)">
+        <!-- Badly formed XML comment ignored for member "M:Chams.Vtumanager.Web.Api.Controllers.v1.InventoryController.GetInventorybyPartnerId(System.Int32,System.Threading.CancellationToken)" -->
+        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.InventoryController.StockPurchase(Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest,System.Threading.CancellationToken)">
             <summary>
-            
+            Purchase Stock using 
             </summary>
-            <param name="stockTopUpRequest"></param>
-            <param name="cancellation"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.TopupTransController.GetAccountBalancebyPartnerId(System.String,System.Int32,System.Threading.CancellationToken)">
-            <summary>
-            
-            </summary>
-            <param name="partnerId"></param>
-            <param name="serviceProviderId"></param>
-            <param name="cancellation"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.TopupTransController.GetAllAccountBalancebyPartnerId(System.String,System.Threading.CancellationToken)">
-            <summary>
-            Returns All epurse accounts balance for a selected Business Account
-            </summary>
-            <param name="partnerId"></param>
+            <param name="stockPurchaseRequest"></param>
             <param name="cancellation"></param>
             <returns></returns>
         </member>
@@ -174,6 +188,11 @@
             <param name="swaggerDoc">SwaggerDocument</param>
             <param name="context">DocumentFilterContext</param>
         </member>
+        <member name="T:Chams.Vtumanager.Web.Api.Helpers.Validation.ModelStateExtensions">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Chams.Vtumanager.Web.Api.KestrelServerOptionsExtensions">
             <summary>
             
@@ -246,42 +265,37 @@
             <param name="host"></param>
             <returns></returns>
         </member>
-        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.AccountBalancesResponseView">
+        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.EpurseAccountModel">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.StockTopUpRequest">
+        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.EpurseTopUpRequest">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.StockTopUpResponse">
+        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.EpurseTopUpResponse">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockTopUpResponse.ResponseCode">
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.EpurseTopUpResponse.ResponseCode">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockTopUpResponse.ResponseDescription">
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.EpurseTopUpResponse.ResponseDescription">
             <summary>
             
             </summary>
         </member>
-        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockTopUpResponse.TransactionReference">
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.EpurseTopUpResponse.TransactionReference">
             <summary>
             
             </summary>
         </member>
         <member name="T:Sales_Mgmt.Services.Simplex.Api.Helpers.Validation.ValidatableObject">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Sales_Mgmt.Services.Simplex.Api.Helpers.Validation.ModelStateExtensions">
             <summary>
             
             </summary>

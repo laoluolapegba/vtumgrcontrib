@@ -9,6 +9,8 @@ using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
+using Chams.Vtumanager.Provisioning.Entities.Epurse;
+using Chams.Vtumanager.Provisioning.Entities.Inventory;
 
 namespace Chams.Vtumanager.Provisioning.Data
 {
@@ -40,6 +42,7 @@ namespace Chams.Vtumanager.Provisioning.Data
         public DbSet<TopUpTransactionLog> TopUpRequests { get; set; }
         public DbSet<EpurseAccount> EpurseAccounts { get; set; }
         public DbSet<BusinessAccount> BusinessAccounts { get; set; }
+        public DbSet<Stock_Details> StockDetails { get; set; }
         private void OnEntityUpdating()
         {
             var entries = ChangeTracker.Entries();

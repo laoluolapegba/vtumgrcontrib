@@ -5,14 +5,11 @@ using System.Threading.Tasks;
 
 namespace Chams.Vtumanager.Web.Api.ViewModels
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class StockTopUpRequest
+    public class StockPurchaseRequest
     {
-        public string PartnerId { get; set; }
-        public decimal Amount { get; set; }
+        public int PartnerId { get; set; }
+        public int tenantId { get; set; }
         public int ServiceProviderId { get; set; }
-
+        public int Quantity { get; set; }
     }
 }
