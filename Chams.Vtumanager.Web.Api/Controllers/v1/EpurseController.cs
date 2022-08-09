@@ -57,7 +57,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
         [HttpGet("{partnerId}", Name = "Get")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(EpurseAccount), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(EpurseAccountMaster), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAccountbyPartnerId(int partnerId,
@@ -66,7 +66,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
             try
             {
                 _logger.LogInformation("API ENTRY: Inside Epurse Get API call.");
-                var result = await _transactionRecordService.GetEpurseByPartnerId(partnerId);
+                var result = _transactionRecordService.GetEpurseByPartnerId(partnerId);
 
 
                 return Ok(new
@@ -90,7 +90,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
         [HttpGet]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(IEnumerable<EpurseAccount>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<EpurseAccountMaster>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Get()
@@ -167,7 +167,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                     return Ok(new
                     {
                         status = "00",
-                        message = "Topup Succeeded",
+                        message = "Topup Successful",
                         data = epacct
 
                     });
@@ -205,7 +205,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
         [HttpPost("Create")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(EpurseAccount), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(EpurseAccountMaster), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Epurse(EpurseAccountModel epurseAccountModel,
@@ -217,7 +217,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                 if (ModelState.IsValid)
                 {
                     _logger.LogInformation("API ENTRY: Inside Epurse Create API call.");
-                    EpurseAccount epurseAccount = new EpurseAccount
+                    EpurseAccountMaster epurseAccount = new EpurseAccountMaster
                     {
                         PartnerId = epurseAccountModel.PartnerId,
                         TenantId = epurseAccountModel.TenantId,
@@ -225,12 +225,22 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                         AuthorisedBy = epurseAccountModel.AuthorisedBy
                     };
 
-                    var acct = await _transactionRecordService.GetEpurseByPartnerId(epurseAccount.PartnerId);
+                    bool ispartnerExists = _transactionRecordService.IsPartnerExist(epurseAccountModel.PartnerId);
+                    if(!ispartnerExists)
+                    {
+                        return Ok(new
+                        {
+                            status = "01",
+                            message = $"Invalid PartnerId {epurseAccountModel.PartnerId}"
+                        });
+                    }
+
+                    var acct = _transactionRecordService.GetEpurseByPartnerId(epurseAccount.PartnerId);
                     if(acct != null)
                     {
                         return Ok(new
                         {
-                            status = "00",
+                            status = "02",
                             message = "Partner already exists",
                             data = acct
                         }); 

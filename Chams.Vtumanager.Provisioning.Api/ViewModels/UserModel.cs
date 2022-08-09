@@ -10,12 +10,33 @@ namespace Chams.Vtumanager.Provisioning.Api.ViewModels
     /// </summary>
     public class UserModel
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public string Username { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string Password { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string EmailAddress { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string Role { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string Lastname { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string Firstname { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         public string PrincipalCompany { get; set; }
     }
 }

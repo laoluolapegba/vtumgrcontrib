@@ -3,6 +3,7 @@ using Chams.Vtumanager.Provisioning.Api.ViewModels;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -24,6 +25,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     [Route("v{version:apiVersion}/api/[controller]")]
     [ApiController]
     [Produces("application/json")]
+    [Authorize]
     public class VtuManagerController : ControllerBase
     {
         private readonly ILogger<VtuManagerController> _logger;
@@ -72,7 +74,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 {
                     _logger.LogInformation("API ENTRY: Inside VtuTopUp API call.");
 
-                    bool isDuplicate = await _transactionRecordService.IsTransactionExist(rechargeRequest.TransactionReference);
+                    bool isDuplicate = _transactionRecordService.IsTransactionExist(rechargeRequest.TransactionReference);
                     if(isDuplicate)
                     {
                         return BadRequest(new

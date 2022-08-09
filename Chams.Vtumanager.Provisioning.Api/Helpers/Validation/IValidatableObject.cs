@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace Sales_Mgmt.Services.Simplex.Api.Helpers.Validation
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class ValidatableObject : IValidatableObject
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="validationContext"></param>
+        /// <returns></returns>
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             throw new NotImplementedException();

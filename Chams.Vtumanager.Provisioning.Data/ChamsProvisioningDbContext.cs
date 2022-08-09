@@ -40,9 +40,12 @@ namespace Chams.Vtumanager.Provisioning.Data
           
         }
         public DbSet<TopUpTransactionLog> TopUpRequests { get; set; }
-        public DbSet<EpurseAccount> EpurseAccounts { get; set; }
+        public DbSet<EpurseAccountMaster> EpurseAccounts { get; set; }
+        public DbSet<EpurseAcctTransactions> EpurseAcctTransactions { get; set; }
         public DbSet<BusinessAccount> BusinessAccounts { get; set; }
-        public DbSet<Stock_Details> StockDetails { get; set; }
+        public DbSet<StockDetails> StockDetails { get; set; }
+        public DbSet<VtuProducts> VtuProducts { get; set; }
+        public DbSet<User> Users { get; set; }
         private void OnEntityUpdating()
         {
             var entries = ChangeTracker.Entries();

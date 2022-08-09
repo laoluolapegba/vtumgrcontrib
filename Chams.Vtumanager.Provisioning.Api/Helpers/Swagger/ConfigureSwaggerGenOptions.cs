@@ -9,6 +9,9 @@ using System.Reflection;
 
 namespace Chams.Vtumanager.Provisioning.Api.Helpers.Swagger
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class ConfigureSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions>
     {
         private readonly IApiVersionDescriptionProvider provider;
@@ -27,6 +30,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Helpers.Swagger
 
             this.provider = versionDescriptionProvider;
             this.settings = swaggerSettings.Value ?? new SwaggerSettings();
+            
         }
 
         /// <inheritdoc />

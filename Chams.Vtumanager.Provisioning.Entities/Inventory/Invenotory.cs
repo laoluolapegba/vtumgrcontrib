@@ -7,7 +7,7 @@ using System.Text;
 namespace Chams.Vtumanager.Provisioning.Entities.Inventory
 {
     [Table("vtu_stock_details")]
-    public class Stock_Details
+    public class StockDetails
     {
        
         [Key]

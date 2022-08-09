@@ -7,6 +7,9 @@ using System.Linq;
 
 namespace Chams.Vtumanager.Provisioning.Api.Helpers.Swagger
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class ConfigureSwaggerUiOptions : IConfigureOptions<SwaggerUIOptions>
     {
         private readonly IApiVersionDescriptionProvider provider;

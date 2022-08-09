@@ -3,6 +3,9 @@ using Swashbuckle.AspNetCore.Swagger;
 
 namespace Chams.Vtumanager.Provisioning.Api.Helpers.Swagger
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class ConfigureSwaggerOptions : IConfigureOptions<SwaggerOptions>
     {
         private readonly SwaggerSettings settings;

@@ -1,4 +1,5 @@
-﻿using Chams.Vtumanager.Provisioning.Data;
+﻿using BCrypt.Net;
+using Chams.Vtumanager.Provisioning.Data;
 using Chams.Vtumanager.Provisioning.Entities;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Microsoft.Extensions.Configuration;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using BCrypt;
 
 namespace Chams.Vtumanager.Provisioning.Services.Authentication
 {
@@ -32,33 +34,41 @@ namespace Chams.Vtumanager.Provisioning.Services.Authentication
         {
 
             var userObj = _userRepo.GetQueryable()
-                .Where(a => a.Username.ToLower() == userLogin.Username.ToLower() && a.IsActive == true).FirstOrDefault();
-            //var salt = GenerateSalt();
+                .Where(a => a.EmailAddress.ToLower() == userLogin.Username.ToLower() && a.IsActive == true).FirstOrDefault();
+
+            //_logger.LogInformation($"Get user info from Database : {userObj}");
             if (userObj != null)
             {
-                string salt = userObj.PasswordSalt;
-                var inputpasswordHash = Convert.ToBase64String(ComputeHMAC_SHA256(Encoding.UTF8.GetBytes(userLogin.Password), Encoding.UTF8.GetBytes(salt)));
-                var userpasswordhash = userObj.Password;
-
                 return userObj;
             }
+            //if (userObj != null) 
+            //{
+            //    //string salt = userObj.PasswordSalt;
+            //    //var inputpasswordHash = Convert.ToBase64String(ComputeHMAC_SHA256(Encoding.UTF8.GetBytes(userLogin.Password), Encoding.UTF8.GetBytes(salt)));
+            //    //var userpasswordhash = userObj.Password;
+            //    var isveriified = BCrypt.Net.BCrypt.Verify(userLogin.Password, userObj.Password);
+            //    return userObj;
+            //}
             return null;
 
         }
         public string GenerateToken(User userModel)
         {
-            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]));
+            string secret = _config.GetSection("JWT:Secret").Value;
+            string issuer = _config.GetSection("JWT:ValidIssuer").Value;
+            string audience = _config.GetSection("JWT:ValidAudience").Value;
+            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, userModel.Username),
                 new Claim(ClaimTypes.Email, userModel.EmailAddress),
-                new Claim(ClaimTypes.GivenName, userModel.Firstname),
+                new Claim(ClaimTypes.GivenName, userModel.Username),
                 new Claim(ClaimTypes.Surname, userModel.Lastname),
-                new Claim(ClaimTypes.Role, userModel.Role)
+                //new Claim(ClaimTypes.Role, userModel.Role)
             };
-            var token = new JwtSecurityToken(_config["JWT:ValidIssuer"],
-                _config["JWT:ValidAudience"],
+            var token = new JwtSecurityToken(issuer,
+                audience,
                 claims,
                 expires: DateTime.Now.AddMinutes(15),
                 signingCredentials: credentials);

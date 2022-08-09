@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace Sales_Mgmt.Services.Simplex.Api.Helpers.Validation
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class ModelStateExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <returns></returns>
         public static List<string> GetErrorMessages(this ModelStateDictionary dictionary)
         {
             return dictionary.SelectMany(m => m.Value.Errors)

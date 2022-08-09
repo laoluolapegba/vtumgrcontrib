@@ -9,12 +9,19 @@
             
             </summary>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Chams.Vtumanager.Provisioning.Services.Authentication.IAuthenticationService)">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Chams.Vtumanager.Provisioning.Services.Authentication.IAuthenticationService,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController})">
             <summary>
             
             </summary>
             <param name="config"></param>
             <param name="authenticationService"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController.Login(Chams.Vtumanager.Provisioning.Api.ViewModels.UserLogin)">
+            <summary>
+            Login
+            </summary>
+            <param name="userLogin"></param>
+            <returns></returns>
         </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController">
             <summary>
@@ -45,6 +52,11 @@
             <param name="cancellation"></param>
             <returns></returns>
         </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions.#ctor(Microsoft.AspNetCore.Mvc.ApiExplorer.IApiVersionDescriptionProvider,Microsoft.Extensions.Options.IOptions{Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings})">
             <summary>
             Initializes a new instance of the <see cref="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions"/> class.
@@ -55,11 +67,21 @@
         <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions.Configure(Swashbuckle.AspNetCore.SwaggerGen.SwaggerGenOptions)">
             <inheritdoc />
         </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerOptions">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerOptions.#ctor(Microsoft.Extensions.Options.IOptions{Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings})">
             <inheritdoc />
         </member>
         <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerOptions.Configure(Swashbuckle.AspNetCore.Swagger.SwaggerOptions)">
             <inheritdoc />
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerUiOptions">
+            <summary>
+            
+            </summary>
         </member>
         <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerUiOptions.#ctor(Microsoft.AspNetCore.Mvc.ApiExplorer.IApiVersionDescriptionProvider,Microsoft.Extensions.Options.IOptions{Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.SwaggerSettings})">
             <inheritdoc />
@@ -69,6 +91,11 @@
             Configure
             </summary>
             <param name="options"></param>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.MiddlewareExtensions">
+            <summary>
+            
+            </summary>
         </member>
         <member name="M:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.MiddlewareExtensions.UseSwaggerDocuments(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
             <summary>
@@ -157,6 +184,65 @@
             </summary>
             <param name="swaggerDoc">SwaggerDocument</param>
             <param name="context">DocumentFilterContext</param>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.ConfigureEndpoints(Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerOptions)">
+            <summary>
+            
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.LoadCertificate(Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            
+            </summary>
+            <param name="config"></param>
+            <param name="environment"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration.Host">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration.Port">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration.Scheme">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration.StoreName">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration.StoreLocation">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration.FilePath">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.KestrelServerOptionsExtensions.EndpointConfiguration.Password">
+            <summary>
+            
+            </summary>
         </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Program">
             <summary>
@@ -279,10 +365,84 @@
             
             </summary>
         </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.ViewModels.UserLogin">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserLogin.Username">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserLogin.Password">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel">
             <summary>
             
             </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel.Username">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel.Password">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel.EmailAddress">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel.Role">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel.Lastname">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel.Firstname">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.UserModel.PrincipalCompany">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Sales_Mgmt.Services.Simplex.Api.Helpers.Validation.ValidatableObject">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Sales_Mgmt.Services.Simplex.Api.Helpers.Validation.ValidatableObject.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            
+            </summary>
+            <param name="validationContext"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Sales_Mgmt.Services.Simplex.Api.Helpers.Validation.ModelStateExtensions">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Sales_Mgmt.Services.Simplex.Api.Helpers.Validation.ModelStateExtensions.GetErrorMessages(Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary)">
+            <summary>
+            
+            </summary>
+            <param name="dictionary"></param>
+            <returns></returns>
         </member>
     </members>
 </doc>

@@ -46,7 +46,14 @@
             <param name="logger"></param>
             <param name="transactionRecordService"></param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Chams.Vtumanager.Web.Api.Controllers.v1.InventoryController.GetInventorybyPartnerId(System.Int32,System.Threading.CancellationToken)" -->
+        <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.InventoryController.GetInventorybyPartnerId(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            
+            </summary>
+            <param name="partnerId"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
+        </member>
         <member name="M:Chams.Vtumanager.Web.Api.Controllers.v1.InventoryController.StockPurchase(Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest,System.Threading.CancellationToken)">
             <summary>
             Purchase Stock using 
@@ -291,6 +298,79 @@
             </summary>
         </member>
         <member name="P:Chams.Vtumanager.Web.Api.ViewModels.EpurseTopUpResponse.TransactionReference">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.PartnerId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.tenantId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.UserId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.items">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.Item">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.Item.ServiceProviderId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.Item.Quantity">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest1">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest1.PartnerId">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest1.tenantId">
+            <summary>
+            
+            </summary>
+            
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest1.ServiceProviderId">
+            <summary>
+            
+            </summary>
+            
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest1.Quantity">
+            <summary>
+            
+            </summary>
+            
+        </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest1.UserId">
             <summary>
             
             </summary>

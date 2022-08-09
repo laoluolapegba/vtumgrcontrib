@@ -46,9 +46,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
 
             _transactionRecordService = transactionRecordService;
         }
-        /// <summary>
        
-
         
 
         /// <summary>
@@ -127,15 +125,82 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
             {
                 if (ModelState.IsValid)
                 {
-                    _logger.LogInformation("API ENTRY: Inside StockPurchase API call.");
-
-                    var balances = await _transactionRecordService.GetStockbalancesbyPartnerId(stockPurchaseRequest.PartnerId);
-                    return Ok(new
+                    if(stockPurchaseRequest.items.Count() < 1)
                     {
-                        status = "00",
-                        message = "Success",
-                        data = balances
-                    });
+                        return BadRequest(new
+                        {
+                            status = "99",
+                            message = "Order must contain at least 1 item"
+
+                        });
+                    }
+
+                    _logger.LogInformation("API ENTRY: Inside StockPurchase API call.");
+                    StockPurchaseOrder stockPurchaseOrder = new StockPurchaseOrder
+                    {
+                        PartnerId = stockPurchaseRequest.PartnerId,
+                        tenantId = stockPurchaseRequest.tenantId,
+                        UserId = stockPurchaseRequest.UserId
+
+                    };
+                    var orderdetails = new List<StockPurchaseOrder.Item>();
+                    decimal orderTotal = 0;
+                    foreach (var item in stockPurchaseRequest.items)
+                    {
+                        StockPurchaseOrder.Item orderdetail = new StockPurchaseOrder.Item();
+                        orderdetail.Quantity = item.Quantity;
+                        orderdetail.ServiceProviderId = item.ServiceProviderId;
+                        orderdetails.Add(orderdetail);
+                        orderTotal += item.Quantity;
+
+                    }
+                    stockPurchaseOrder.items = orderdetails;
+
+                    var partnerAccount = _transactionRecordService.GetEpurseByPartnerId(stockPurchaseRequest.PartnerId);
+                    if(partnerAccount!=null)
+                    {
+                        decimal balance = partnerAccount.MainAcctBalance;
+
+                        if (balance < orderTotal)
+                        {
+                            return Ok(new
+                            {
+                                status = "03",
+                                message = "Insufficient Balance",
+
+                            });
+                        }
+
+                        var purchaseStatus = await _transactionRecordService.PurchaseStock(stockPurchaseOrder);
+                        if (purchaseStatus)
+                        {
+                            return Ok(new
+                            {
+                                status = "00",
+                                message = "Success",
+                                //data = balances
+                            });
+                        }
+                        else
+                        {
+                            return Ok(new
+                            {
+                                status = "04",
+                                message = "Stock Purchase failed",
+                                //data = balances
+                            });
+                        }
+                    }
+                    else
+                    {
+                        return Ok(new
+                        {
+                            status = "99",
+                            message = "Invalid Epurse Account",
+                            //data = balances
+                        });
+                    }
+                    
 
                 }
                 else

@@ -20,9 +20,11 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
     {
         private readonly ILogger<TransactionRecordService> _logger;
         private readonly IRepository<TopUpTransactionLog> _requestsRepo;
-        private readonly IRepository<EpurseAccount> _epurserepo;
+        private readonly IRepository<EpurseAccountMaster> _epurserepo;
         private readonly IRepository<BusinessAccount> _partnerRepo;
-        private readonly IRepository<Stock_Details> _stockRepo;
+        private readonly IRepository<StockDetails> _stockRepo;
+        private readonly IRepository<VtuProducts> _productsRepo;
+        private readonly IRepository<EpurseAcctTransactions> _epursetransRepo;
 
         public TransactionRecordService(
             ILogger<TransactionRecordService> logger,
@@ -31,21 +33,23 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         {
             _logger = logger;
             _requestsRepo = unitOfWork.GetRepository<TopUpTransactionLog>();
-            _epurserepo = unitOfWork.GetRepository<EpurseAccount>();
+            _epurserepo = unitOfWork.GetRepository<EpurseAccountMaster>();
             _partnerRepo = unitOfWork.GetRepository<BusinessAccount>();
-            _stockRepo = unitOfWork.GetRepository<Stock_Details>();
+            _stockRepo = unitOfWork.GetRepository<StockDetails>();
+            _productsRepo = unitOfWork.GetRepository<VtuProducts>();
+            _epursetransRepo = unitOfWork.GetRepository<EpurseAcctTransactions>();
         }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="transreference"></param>
         /// <returns></returns>
-        public async Task<bool> IsTransactionExist(string transreference)
+        public bool IsTransactionExist(string transreference)
         {
             _logger.LogInformation($"Checking if transactionexists from Database : {transreference}");
             var requestObkect = _requestsRepo.GetQueryable()
 
-                .Where(a => a.transref == transreference); ;
+                .Where(a => a.transref == transreference);
             return requestObkect.Count() > 0;
 
         }
@@ -82,7 +86,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             return transactionStatus;
 
         }
-        public async Task<EpurseAccount> CreditEpurseAccount(AccountTopUpRequest accountTopUpRequest)
+        public async Task<EpurseAccountMaster> CreditEpurseAccount(AccountTopUpRequest accountTopUpRequest)
         {
 
 
@@ -104,37 +108,37 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             return epurseacct;
         }
 
-
+        #region Epurse
         /// <summary>
         /// 
         /// </summary>
         /// <param name="PartnerId"></param>
         /// <returns></returns>
-        public async Task<EpurseAccount> GetEpurseByPartnerId(int PartnerId)
+        public EpurseAccountMaster GetEpurseByPartnerId(int PartnerId)
         {
 
-            EpurseAccount epurseAccount = _epurserepo.GetQueryable()
+            EpurseAccountMaster epurseAccount = _epurserepo.GetQueryable()
                 .Where(a => a.PartnerId == PartnerId).FirstOrDefault();
 
 
             return epurseAccount;
         }
-        public async Task<IEnumerable<EpurseAccount>> GetEpurseAccounts()
+        public async Task<IEnumerable<EpurseAccountMaster>> GetEpurseAccounts()
         {
 
-            var epurseAccounts = _epurserepo.GetAll();
+            var epurseAccounts = await _epurserepo.GetAllAsync();
 
             return epurseAccounts;
         }
 
 
 
-        public bool IsPartnerExist(string partnerId)
+        public bool IsPartnerExist(int partnerId)
         {
             _logger.LogInformation($"Checking if IspartnerExists from Database : {partnerId}");
             var requestObkect = _partnerRepo.GetQueryable()
 
-                .Where(a => a.AccountCode == partnerId); ;
+                .Where(a => a.PartnerId == partnerId); ;
             return requestObkect.Count() > 0;
 
         }
@@ -147,8 +151,21 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             return requestObkect.Count() > 0;
 
         }
-        public async Task<EpurseAccount> CreateEpurseAccount(EpurseAccount epurseAccount)
+        public async Task<EpurseAccountMaster> CreateEpurseAccount(EpurseAccountMaster epurseAccount)
         {
+            var lastacct = _epurserepo.GetQueryable()
+                .Where(a => a.TenantId == epurseAccount.TenantId).OrderByDescending(a=>a.AcctNo).FirstOrDefault();
+            int acctNo = 0;
+            if(lastacct == null)
+            {
+                epurseAccount.AcctNo = "1000001";
+            }
+            else
+            {
+                acctNo = int.Parse(lastacct.AcctNo) + 1;
+                epurseAccount.AcctNo = acctNo.ToString();
+            }
+
             epurseAccount.MainAcctBalance = 0;
             epurseAccount.RewardPoints = 0;
             epurseAccount.CommissionAcctBalance = 0;
@@ -160,12 +177,12 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             await _epurserepo.SaveAsync();
 
 
-            var acctcount = _epurserepo.GetQueryable()
-                .Where(a => a.PartnerId == epurseAccount.PartnerId && a.TenantId == epurseAccount.TenantId).FirstOrDefault();
+            
 
 
-            return acctcount;
+            return epurseAccount;
         }
+        #endregion
         /// <summary>
         /// 
         /// </summary>
@@ -194,6 +211,66 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                 });
 
             return balances;
+        }
+
+        public async Task<bool> PurchaseStock(StockPurchaseOrder stockPurchaseRequest)
+        {
+            int rowcount = 0;
+            var epurseacctObj = _epurserepo.GetQueryable()
+                .Where(a => a.PartnerId == stockPurchaseRequest.PartnerId).FirstOrDefault();
+
+            foreach (var orderLine in stockPurchaseRequest.items)
+            {
+                var product = _productsRepo.GetQueryable()
+                .Where(a => a.ServiceProviderId == orderLine.ServiceProviderId && a.ProductType == 1).FirstOrDefault();
+
+                //add d txn
+                var epurseaccttrans = new EpurseAcctTransactions
+                {
+                    PartnerId = stockPurchaseRequest.PartnerId,
+                    DrCr = "D",
+                    TranDate = DateTime.Now,
+                    TranDesc = "Stock Purchase",
+                    TenantId = stockPurchaseRequest.tenantId,
+                    TranAmount = orderLine.Quantity * product.Price,
+                    UserId = stockPurchaseRequest.UserId,
+                    AccountNo = epurseacctObj.AcctNo,
+                    ProductCode = product.ProductId
+
+
+                };
+                _epursetransRepo.Add(epurseaccttrans);
+
+                //add d inventory
+
+                var stockentry = new StockDetails
+                {
+                    partner_id = stockPurchaseRequest.PartnerId,
+                    price = 0,
+                    quantity = orderLine.Quantity,
+                    service_provider_id = orderLine.ServiceProviderId,
+                    tenant_id = stockPurchaseRequest.tenantId,
+                    trans_date = DateTime.Now,
+                    trans_type_id = 1,
+                    product_id = product.ProductId,
+                    user_id = stockPurchaseRequest.UserId
+                };
+                _stockRepo.Add(stockentry);
+
+
+                //debit
+                epurseacctObj.MainAcctBalance = epurseacctObj.MainAcctBalance - (orderLine.Quantity * product.Price);
+                await _epurserepo.UpdateAsync(epurseacctObj);
+
+            }
+
+            rowcount = await _epursetransRepo.SaveAsync(); rowcount = 0;
+            rowcount = await _epurserepo.SaveAsync(); rowcount = 0;
+            rowcount = await _stockRepo.SaveAsync();
+
+            return true;
+
+
         }
     }
 }

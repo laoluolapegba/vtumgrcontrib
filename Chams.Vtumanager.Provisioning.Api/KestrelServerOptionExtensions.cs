@@ -12,8 +12,15 @@ using System.Threading.Tasks;
 
 namespace Chams.Vtumanager.Provisioning.Api
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class KestrelServerOptionsExtensions
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
         public static void ConfigureEndpoints(this KestrelServerOptions options)
         {
             var configuration = options.ApplicationServices.GetRequiredService<IConfiguration>();
@@ -62,6 +69,12 @@ namespace Chams.Vtumanager.Provisioning.Api
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="environment"></param>
+        /// <returns></returns>
         private static X509Certificate2 LoadCertificate(EndpointConfiguration config, IHostingEnvironment environment)
         {
             if (config.StoreName != null && config.StoreLocation != null)
@@ -90,15 +103,38 @@ namespace Chams.Vtumanager.Provisioning.Api
 
             throw new InvalidOperationException("No valid certificate configuration found for the current endpoint.");
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
         public class EndpointConfiguration
         {
+            /// <summary>
+            /// 
+            /// </summary>
             public string Host { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public int? Port { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public string Scheme { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public string StoreName { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public string StoreLocation { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public string FilePath { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public string Password { get; set; }
         }
     }

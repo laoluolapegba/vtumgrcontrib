@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Chams.Vtumanager.Provisioning.Api.Helpers.Swagger
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class MiddlewareExtensions
     {
         /// <summary>

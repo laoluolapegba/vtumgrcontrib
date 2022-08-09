@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace Chams.Vtumanager.Web.Api.ViewModels
+namespace Chams.Vtumanager.Provisioning.Entities.ViewModels
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class StockPurchaseRequest
+    public class StockPurchaseOrder
     {
         /// <summary>
         /// 
@@ -18,18 +14,8 @@ namespace Chams.Vtumanager.Web.Api.ViewModels
         /// 
         /// </summary>
         public int tenantId { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
         public string UserId { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public Item[] items { get; set;   }
-        
-        /// <summary>
-        /// 
-        /// </summary>
+        public List<Item> items { get; set; }
         public class Item
         {
             /// <summary>
@@ -41,6 +27,5 @@ namespace Chams.Vtumanager.Web.Api.ViewModels
             /// </summary>
             public int Quantity { get; set; }
         }
-
     }
 }

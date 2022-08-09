@@ -7,10 +7,11 @@ using System.Text;
 namespace Chams.Vtumanager.Provisioning.Entities.Epurse
 {
     [Table("vtu_epurse_account")]
-    public class EpurseAccount
+    public class EpurseAccountMaster
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("account_no")]
+        public string AcctNo { get; set; }
         [Column("partner_id")]
         public int PartnerId { get; set; }
         [Column("tenant_id")]

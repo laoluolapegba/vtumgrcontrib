@@ -9,7 +9,7 @@ namespace Chams.Vtumanager.Web.Api
     {
         public MappingProfile()
         {
-            CreateMap<EpurseAccountModel, EpurseAccount>()
+            CreateMap<EpurseAccountModel, EpurseAccountMaster>()
                 .ReverseMap();
         }
     }

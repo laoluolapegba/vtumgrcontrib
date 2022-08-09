@@ -35,6 +35,8 @@ using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.OpenApi.Models;
+using Chams.Vtumanager.Provisioning.Services.Authentication;
 
 namespace Chams.Vtumanager.Provisioning.Api
 {
@@ -68,7 +70,8 @@ namespace Chams.Vtumanager.Provisioning.Api
             
             services.AddDbContext<ChamsProvisioningDbContext>(options =>
             {
-                options.UseMySql(_config.GetConnectionString("DefaultConnection"));
+                options.UseMySql(_config.GetConnectionString("DefaultConnection"))
+                ;
                 //options.UseOracle(_config.GetConnectionString("DefaultConnection"), options => options
                 //.UseOracleSQLCompatibility("11"));
                 
@@ -119,6 +122,7 @@ namespace Chams.Vtumanager.Provisioning.Api
 
             services.AddScoped<IAMQService, AMQService>();
             services.AddScoped<ITransactionRecordService, TransactionRecordService>();
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUnitOfWork, UnitOfWork<ChamsProvisioningDbContext>>();
            
             services
@@ -167,7 +171,35 @@ namespace Chams.Vtumanager.Provisioning.Api
             services
                 .AddApiVersionWithExplorer()
                 .AddSwaggerOptions()
-                .AddSwaggerGen();
+                .AddSwaggerGen( swagger =>
+                {
+                    swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                    {
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey,
+                        Scheme = "Bearer",
+                        BearerFormat = "JWT",
+                        In = ParameterLocation.Header,
+                        Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+                    });
+                    swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                              new OpenApiSecurityScheme
+                                {
+                                    Reference = new OpenApiReference
+                                    {
+                                        Type = ReferenceType.SecurityScheme,
+                                        Id = "Bearer"
+                                    }
+                                },
+                                new string[] {}
+
+                        }
+                    });
+                   
+                }
+                );
             services.AddResponseCompression();
             // suppress automatic model state validation when using the 
             // ApiController attribute (as it will return a 400 Bad Request
@@ -182,7 +214,7 @@ namespace Chams.Vtumanager.Provisioning.Api
             services
                 .AddCors(opts =>
                 {
-                    opts.AddPolicy("SMTPolicy", builder => builder.WithOrigins(allowOrigins).AllowCredentials());
+                    opts.AddPolicy("ChamsPolicy", builder => builder.WithOrigins(allowOrigins).AllowCredentials());
                     opts.AddPolicy("PublicEndpoints", builder => builder.SetIsOriginAllowed(IsOriginAllowed));
                     //builder => builder.AllowAnyOrigin()
                     // .WithMethods("Get")
@@ -226,7 +258,7 @@ namespace Chams.Vtumanager.Provisioning.Api
             app.UseMvc();
             app.UseRouting();
             app.UseAuthorization();
-            app.UseCors("SMTPolicy");
+            app.UseCors("ChamsPolicy");
             //loggerFactory.AddConsole(_config.GetSection("Logging"));
             //loggerFactory.AddDebug();
             //loggerFactory.AddFile("logs/ts-{Date}.txt");
