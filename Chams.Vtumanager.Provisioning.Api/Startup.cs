@@ -37,6 +37,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
 using Chams.Vtumanager.Provisioning.Services.Authentication;
+using Chams.Vtumanager.Provisioning.Services.BillPayments;
 
 namespace Chams.Vtumanager.Provisioning.Api
 {
@@ -78,6 +79,7 @@ namespace Chams.Vtumanager.Provisioning.Api
             });
             services.Configure<KestrelServerOptions>(
             _config.GetSection("Kestrel"));
+
 
             services.AddSingleton<IScopeInformation, ScopeInformation>();
 
@@ -124,7 +126,14 @@ namespace Chams.Vtumanager.Provisioning.Api
             services.AddScoped<ITransactionRecordService, TransactionRecordService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUnitOfWork, UnitOfWork<ChamsProvisioningDbContext>>();
-           
+            services.AddScoped<IBillPaymentsService, BillPaymentsService>();
+
+            services.AddHttpClient("BaxiBillsAPI", client =>
+            {
+                client.BaseAddress = new Uri(_config["BaxiBillsAPI:URL"]);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
             services
                 .AddMvc(options =>
                 {

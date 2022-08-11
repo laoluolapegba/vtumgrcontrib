@@ -4,6 +4,11 @@
         <name>Chams.Vtumanager.Provisioning.Api</name>
     </assembly>
     <members>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.BillPaymentsController">
+            <summary>
+            
+            </summary>
+        </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController">
             <summary>
             
