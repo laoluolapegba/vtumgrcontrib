@@ -16,6 +16,8 @@ namespace Chams.Vtumanager.Web.Api.ViewModels
         [Required]
         public int PartnerId { get; set; }
         [Required]
+        public int ProductcategoryId { get; set; }
+        [Required]
         public decimal Amount { get; set; }
         
 

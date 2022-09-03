@@ -43,11 +43,11 @@ namespace Chams.Vtumanager.Provisioning.Entities.ViewModels
         /// Source channel - ussd, sms, web, mobile
         /// </summary>
         public int ChannelId { get; set; }
-        /// <summary>
-        /// Assigned source system identifier
-        /// </summary>
-        [Required]
-        public string SourceSystemId { get; set; }
+        ///// <summary>
+        ///// Assigned source system identifier
+        ///// </summary>
+        //[Required]
+        //public string SourceSystemId { get; set; }
         
         
 

@@ -42,5 +42,8 @@ namespace Chams.Vtumanager.Provisioning.Entities.Epurse
         [Column("auth_id")]
         public string AuthId { get; set; }
 
+        [Column("service_provider_id")]
+        public int ServiceProviderId { get; set; }
+
     }
 }

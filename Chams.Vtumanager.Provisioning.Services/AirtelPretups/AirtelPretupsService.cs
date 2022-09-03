@@ -184,12 +184,12 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
         public async Task<PretupsRechargeResponseEnvelope.COMMAND> DataRecharge(PinlessRechargeRequest pinRechargeRequest)
         {
 
-            _logger.LogInformation($"calling DataRecharge svc for transId : {pinRechargeRequest.transId}");
+            _logger.LogInformation($"calling Airtel DataRecharge svc for transId : {pinRechargeRequest.transId}");
 
             PretupsRechargeResponseEnvelope.COMMAND resultEnvelope = new PretupsRechargeResponseEnvelope.COMMAND();
             try
             {
-                string rechargeType = pinRechargeRequest.rechargeType == 2 ? _settings.transactionType.DataPurchase : _settings.transactionType.AirtimePurchase;
+                //string rechargeType = pinRechargeRequest.rechargeType == 2 ? _settings.transactionType.DataPurchase : _settings.transactionType.AirtimePurchase;
 
                 string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
 
@@ -198,21 +198,21 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                 sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
                 sb.AppendLine(@"<!DOCTYPE COMMAND PUBLIC ""-//Ocam//DTD XML Command1.0//EN"" ""xml/command.dtd"">");
                 sb.AppendLine(@"<COMMAND>");
-                sb.AppendLine(@"   <TYPE>" + rechargeType + "</TYPE>");
-                sb.AppendLine(@"   <DATE>" + tranDate + "</DATE>");
-                sb.AppendLine(@"   <EXTNWCODE>NG</EXTNWCODE>");
-                sb.AppendLine(@"   <MSISDN>" + _settings.PartnerMsisdn + "</MSISDN>");
-                sb.AppendLine(@"   <PIN>" + _settings.PIN + "</PIN>");
-                sb.AppendLine(@"   <LOGINID />");
-                sb.AppendLine(@"   <PASSWORD />");
-                sb.AppendLine(@"   <EXTCODE />");
-                sb.AppendLine(@"   <EXTREFNUM>" + _settings.PartnerCode + "</EXTREFNUM>");
-                sb.AppendLine(@"   <SUBSMSISDN>" + pinRechargeRequest.Msisdn + "</SUBSMSISDN>");
-                sb.AppendLine(@"   <AMT>" + pinRechargeRequest.Amount + "</AMT>");
-                sb.AppendLine(@"   <SUBSERVICE>" + pinRechargeRequest.ProductCode + "</SUBSERVICE>");
+                sb.AppendLine(@"<TYPE>VASSELLREQ</TYPE>");
+                sb.AppendLine(@"<DATE>" + tranDate + "</DATE>");
+                sb.AppendLine(@"<EXTNWCODE>NG</EXTNWCODE>");
+                sb.AppendLine(@"<MSISDN>" + _settings.PartnerMsisdn + "</MSISDN>");
+                sb.AppendLine(@"<PIN>" + _settings.PIN + "</PIN>");
+                sb.AppendLine(@"<LOGINID/>");
+                sb.AppendLine(@"<PASSWORD/>");
+                sb.AppendLine(@"<EXTCODE/>");
+                sb.AppendLine(@"<EXTREFNUM>" + _settings.PartnerCode + "</EXTREFNUM>");
+                sb.AppendLine(@"<SUBSMSISDN>" + pinRechargeRequest.Msisdn + "</SUBSMSISDN>");
+                sb.AppendLine(@"<AMT>" + pinRechargeRequest.Amount + "</AMT>");
+                sb.AppendLine(@"<SUBSERVICE>" + pinRechargeRequest.ProductCode + "</SUBSERVICE>");
                 sb.AppendLine(@"</COMMAND>");
 
-                _logger.LogInformation($"DataRecharge soap request = {sb.ToString()}");
+                _logger.LogInformation($"Airtel DataRecharge soap request = {sb.ToString()}");
 
 
                 var httpClient = _clientFactory.CreateClient("PretupsRechargeClient");
@@ -229,7 +229,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                 {
                     Content = new StringContent(Regex.Unescape(sb.ToString()), Encoding.UTF8, "text/xml"),
                 };
-                _logger.LogInformation($"Calling DataRecharge URL  {request.RequestUri}");
+                _logger.LogInformation($"Calling Airtel DataRecharge URL  {request.RequestUri}");
                 //request.Headers.Clear();
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
 
@@ -240,11 +240,11 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                     {
                         var errorStream = await response.Content.ReadAsStreamAsync();
                         var validationErrors = errorStream.ReadAndDeserializeFromJson();
-                        _logger.LogWarning($"DataRecharge api call returned with status code {response.StatusCode} {validationErrors}");
+                        _logger.LogWarning($"Airtel DataRecharge api call returned with status code {response.StatusCode} {validationErrors}");
                     }
                     var contentStream = await response.Content.ReadAsStringAsync();
 
-                    _logger.LogInformation($"DataRecharge response = {contentStream}");
+                    _logger.LogInformation($"Airtel DataRecharge response = {contentStream}");
 
 
                     using (var stringReader = new StringReader(contentStream))
@@ -264,7 +264,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
             //}
             catch (Exception ex)
             {
-                _logger.LogError($"DataRecharge svc failed for transId : {pinRechargeRequest.transId} with error {ex}");
+                _logger.LogError($"Airtel DataRecharge svc failed for transId : {pinRechargeRequest.transId} with error {ex}");
             }
 
             return resultEnvelope;
@@ -286,9 +286,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
 
                 var sb = new System.Text.StringBuilder(1244);
 
-
-                _logger.LogInformation($"QueryTransactionStatus soap request = {sb.ToString()}");  //
-
+                _logger.LogInformation($"Airtel QueryTransactionStatus soap request = {sb.ToString()}");  //
 
                 var httpClient = _clientFactory.CreateClient("PretupsRechargeClient");
 

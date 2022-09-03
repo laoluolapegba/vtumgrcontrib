@@ -37,6 +37,8 @@ namespace Chams.Vtumanager.Provisioning.Entities.Common
         public string sourcesystem { get; set; }
         [Column("is_processed")]
         public int IsProcessed { get; set; }
+        [Column("transaction_status")]
+        public int TransactionStatus { get; set; }
         [Column("count_retries")]
         public int CountRetries { get; set; }
         [Column("processed_date")]
@@ -45,5 +47,9 @@ namespace Chams.Vtumanager.Provisioning.Entities.Common
         public string ErrorCode { get; set; }
         [Column("error_desc")]
         public string ErrorDesc { get; set; }
+        [Column("ext_transref")]
+        public string external_transref { get; set; }
+        [Column("partner_id")]
+        public int PartnerId { get; set; }
     }
 }

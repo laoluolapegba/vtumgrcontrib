@@ -20,6 +20,7 @@ using System.Xml.Serialization;
 using System.Xml;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp.Mtn;
 using System.Reflection.Metadata;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Dstv;
 
 namespace Chams.Vtumanager.Provisioning.Services.Mtn
 {
@@ -330,68 +331,69 @@ IHttpClientFactory clientFactory)
             return resultEnvelope;
         }
 
-        public async Task<MtnResponseEnvelope> PinlessRecharge1(
-         PinlessRechargeRequest pinlessRechargeRequest, CancellationToken cancellationToken)
+        public async Task<MtnSubscriptionResponse> MtnSubscription(
+         PinlessRechargeRequest pinlessRechargeRequest)
         {
+            _logger.LogInformation($"Inside MTN Subscription service request");
 
-            _logger.LogInformation($"Inside MTN PinlessRecharge service request");
+            string gatewayURL = _config["MtnTopupSettings:V3:Url"];
+            string apiKey = _config["MtnTopupSettings:V3:API_KEY"];
+            string coundtryCode = _config["MtnTopupSettings:V3:CountryCode"];
+            string credentials = _config["MtnTopupSettings:V3:Credentials"];
+            string subscriptionProviderId = _config["MtnTopupSettings:V3:subscriptionProviderId"];
 
-            MtnResponseEnvelope result = new MtnResponseEnvelope();
-            string gatewayURL = _config["MtnTopupSettings:Verion3:Url"];
-            AccessTokenResponse accessToken = await GetAccessToken();
-
-            //AccessTokenResponse accessToken = await GetAccessToken(new AccessTokenRequest
-            //{
-            //    scope = "pr.person.read"
-            //});
-
-            var keyValues = new List<KeyValuePair<string, string>>();
-
-            keyValues.Add(new KeyValuePair<string, string>("access_token", accessToken.access_token));
-
-
-            if (accessToken.access_token != string.Empty)
+            MtnSubscriptionRequest subscriptionRequest = new MtnSubscriptionRequest
             {
-                var httpClient = _clientFactory.CreateClient("MtnTopupClient");
+                amountCharged = pinlessRechargeRequest.Amount.ToString(),
+                beneficiaryId = pinlessRechargeRequest.Msisdn,
+                correlationId = pinlessRechargeRequest.transId,
+                subscriptionId = pinlessRechargeRequest.ProductCode,
+                subscriptionProviderId = subscriptionProviderId
+            };
+
+            
+            
+            MtnSubscriptionResponse result = new MtnSubscriptionResponse();
+            
+            var httpClient = _clientFactory.CreateClient("MtnTopupClient");
+
+            httpClient.DefaultRequestHeaders.Add("x-api-key", apiKey);
+            httpClient.DefaultRequestHeaders.Add("x-country-code", coundtryCode);
+            httpClient.DefaultRequestHeaders.Add("transactionId", subscriptionRequest.correlationId);
+            httpClient.DefaultRequestHeaders.Add("Credentials", credentials);
+            //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.access_token);
 
 
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.access_token);
-                string requestParams = new FormUrlEncodedContent(keyValues).ReadAsStringAsync().Result;
-                var httpRequest = new HttpRequestMessage(HttpMethod.Get, gatewayURL + "?" + requestParams);
-                _logger.LogInformation($"Calling MTN PinlessRecharge  {httpRequest.RequestUri}");
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, gatewayURL);
+            _logger.LogInformation($"Calling MTN Subscription  {httpRequest.RequestUri}");
 
-                using (var httpContent = new FormUrlEncodedContent(keyValues))
+            using (var httpContent = CreateHttpContent(subscriptionRequest) )
+            {
+                httpRequest.Content = httpContent;
+
+                using (var response = await httpClient
+                    .SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead)
+                    .ConfigureAwait(false))
                 {
-                    httpRequest.Content = httpContent;
-
-                    using (var response = await httpClient
-                        .SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead)
-                        .ConfigureAwait(false))
+                    //response.EnsureSuccessStatusCode();
+                    if (!response.IsSuccessStatusCode)
                     {
-                        //response.EnsureSuccessStatusCode();
-                        if (!response.IsSuccessStatusCode)
-                        {
-                            _logger.LogInformation($"api call PinlessRecharge returned with statusCode {response.StatusCode} reason: {response.ReasonPhrase}");
-                            var errorStream = await response.Content.ReadAsStreamAsync();
-                            var validationErrors = errorStream.ReadAndDeserializeFromJson();
-                            _logger.LogWarning($"api call PinlessRecharge returned with status code: {response.StatusCode} validationErrors: -- {validationErrors} --");
+                        _logger.LogInformation($"api call MTN Subscription returned with statusCode {response.StatusCode} reason: {response.ReasonPhrase}");
+                        var errorStream = await response.Content.ReadAsStreamAsync();
+                        var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                        _logger.LogWarning($"api call MTN Subscription returned with status code: {response.StatusCode} validationErrors: -- {validationErrors} --");
 
-                            result = JsonConvert.DeserializeObject<MtnResponseEnvelope>(validationErrors.ToString());
-
-                        }
-                        if (response.IsSuccessStatusCode)
-                        {
-                            string contentStream = await response.Content.ReadAsStringAsync();
-                            _logger.LogInformation($"api call PinlessRecharge returned with contentstream  {contentStream}");
-                            result = JsonConvert.DeserializeObject<MtnResponseEnvelope>(contentStream);
-                        }
+                        result = JsonConvert.DeserializeObject<MtnSubscriptionResponse>(validationErrors.ToString());
 
                     }
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string contentStream = await response.Content.ReadAsStringAsync();
+                        _logger.LogInformation($"api call MTN Subscription returned with contentstream  {contentStream}");
+                        result = JsonConvert.DeserializeObject<MtnSubscriptionResponse>(contentStream);
+                    }
+
                 }
-            }
-            else
-            {
-                _logger.LogInformation($"failed to acquire token for mtn PinlessRecharge");
             }
 
             return result;

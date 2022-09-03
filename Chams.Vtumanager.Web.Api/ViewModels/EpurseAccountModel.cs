@@ -20,8 +20,12 @@ namespace Chams.Vtumanager.Web.Api.ViewModels
         public string CreatedBy { get; set; }
         [Required]
         public string AuthorisedBy { get; set; }
+        [Required]
+
+        public List<int> ProductCategoryIds { get; set; }
         //public decimal MainAcctBalance { get; set; }        
         //public decimal CommissionAcctBalance { get; set; }
         //public int RewardPoints { get; set; }
     }
+
 }

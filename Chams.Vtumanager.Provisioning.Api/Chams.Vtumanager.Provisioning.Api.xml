@@ -4,36 +4,181 @@
         <name>Chams.Vtumanager.Provisioning.Api</name>
     </assembly>
     <members>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.BillPaymentsController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AbujaPostpaidController">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AbujaPrepaidController">
             <summary>
             
             </summary>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Chams.Vtumanager.Provisioning.Services.Authentication.IAuthenticationService,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController})">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AuthenticationController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AuthenticationController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Chams.Vtumanager.Provisioning.Services.Authentication.IAuthenticationService,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.AuthenticationController})">
             <summary>
             
             </summary>
             <param name="config"></param>
             <param name="authenticationService"></param>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.LoginController.Login(Chams.Vtumanager.Provisioning.Api.ViewModels.UserLogin)">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AuthenticationController.Login(Chams.Vtumanager.Provisioning.Api.ViewModels.UserLogin)">
             <summary>
             Login
             </summary>
             <param name="userLogin"></param>
             <returns></returns>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.BulkSMSController">
             <summary>
             
             </summary>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController},Chams.Vtumanager.Provisioning.Services.QueService.IAMQService,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.CarpaddyController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.CornerstoneController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.EkoElectricPostPaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.EkoElectricPrePaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IbadanDiscoPostpaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IbadanDiscoPrepaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IkejaElectricBillPaymentController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IkejaElectricTokenPurchaseController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.JambCandidatesPINController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.JosElectricPostpaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.JosElectricPrepaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KadunaPostpaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KadunaPrepaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KedcoPostpaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KedcoPrepaidlController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.MultiChoiceDstvController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.MultiChoiceGotvController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.MutualMotoVehicleInsuranceController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.PortHarcourtPrepaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.PortharcoutPostpaidController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.ShowmaxVouchers">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SmileBundleController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SmileRechargeController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SpectranetPaymentPlanController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SpectranetPaymentRefillController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SpectranetPINController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.StartimesController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController},Chams.Vtumanager.Provisioning.Services.QueService.IAMQService,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
             <summary>
             
             </summary>
@@ -41,7 +186,7 @@
             <param name="aMQService"></param>
             <param name="transactionRecordService"></param>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController.VtuTopUp(Chams.Vtumanager.Provisioning.Entities.ViewModels.RechargeRequest,System.Threading.CancellationToken)">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController.VtuTopUp(Chams.Vtumanager.Provisioning.Entities.ViewModels.RechargeRequest,System.Threading.CancellationToken)">
             <summary>
             Submit a Virtual Top Up service request
             </summary>
@@ -49,13 +194,18 @@
             <param name="cancellation"></param>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.VtuManagerController.GetTransactionbyId(System.String,System.Threading.CancellationToken)">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController.GetTransactionbyId(System.String,System.Threading.CancellationToken)">
             <summary>
             Query the status of a transaction
             </summary>
             <param name="transactionReference"></param>
             <param name="cancellation"></param>
             <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.WAECPINController">
+            <summary>
+            
+            </summary>
         </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions">
             <summary>

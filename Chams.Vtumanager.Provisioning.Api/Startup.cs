@@ -38,6 +38,9 @@ using System.Text;
 using Microsoft.OpenApi.Models;
 using Chams.Vtumanager.Provisioning.Services.Authentication;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
+using Microsoft.AspNetCore.Diagnostics;
+using Newtonsoft.Json;
+using System.Reflection.PortableExecutable;
 
 namespace Chams.Vtumanager.Provisioning.Api
 {
@@ -126,12 +129,35 @@ namespace Chams.Vtumanager.Provisioning.Api
             services.AddScoped<ITransactionRecordService, TransactionRecordService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUnitOfWork, UnitOfWork<ChamsProvisioningDbContext>>();
-            services.AddScoped<IBillPaymentsService, BillPaymentsService>();
+            services.AddScoped<IDstvPaymentsService, DstvPaymentsService>();
 
             services.AddHttpClient("BaxiBillsAPI", client =>
             {
                 client.BaseAddress = new Uri(_config["BaxiBillsAPI:URL"]);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidAudience = _config["JWT:ValidAudience"],
+                    ValidIssuer = _config["JWT:ValidIssuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]))
+
+                };
             });
 
             services
@@ -151,28 +177,7 @@ namespace Chams.Vtumanager.Provisioning.Api
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
 
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.SaveToken = true;
-                options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidAudience = _config["JWT:ValidAudience"],
-                    ValidIssuer = _config["JWT:ValidIssuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]))
-
-                };
-            });
+            
 
 
 
@@ -241,15 +246,53 @@ namespace Chams.Vtumanager.Provisioning.Api
         public void Configure(IApplicationBuilder app,
                               IWebHostEnvironment env,
                               IApiVersionDescriptionProvider provider
-                              //ILoggerFactory loggerFactory
-                              )
-        {
+//ILoggerFactory loggerFactory
+)
+{
 
-
-            app.UseApiExceptionHandler(options =>
+            if (env.IsDevelopment())
             {
-                options.AddResponseDetails = UpdateApiErrorResponse;
-                options.DetermineLogLevel = DetermineLogLevel;
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseExceptionHandler(options =>
+            {
+                options.Use(async (context, next) =>
+                {
+                    var error = context.Features[typeof(IExceptionHandlerFeature)] as IExceptionHandlerFeature;
+
+                    //when authorization has failed, should retrun a json message to client
+                    if (error != null && error.Error is SecurityTokenExpiredException)
+                    {
+                        context.Response.StatusCode = 401;
+                        context.Response.ContentType = "application/json";
+
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(new
+                        {
+                            State = "Unauthorized",
+                            Msg = "token expired"
+                        }));
+                    }
+                    //when orther error, retrun a error message json to client
+                    else if (error != null && error.Error != null)
+                    {
+                        context.Response.StatusCode = 500;
+                        context.Response.ContentType = "application/json";
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(new
+                        {
+                            State = "Internal Server Error",
+                            Msg = error.Error.Message
+                        }));
+                    }
+                    
+                    //when no error, do next.
+                    else await next();
+
+                });
+
+                //options.AddResponseDetails = UpdateApiErrorResponse;
+                //options.DetermineLogLevel = DetermineLogLevel;
+
             });
             app.UseHsts();
             app.UseExceptionHandler("/Error");
@@ -264,10 +307,14 @@ namespace Chams.Vtumanager.Provisioning.Api
                 //    Path.Combine(env.WebRootPath, "yaml")),
                 //RequestPath = new PathString("/yaml")
             });
-            app.UseMvc();
+
             app.UseRouting();
+            app.UseAuthentication();
+            
             app.UseAuthorization();
-            app.UseCors("ChamsPolicy");
+            
+            //app.UseCors("ChamsPolicy");
+
             //loggerFactory.AddConsole(_config.GetSection("Logging"));
             //loggerFactory.AddDebug();
             //loggerFactory.AddFile("logs/ts-{Date}.txt");
@@ -276,7 +323,7 @@ namespace Chams.Vtumanager.Provisioning.Api
             {
                 endpoints.MapControllers();
             });
-            app.UseAuthentication();
+            
 
         }
         /// <summary>

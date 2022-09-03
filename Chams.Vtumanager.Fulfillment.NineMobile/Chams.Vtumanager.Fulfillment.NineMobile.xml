@@ -90,6 +90,67 @@
         <member name="P:SalesMgmt.Services.Evc.Worker.Entities.EtopUp.ModifyEvcResponseEnvelope.ResultHeader.ResultDesc">
             <remarks/>
         </member>
+        <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Models.SmtpSettings">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.BulkTopupTask">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.BulkTopupTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Fulfillment.NineMobile.Services.BulkTopupTask},Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
+            <summary>
+            
+            </summary>
+            <param name="unitOfWork"></param>
+            <param name="mapper"></param>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="config"></param>
+            <param name="_httpClientFactory"></param>
+            <param name="transaactionRecordService"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.BulkTopupTask.ProcessPendingRequests">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.BulkTopupTask.GetPendingJobs(System.Int64)">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.BulkTopupTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.BulkTopupTask.UpdateMasterTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.BulkTopupTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
         <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.IServiceProvider">
             <summary>
             
@@ -99,6 +160,27 @@
             <summary>
             
             </summary>
+        </member>
+        <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.MailHelper">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.MailHelper.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Fulfillment.NineMobile.Services.MailHelper})">
+            <summary>
+            
+            </summary>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.MailHelper.SendMail(System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="subject"></param>
+            <param name="mailBody"></param>
+            <param name="recipientAddress"></param>
+            <param name="ccAddress"></param>
         </member>
         <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.MtnProcessor">
             <summary>
@@ -134,12 +216,80 @@
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask">
+        <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.NotificationsBackgroundTask">
             <summary>
             
             </summary>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask},Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService,Chams.Vtumanager.Fulfillment.NineMobile.Services.IAirtelPretupsService,Chams.Vtumanager.Provisioning.Services.Mtn.IMtnTopupService,Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory)">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.NotificationsBackgroundTask.ProcessPendingRequests">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.NotificationsBackgroundTask.GetPendingNotifications">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.NotificationsBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidBackgroundTask">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidBackgroundTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidBackgroundTask},Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
+            <summary>
+            
+            </summary>
+            <param name="unitOfWork"></param>
+            <param name="mapper"></param>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="config"></param>
+            <param name="_httpClientFactory"></param>
+            <param name="transaactionRecordService"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidBackgroundTask.ProcessPendingRequests">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidBackgroundTask.GetPendingJobs">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidBackgroundTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidCycleTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask},Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService,Chams.Vtumanager.Fulfillment.NineMobile.Services.IAirtelPretupsService,Chams.Vtumanager.Provisioning.Services.Mtn.IMtnTopupService,Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory)">
             <summary>
             
             </summary>
@@ -154,19 +304,19 @@
             <param name="config"></param>
             <param name="_httpClientFactory"></param>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.ProcessPendingRequests">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidCycleTask.ProcessPendingRequests">
             <summary>
             
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.GetPendingJobs">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidCycleTask.GetPendingJobs">
             <summary>
             
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String)">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidCycleTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String)">
             <summary>
             
             </summary>
@@ -175,7 +325,7 @@
             <param name="errorDesc"></param>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.EvcBackgroundTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PostpaidCycleTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
             <summary>
             
             </summary>
@@ -184,24 +334,34 @@
             <param name="errorDesc"></param>
             <returns></returns>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PrepaidBackgroundTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask},Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService,Chams.Vtumanager.Fulfillment.NineMobile.Services.IAirtelPretupsService,Chams.Vtumanager.Provisioning.Services.Mtn.IMtnTopupService,Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory)">
             <summary>
             
             </summary>
+            <param name="unitOfWork"></param>
+            <param name="mapper"></param>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="evcService"></param>
+            <param name="gloTopupService"></param>
+            <param name="airtelPreupsService"></param>
+            <param name="mtnToupService"></param>
+            <param name="config"></param>
+            <param name="_httpClientFactory"></param>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask.GetPendingJobs">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PrepaidBackgroundTask.ProcessPendingRequests">
             <summary>
             
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask.ProcessPendingRequests">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PrepaidBackgroundTask.GetPendingJobs">
             <summary>
             
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PrepaidBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String)">
             <summary>
             
             </summary>
@@ -210,7 +370,92 @@
             <param name="errorDesc"></param>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IEvcBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String)">
+        <member name="M:Chams.Vtumanager.Fulfillment.NineMobile.Services.PrepaidBackgroundTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask},Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService,Chams.Vtumanager.Fulfillment.NineMobile.Services.IAirtelPretupsService,Chams.Vtumanager.Provisioning.Services.Mtn.IMtnTopupService,Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory)">
+            <summary>
+            
+            </summary>
+            <param name="unitOfWork"></param>
+            <param name="mapper"></param>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="evcService"></param>
+            <param name="gloTopupService"></param>
+            <param name="airtelPreupsService"></param>
+            <param name="mtnToupService"></param>
+            <param name="config"></param>
+            <param name="_httpClientFactory"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.ProcessPendingRequests">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.GetPendingJobs">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Hangfire.Services.IFulfillmentBackgroundTask">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IFulfillmentBackgroundTask.GetPendingJobs">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IFulfillmentBackgroundTask.ProcessPendingRequests">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IFulfillmentBackgroundTask.UpdateFailedTaskStatusAsync(System.Int64,System.String,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="taskId"></param>
+            <param name="errorCode"></param>
+            <param name="errorDesc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IFulfillmentBackgroundTask.UpdateTaskStatusAsync(System.Int64,System.String,System.String,System.String)">
             <summary>
             
             </summary>

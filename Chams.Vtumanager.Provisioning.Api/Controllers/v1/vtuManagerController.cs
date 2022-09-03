@@ -26,9 +26,9 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     [ApiController]
     [Produces("application/json")]
     [Authorize]
-    public class VtuManagerController : ControllerBase
+    public class vtuController : ControllerBase
     {
-        private readonly ILogger<VtuManagerController> _logger;
+        private readonly ILogger<vtuController> _logger;
         private readonly IAMQService _aMQService;
         private readonly ITransactionRecordService _transactionRecordService;
 
@@ -39,8 +39,8 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         /// <param name="logger"></param>
         /// <param name="aMQService"></param>
         /// <param name="transactionRecordService"></param>
-        public VtuManagerController(
-            ILogger<VtuManagerController> logger,
+        public vtuController(
+            ILogger<vtuController> logger,
             IAMQService aMQService,
             ITransactionRecordService transactionRecordService
             )
@@ -57,12 +57,13 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         /// <param name="rechargeRequest"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        [HttpPost("TopUp")]
+        [HttpPost("topup")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(RechargeResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Authorize]
         public async Task<IActionResult> VtuTopUp(
             RechargeRequest rechargeRequest,
             CancellationToken cancellation)
@@ -74,17 +75,31 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 {
                     _logger.LogInformation("API ENTRY: Inside VtuTopUp API call.");
 
-                    bool isDuplicate = _transactionRecordService.IsTransactionExist(rechargeRequest.TransactionReference);
+                    var apikey = (string)HttpContext.Request.Headers["x-api-key"];
+
+                    int partnerid = _transactionRecordService.GetPartnerIdbykey(apikey);
+
+                    if (partnerid < 1)
+                    {
+                        return BadRequest(new
+                        {
+                            status = "2001",
+                            message = "Authorization Error : Invalid API KEY"
+                        });
+                    }
+
+                    bool isDuplicate = _transactionRecordService.IsTransactionExist(rechargeRequest.TransactionReference, partnerid);
                     if(isDuplicate)
                     {
                         return BadRequest(new
                         {
-                            status = "00",
+                            status = "2002",
                             message = "Duplicate transaction",
                             data = rechargeRequest.TransactionReference
                         });
                     }
-                    await _transactionRecordService.RecordTransaction(rechargeRequest);
+                    await _transactionRecordService.RecordTransaction(rechargeRequest, partnerid);
+
                     var rsponse = _aMQService.SubmitTopupOrder(rechargeRequest);
                     return Ok(new
                     {
@@ -99,7 +114,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 {
                     return BadRequest(new
                     {
-                        status = "99",
+                        status = "2010",
                         message = ModelState.GetErrorMessages()
 
                     });

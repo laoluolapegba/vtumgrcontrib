@@ -11,13 +11,14 @@ using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
 using Chams.Vtumanager.Provisioning.Entities.Epurse;
 using Chams.Vtumanager.Provisioning.Entities.Inventory;
+using Chams.Vtumanager.Provisioning.Entities.Subscription;
 
 namespace Chams.Vtumanager.Provisioning.Data
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ChamsProvisioningDbContext :DbContext
+    public class ChamsProvisioningDbContext : DbContext
     {
         /// <summary>
         /// 
@@ -26,7 +27,7 @@ namespace Chams.Vtumanager.Provisioning.Data
         /// <summary>
         /// 
         /// </summary>
-        private readonly  IConfiguration _config;
+        private readonly IConfiguration _config;
 
         public ChamsProvisioningDbContext(DbContextOptions<ChamsProvisioningDbContext> options) : base(options)
         {
@@ -37,7 +38,7 @@ namespace Chams.Vtumanager.Provisioning.Data
 
         public ChamsProvisioningDbContext()
         {
-          
+
         }
         public DbSet<TopUpTransactionLog> TopUpRequests { get; set; }
         public DbSet<EpurseAccountMaster> EpurseAccounts { get; set; }
@@ -46,6 +47,21 @@ namespace Chams.Vtumanager.Provisioning.Data
         public DbSet<StockDetails> StockDetails { get; set; }
         public DbSet<VtuProducts> VtuProducts { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<ApiCredentials> ApiCredentials { get; set; }
+
+        public DbSet<DirectSalesMaster> DirectSalesMasters { get; set; }
+
+        public DbSet<DirectSalesDetail> DirectSalesDetails { get; set; }
+
+        public DbSet<StockMaster> StockMasters { get; set; }
+        public DbSet<PartnerServiceProvider> PartnerServiceProviders { get; set; }
+
+        public DbSet<Subscriber> Subscribers { get; set; }
+        
+        public DbSet<NotificationSettings> NotificationSettings { get; set; }
+        public DbSet<StockLevels> StockLevels { get; set; }
+        //public DbSet<UserProfile> UserProfiles { get; set; }
+
         private void OnEntityUpdating()
         {
             var entries = ChangeTracker.Entries();

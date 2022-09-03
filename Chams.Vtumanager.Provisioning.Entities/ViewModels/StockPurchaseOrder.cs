@@ -15,6 +15,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.ViewModels
         /// </summary>
         public int tenantId { get; set; }
         public string UserId { get; set; }
+        public int ProductCategoryId { get; set; }
         public List<Item> items { get; set; }
         public class Item
         {

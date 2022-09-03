@@ -11,6 +11,6 @@ namespace Chams.Vtumanager.Provisioning.Services.Mtn
         Task<MtnResponseEnvelope.Envelope> AirtimeRecharge(PinlessRechargeRequest pinlessRechargeRequest);
         Task<RechargeResponseEnvelope.Envelope> DataRecharge(PinlessRechargeRequest pinlessRechargeRequest);
         Task<AccessTokenResponse> GetAccessToken();
-        Task<MtnResponseEnvelope> PinlessRecharge1(PinlessRechargeRequest pinlessRechargeRequest, CancellationToken cancellationToken);
+        Task<MtnSubscriptionResponse> MtnSubscription(PinlessRechargeRequest pinlessRechargeRequest);
     }
 }

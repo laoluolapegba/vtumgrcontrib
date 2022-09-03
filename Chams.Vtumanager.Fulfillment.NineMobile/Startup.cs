@@ -31,6 +31,7 @@ using Chams.Vtumanager.Provisioning.Services.NineMobileEvc;
 using Chams.Vtumanager.Provisioning.Services.Mtn;
 using Chams.Vtumanager.Provisioning.Services.GloTopup;
 using Chams.Vtumanager.Fulfillment.NineMobile.Services;
+using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 
 namespace Sales_Mgmt.Services.Smtp.Hangfire
 {
@@ -208,6 +209,8 @@ namespace Sales_Mgmt.Services.Smtp.Hangfire
             services.AddScoped<IMtnTopupService, MtnTopupService>();
             services.AddScoped<IGloTopupService, GloTopupService>();
             services.AddScoped<IAirtelPretupsService, AirtelPretupsService>();
+            services.AddScoped<ITransactionRecordService, TransactionRecordService>();
+            services.AddScoped<IMailHelper, MailHelper>();
 
 
         }
@@ -252,8 +255,11 @@ namespace Sales_Mgmt.Services.Smtp.Hangfire
             {
                 Authorization = new[] { new MyAuthorizationFilter() }
             });
-            RecurringJob.AddOrUpdate<EvcBackgroundTask>(x => x.ProcessPendingRequests(), MinuteInterval(2));
-            
+            RecurringJob.AddOrUpdate<FulfillmentBackgroundTask>(x => x.ProcessPendingRequests(), MinuteInterval(2));
+            RecurringJob.AddOrUpdate<BulkTopupTask>(x => x.ProcessPendingRequests(), MinuteInterval(1));
+            RecurringJob.AddOrUpdate<PostpaidBackgroundTask>(x => x.ProcessPendingRequests(), MinuteInterval(1));
+            RecurringJob.AddOrUpdate<NotificationsBackgroundTask>(x => x.ProcessPendingRequests(), MinuteInterval(1));
+
 
             //backgroundJob.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
 

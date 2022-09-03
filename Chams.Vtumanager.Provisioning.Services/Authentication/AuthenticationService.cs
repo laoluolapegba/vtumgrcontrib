@@ -13,6 +13,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using BCrypt;
+using Newtonsoft.Json.Linq;
 
 namespace Chams.Vtumanager.Provisioning.Services.Authentication
 {
@@ -59,6 +60,7 @@ namespace Chams.Vtumanager.Provisioning.Services.Authentication
             string audience = _config.GetSection("JWT:ValidAudience").Value;
             var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, userModel.Username),
@@ -67,13 +69,31 @@ namespace Chams.Vtumanager.Provisioning.Services.Authentication
                 new Claim(ClaimTypes.Surname, userModel.Lastname),
                 //new Claim(ClaimTypes.Role, userModel.Role)
             };
-            var token = new JwtSecurityToken(issuer,
-                audience,
-                claims,
-                expires: DateTime.Now.AddMinutes(15),
-                signingCredentials: credentials);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            //var token = new JwtSecurityToken(issuer,
+            //    audience,
+            //    claims,
+            //    expires: DateTime.Now.AddMinutes(15),
+            //    signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                     new Claim(ClaimTypes.NameIdentifier, userModel.Username),
+                    new Claim(ClaimTypes.Email, userModel.EmailAddress),
+                    new Claim(ClaimTypes.GivenName, userModel.Username),
+                    new Claim(ClaimTypes.Surname, userModel.Lastname),
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(10),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
+
+            //return new Tokens { Token = tokenHandler.WriteToken(token) };
+
+            //return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
 

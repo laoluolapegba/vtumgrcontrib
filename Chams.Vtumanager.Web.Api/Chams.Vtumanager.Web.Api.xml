@@ -317,6 +317,11 @@
             
             </summary>
         </member>
+        <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.ProductCategoryId">
+            <summary>
+            Product category - fund transfer, bill payment, post,  paid pre-pad
+            </summary>
+        </member>
         <member name="P:Chams.Vtumanager.Web.Api.ViewModels.StockPurchaseRequest.UserId">
             <summary>
             

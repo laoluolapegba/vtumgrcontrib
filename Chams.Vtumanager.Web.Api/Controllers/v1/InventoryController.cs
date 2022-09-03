@@ -59,7 +59,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
         [HttpGet("GetInventorybyPartnerId/{partnerId}")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(StockBalanceView), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<StockBalanceView>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetInventorybyPartnerId(
             int partnerId, 
@@ -140,7 +140,8 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                     {
                         PartnerId = stockPurchaseRequest.PartnerId,
                         tenantId = stockPurchaseRequest.tenantId,
-                        UserId = stockPurchaseRequest.UserId
+                        UserId = stockPurchaseRequest.UserId,
+                        ProductCategoryId = stockPurchaseRequest.ProductCategoryId
 
                     };
                     var orderdetails = new List<StockPurchaseOrder.Item>();
@@ -156,7 +157,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                     }
                     stockPurchaseOrder.items = orderdetails;
 
-                    var partnerAccount = _transactionRecordService.GetEpurseByPartnerId(stockPurchaseRequest.PartnerId);
+                    var partnerAccount = _transactionRecordService.GetEpurseByPartnerIdCategoryId(stockPurchaseRequest.PartnerId, stockPurchaseRequest.ProductCategoryId);
                     if(partnerAccount!=null)
                     {
                         decimal balance = partnerAccount.MainAcctBalance;
@@ -171,7 +172,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                             });
                         }
 
-                        var purchaseStatus = await _transactionRecordService.PurchaseStock(stockPurchaseOrder);
+                        var purchaseStatus = await _transactionRecordService.PurchaseStock(stockPurchaseOrder, true);
                         if (purchaseStatus)
                         {
                             return Ok(new

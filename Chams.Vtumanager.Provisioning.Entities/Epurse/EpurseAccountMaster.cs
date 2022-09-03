@@ -16,8 +16,11 @@ namespace Chams.Vtumanager.Provisioning.Entities.Epurse
         public int PartnerId { get; set; }
         [Column("tenant_id")]
         public int TenantId { get; set; }
+        [Column("product_category_id")]
+        public int ProductcategoryId { get; set; }
 
         [Column("main_account_balance")]
+
         public decimal MainAcctBalance { get; set; }
         [Column("commision_account_balance")]
         public decimal CommissionAcctBalance { get; set; }
@@ -32,5 +35,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.Epurse
         public string CreatedBy { get; set; }
         [Column("authorised_by")]
         public string AuthorisedBy { get; set; }
+        [Column("created_date")]
+        public DateTime CreatedDate { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.Common;
+﻿using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
+using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.Epurse;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using System.Collections.Generic;
@@ -8,17 +9,20 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
 {
     public interface ITransactionRecordService
     {
-        Task<EpurseAccountMaster> CreateEpurseAccount(EpurseAccountMaster epurseAccount);
+        Task<EpurseAccountMaster> CreateEpurseAccount(EpurseAccountMaster epurseAccount, int prodCat);
         
         bool IsPartnerExist(int partnerId);
-        bool IsTransactionExist(string transreference);
-        Task<bool> RecordTransaction(RechargeRequest rechargeRequest);
+        bool IsTransactionExist(string transreference,int partnerId);
+        Task<bool> RecordTransaction(RechargeRequest rechargeRequest, int partnerId);
         Task<EpurseAccountMaster> CreditEpurseAccount(AccountTopUpRequest accountTopUpRequest);
         
         Task<IEnumerable<EpurseAccountMaster>> GetEpurseAccounts();
-        EpurseAccountMaster GetEpurseByPartnerId(int PartnerId);
+        List<EpurseAccountMaster> GetEpurseByPartnerId(int PartnerId);
+        EpurseAccountMaster GetEpurseByPartnerIdCategoryId(int PartnerId, int productcategoryId);
         bool IsEpurseExist(int partnerId, int tenantId);
         Task<IEnumerable<StockBalanceView>> GetStockbalancesbyPartnerId(int partnerId);
-        Task<bool> PurchaseStock(StockPurchaseOrder stockPurchaseRequest);
+        Task<bool> PurchaseStock(StockPurchaseOrder stockPurchaseRequest, bool addCommision);
+        int GetPartnerIdbykey(string apiKey);
+        Task<BusinessAccount> GetPatnerById(int partnerId);
     }
 }

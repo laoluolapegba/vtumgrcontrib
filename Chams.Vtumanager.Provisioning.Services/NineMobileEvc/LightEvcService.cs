@@ -361,10 +361,7 @@ namespace Chams.Vtumanager.Provisioning.Services.NineMobileEvc
                     }
                     var contentStream = await response.Content.ReadAsStringAsync();
 
-                    _logger.LogInformation($"QueryBalanceRequest response = {contentStream}");  //= {contentStream}
-                                                                                                //deserialize the response
-                                                                                                //MobileNIMC.Services.Services.Models.CreateTokenEnvelope.Envelope resultEnvelope = null;
-
+                    _logger.LogInformation($"QueryBalanceRequest response = {contentStream}");  
                     using (var stringReader = new StringReader(contentStream))
                     {
                         using (XmlReader reader = new XmlTextReader(stringReader))

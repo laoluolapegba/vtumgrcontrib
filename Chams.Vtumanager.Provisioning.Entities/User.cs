@@ -14,7 +14,7 @@ namespace Chams.Vtumanager.Provisioning.Entities
         [Column("id")]
         public int Id { get; set; }
 
-        [Column("name")]
+        [Column("firstname")]
         public string Username { get; set; }
 
         [Column("lastname")]
@@ -42,7 +42,7 @@ namespace Chams.Vtumanager.Provisioning.Entities
         public DateTime CreatedAt { get; set; }
         [Column("deleted_at")]
         public DateTime? DeletedAt { get; set; }
-        [Column("isactive")]
+        [Column("is_active")]
         public bool IsActive { get; set; }
 
         //public string Role { get; set; }

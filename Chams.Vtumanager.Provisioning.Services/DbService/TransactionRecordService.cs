@@ -1,8 +1,10 @@
 ﻿using Chams.Vtumanager.Provisioning.Data;
+using Chams.Vtumanager.Provisioning.Entities;
 using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.Epurse;
 using Chams.Vtumanager.Provisioning.Entities.Inventory;
+using Chams.Vtumanager.Provisioning.Entities.Partner;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.Authentication;
 using Chams.Vtumanager.Provisioning.Services.QueService;
@@ -11,6 +13,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,6 +28,9 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         private readonly IRepository<StockDetails> _stockRepo;
         private readonly IRepository<VtuProducts> _productsRepo;
         private readonly IRepository<EpurseAcctTransactions> _epursetransRepo;
+        private readonly IRepository<ApiCredentials> _apicredRepo;
+        private readonly IRepository<StockMaster> _stockmasterRepo;
+        private readonly IRepository<PartnerServiceProvider> _partnerServicesRepo;
 
         public TransactionRecordService(
             ILogger<TransactionRecordService> logger,
@@ -38,32 +44,56 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             _stockRepo = unitOfWork.GetRepository<StockDetails>();
             _productsRepo = unitOfWork.GetRepository<VtuProducts>();
             _epursetransRepo = unitOfWork.GetRepository<EpurseAcctTransactions>();
+            _apicredRepo = unitOfWork.GetRepository<ApiCredentials>();
+            _stockmasterRepo = unitOfWork.GetRepository<StockMaster>();
+            _partnerServicesRepo = unitOfWork.GetRepository<PartnerServiceProvider>();
         }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="transreference"></param>
         /// <returns></returns>
-        public bool IsTransactionExist(string transreference)
+        public bool IsTransactionExist(string transreference, int partnerId)
         {
             _logger.LogInformation($"Checking if transactionexists from Database : {transreference}");
             var requestObkect = _requestsRepo.GetQueryable()
 
-                .Where(a => a.transref == transreference);
+                .Where(a => a.transref == transreference && a.PartnerId == partnerId);
             return requestObkect.Count() > 0;
 
         }
+        public int GetPartnerIdbykey(string apiKey)
+        {
+            int partnerid = 0;
+            try
+            {
+                _logger.LogInformation($"Checking if GetPartnerIdbykey from Database");
+                var requestObject = _apicredRepo.GetQueryable()
 
+                    .Where(a => a.ApiKey == apiKey && a.Active == true).FirstOrDefault();
+                partnerid = requestObject.Id;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Failed to get partnerId by apikey");
+                partnerid = 0;
+            }
+
+            return partnerid;
+        }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="rechargeRequest"></param>
         /// <returns></returns>
-        public async Task<bool> RecordTransaction(RechargeRequest rechargeRequest)
+        public async Task<bool> RecordTransaction(RechargeRequest rechargeRequest, int partnerId)
         {
             bool transactionStatus = false;
             _logger.LogInformation($"Saving transaction record : {JsonConvert.SerializeObject(rechargeRequest)}");
             string serviceprovidername = Enum.GetName(typeof(ServiceProvider), rechargeRequest.ServiceProviderId);
+            var partner = await GetPatnerById(partnerId);
+            string partnerCode = partner.PartnerCode;
+
             TopUpTransactionLog topUpRequest = new TopUpTransactionLog
             {
                 tran_date = DateTime.Now,
@@ -74,8 +104,9 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                 msisdn = rechargeRequest.PhoneNumber,
                 productid = rechargeRequest.ProductId,
                 serviceproviderid = rechargeRequest.ServiceProviderId,
-                sourcesystem = rechargeRequest.SourceSystemId,
+                sourcesystem = partnerCode,
                 serviceprovidername = serviceprovidername,
+                PartnerId = partnerId,
                 CountRetries = 0,
 
 
@@ -93,7 +124,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             //int acctcount = _epurserepo.GetQueryable()
             //    .Where(a => a.PartnerId == accountTopUpRequest.PartnerId).Count();
             var epurseacct = _epurserepo.GetQueryable()
-                .Where(a => a.PartnerId == accountTopUpRequest.PartnerId && a.TenantId == accountTopUpRequest.TenantId).FirstOrDefault();
+                .Where(a => a.PartnerId == accountTopUpRequest.PartnerId && a.ProductcategoryId == accountTopUpRequest.ProductCategoryId).FirstOrDefault();
             if(epurseacct != null)
             {
                 epurseacct.LastCreditDate = DateTime.Now;
@@ -114,14 +145,23 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         /// </summary>
         /// <param name="PartnerId"></param>
         /// <returns></returns>
-        public EpurseAccountMaster GetEpurseByPartnerId(int PartnerId)
+        public List<EpurseAccountMaster> GetEpurseByPartnerId(int PartnerId)
         {
 
-            EpurseAccountMaster epurseAccount = _epurserepo.GetQueryable()
-                .Where(a => a.PartnerId == PartnerId).FirstOrDefault();
+            var epurseAccounts = _epurserepo.GetQueryable()
+                .Where(a => a.PartnerId == PartnerId ).ToList();
 
 
-            return epurseAccount;
+            return epurseAccounts;
+        }
+        public EpurseAccountMaster GetEpurseByPartnerIdCategoryId(int PartnerId, int productcategoryId)
+        {
+
+            var epurseAccounts = _epurserepo.GetQueryable()
+                .Where(a => a.PartnerId == PartnerId && a.ProductcategoryId == productcategoryId).FirstOrDefault();
+
+
+            return epurseAccounts;
         }
         public async Task<IEnumerable<EpurseAccountMaster>> GetEpurseAccounts()
         {
@@ -151,19 +191,23 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             return requestObkect.Count() > 0;
 
         }
-        public async Task<EpurseAccountMaster> CreateEpurseAccount(EpurseAccountMaster epurseAccount)
+        public async Task<EpurseAccountMaster> CreateEpurseAccount(EpurseAccountMaster epurseAccount, int prodCat)
         {
-            var lastacct = _epurserepo.GetQueryable()
-                .Where(a => a.TenantId == epurseAccount.TenantId).OrderByDescending(a=>a.AcctNo).FirstOrDefault();
+            var lastacct = _epurserepo.GetQueryable().OrderByDescending(a => a.AcctNo).FirstOrDefault();
+               // .Where(a => a.PartnerId == epurseAccount.PartnerId ).OrderByDescending(a=>a.AcctNo).FirstOrDefault(); //&& a.ProductcategoryId == prodCat
             int acctNo = 0;
+
+            
             if(lastacct == null)
             {
+                _logger.LogInformation($"No  account found for partnerId:{epurseAccount.PartnerId}");
                 epurseAccount.AcctNo = "1000001";
             }
             else
             {
                 acctNo = int.Parse(lastacct.AcctNo) + 1;
                 epurseAccount.AcctNo = acctNo.ToString();
+                _logger.LogInformation($"Next  account number for partnerId:{epurseAccount.PartnerId} : acctNo");
             }
 
             epurseAccount.MainAcctBalance = 0;
@@ -171,13 +215,12 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             epurseAccount.CommissionAcctBalance = 0;
             epurseAccount.CreatedBy = epurseAccount.CreatedBy;
             epurseAccount.AuthorisedBy = epurseAccount.AuthorisedBy;
-
+            epurseAccount.ProductcategoryId = prodCat;
+            epurseAccount.CreatedDate = DateTime.Now;
+            _logger.LogInformation($"Creating account number: {epurseAccount.AcctNo}");
 
             await _epurserepo.AddAsync(epurseAccount);
             await _epurserepo.SaveAsync();
-
-
-            
 
 
             return epurseAccount;
@@ -204,27 +247,32 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                 .GroupBy(a => a.service_provider_id)
                 .Select( g => 
                 new StockBalanceView
-                { 
+                {
+                    ProductCategoryId = 2,
                     ServiceProviderId = g.Key,
                     PartnerId = partnerId,
-                    Qoh = g.Sum( a=>a.quantity)
+                    Qoh = g.Sum( a=>a.quantity) 
                 });
 
             return balances;
         }
 
-        public async Task<bool> PurchaseStock(StockPurchaseOrder stockPurchaseRequest)
+        public async Task<bool> PurchaseStock(StockPurchaseOrder stockPurchaseRequest, bool addCommision)
         {
             int rowcount = 0;
             var epurseacctObj = _epurserepo.GetQueryable()
-                .Where(a => a.PartnerId == stockPurchaseRequest.PartnerId).FirstOrDefault();
+                .Where(a => a.PartnerId == stockPurchaseRequest.PartnerId && a.ProductcategoryId == stockPurchaseRequest.ProductCategoryId).FirstOrDefault();
+
+            
 
             foreach (var orderLine in stockPurchaseRequest.items)
             {
                 var product = _productsRepo.GetQueryable()
                 .Where(a => a.ServiceProviderId == orderLine.ServiceProviderId && a.ProductType == 1).FirstOrDefault();
 
-                //add d txn
+               
+
+                //Create a transaction on the partner's account
                 var epurseaccttrans = new EpurseAcctTransactions
                 {
                     PartnerId = stockPurchaseRequest.PartnerId,
@@ -235,13 +283,12 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                     TranAmount = orderLine.Quantity * product.Price,
                     UserId = stockPurchaseRequest.UserId,
                     AccountNo = epurseacctObj.AcctNo,
-                    ProductCode = product.ProductId
-
+                    ProductCode = product.ProductId,
+                    ServiceProviderId = orderLine.ServiceProviderId
 
                 };
                 _epursetransRepo.Add(epurseaccttrans);
-
-                //add d inventory
+                //create an inventory details record
 
                 var stockentry = new StockDetails
                 {
@@ -257,8 +304,112 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                 };
                 _stockRepo.Add(stockentry);
 
+                //Increase the QOH
+                StockMaster stockObj = _stockmasterRepo.GetQueryable(a => a.PartnerId == stockPurchaseRequest.PartnerId && a.ServiceProviderId == orderLine.ServiceProviderId).FirstOrDefault();
+                if (stockObj == null)
+                {
+                    StockMaster masterrecord = new StockMaster
+                    {
+                        ServiceProviderId = orderLine.ServiceProviderId,
+                        PartnerId = stockPurchaseRequest.PartnerId,
+                        TenantId = stockPurchaseRequest.tenantId,
+                        QuantityOnHand = orderLine.Quantity
+                    };
+                    //stockObj.partner_id = stockPurchaseRequest.PartnerId;
+                    //stockObj.tenant_id = stockPurchaseRequest.tenantId;
+                    //stockObj.service_provider_id = orderLine.ServiceProviderId;
+                    //stockObj.QuantityOnHand = orderLine.Quantity;
 
-                //debit
+                    _logger.LogInformation($"transactionrecord adding stock master: {JsonConvert.SerializeObject(masterrecord)}");
+                    await _stockmasterRepo.AddAsync(masterrecord);
+
+                }
+                else
+                {
+                    
+                    stockObj.QuantityOnHand = stockObj.QuantityOnHand + orderLine.Quantity;
+                    _logger.LogInformation($"transactionrecord updating stock master: {JsonConvert.SerializeObject(stockObj)}");
+                    await _stockmasterRepo.UpdateAsync(stockObj);
+                }
+
+
+
+                if (addCommision)
+                {
+                    decimal commisionpct = 0;
+                    var commisionObj = _partnerServicesRepo.GetQueryable()
+                   .Where(a => a.PartnerId == stockPurchaseRequest.PartnerId && a.ServiceProviderId == orderLine.ServiceProviderId).FirstOrDefault();
+
+                    if(commisionObj != null && commisionObj.CommissionPct != null )
+                    {
+                        commisionpct = (decimal)commisionObj.CommissionPct;
+
+                        if(commisionpct > 0)
+                        {
+                            int commisionQty = Convert.ToInt32(Math.Round((orderLine.Quantity * (commisionpct / 100))));
+                            decimal commisionAmt = (orderLine.Quantity * (commisionpct / 100));
+                            //Add the  partner's commision
+                            var epurseCommitssion = new EpurseAcctTransactions
+                            {
+                                PartnerId = stockPurchaseRequest.PartnerId,
+                                DrCr = "C",
+                                TranDate = DateTime.Now,
+                                TranDesc = "Commission for Stock Purchase",
+                                TenantId = stockPurchaseRequest.tenantId,
+                                TranAmount = commisionAmt * product.Price, //GetHashCode rate Laolu
+                                UserId = stockPurchaseRequest.UserId,
+                                AccountNo = epurseacctObj.AcctNo,
+                                ProductCode = product.ProductId,
+                                ServiceProviderId = orderLine.ServiceProviderId
+
+                            };
+                            _epursetransRepo.Add(epurseCommitssion);
+
+                            var commisionEntry = new StockDetails
+                            {
+                                partner_id = stockPurchaseRequest.PartnerId,
+                                price = 0,
+                                quantity = commisionQty,
+                                service_provider_id = orderLine.ServiceProviderId,
+                                tenant_id = stockPurchaseRequest.tenantId,
+                                trans_date = DateTime.Now,
+                                trans_type_id = 1,
+                                product_id = product.ProductId,
+                                user_id = stockPurchaseRequest.UserId
+                            };
+                            _stockRepo.Add(commisionEntry);
+
+                            var commisionStock = _stockmasterRepo.GetQueryable(a => a.PartnerId == stockPurchaseRequest.PartnerId && a.ServiceProviderId == orderLine.ServiceProviderId).FirstOrDefault();
+
+                            if (commisionStock == null)
+                            {
+                                StockMaster masterrecord = new StockMaster
+                                {
+                                    ServiceProviderId = orderLine.ServiceProviderId,
+                                    PartnerId = stockPurchaseRequest.PartnerId,
+                                    TenantId = stockPurchaseRequest.tenantId,
+                                    QuantityOnHand = commisionQty  //get commiison #tage
+                                };
+                                await _stockmasterRepo.AddAsync(masterrecord);
+
+                            }
+                            else
+                            {
+                                commisionStock.QuantityOnHand = stockObj.QuantityOnHand + commisionQty;  //get commiison #tage
+                                await _stockmasterRepo.UpdateAsync(commisionStock);
+                            }
+                        }
+                    }
+
+                   
+
+                }
+                
+                
+                
+
+
+                //debit the main account
                 epurseacctObj.MainAcctBalance = epurseacctObj.MainAcctBalance - (orderLine.Quantity * product.Price);
                 await _epurserepo.UpdateAsync(epurseacctObj);
 
@@ -267,10 +418,17 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             rowcount = await _epursetransRepo.SaveAsync(); rowcount = 0;
             rowcount = await _epurserepo.SaveAsync(); rowcount = 0;
             rowcount = await _stockRepo.SaveAsync();
+            rowcount = await _stockmasterRepo.SaveAsync();
 
             return true;
 
 
+        }
+        
+        public async Task<BusinessAccount> GetPatnerById(int partnerId)
+        {
+            var partner = _partnerRepo.GetQueryable().Where(a => a.PartnerId == partnerId).FirstOrDefault();
+            return partner;
         }
     }
 }

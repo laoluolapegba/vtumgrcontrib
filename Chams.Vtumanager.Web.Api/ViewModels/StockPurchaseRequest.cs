@@ -19,6 +19,10 @@ namespace Chams.Vtumanager.Web.Api.ViewModels
         /// </summary>
         public int tenantId { get; set; }
         /// <summary>
+        /// Product category - fund transfer, bill payment, post,  paid pre-pad
+        /// </summary>
+        public int ProductCategoryId { get; set; }
+        /// <summary>
         /// 
         /// </summary>
         public string UserId { get; set; }

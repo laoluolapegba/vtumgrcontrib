@@ -145,7 +145,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
             {
                 if (ModelState.IsValid)
                 {
-                    _logger.LogInformation("API ENTRY: Inside EpurseTopUp API call.");
+                    _logger.LogInformation($"API ENTRY: Inside EpurseTopUp API call. request {JsonConvert.SerializeObject(stockTopUpRequest)}");
 
                     if (!_transactionRecordService.IsEpurseExist(stockTopUpRequest.PartnerId, stockTopUpRequest.TenantId))
                     {
@@ -160,7 +160,8 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                     {
                         TenantId = stockTopUpRequest.TenantId,
                         Amount = stockTopUpRequest.Amount,
-                        PartnerId = stockTopUpRequest.PartnerId
+                        PartnerId = stockTopUpRequest.PartnerId,
+                        ProductCategoryId = stockTopUpRequest.ProductcategoryId
                     };
                     var epacct = await _transactionRecordService.CreditEpurseAccount(accountTopUpRequest);
 
@@ -216,14 +217,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
             {
                 if (ModelState.IsValid)
                 {
-                    _logger.LogInformation("API ENTRY: Inside Epurse Create API call.");
-                    EpurseAccountMaster epurseAccount = new EpurseAccountMaster
-                    {
-                        PartnerId = epurseAccountModel.PartnerId,
-                        TenantId = epurseAccountModel.TenantId,
-                        CreatedBy = epurseAccountModel.CreatedBy,
-                        AuthorisedBy = epurseAccountModel.AuthorisedBy
-                    };
+                    _logger.LogInformation($"API ENTRY: Inside Epurse Create API call. request:{JsonConvert.SerializeObject(epurseAccountModel)}");                    
 
                     bool ispartnerExists = _transactionRecordService.IsPartnerExist(epurseAccountModel.PartnerId);
                     if(!ispartnerExists)
@@ -234,19 +228,47 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                             message = $"Invalid PartnerId {epurseAccountModel.PartnerId}"
                         });
                     }
-
-                    var acct = _transactionRecordService.GetEpurseByPartnerId(epurseAccount.PartnerId);
-                    if(acct != null)
+                    List<EpurseAccountMaster> acctsCreated = new List<EpurseAccountMaster>();
+                    foreach (int productCategory in epurseAccountModel.ProductCategoryIds)
                     {
-                        return Ok(new
+                        EpurseAccountMaster epurseAccount = new EpurseAccountMaster
                         {
-                            status = "02",
-                            message = "Partner already exists",
-                            data = acct
-                        }); 
+                            PartnerId = epurseAccountModel.PartnerId,
+                            TenantId = epurseAccountModel.TenantId,
+                            ProductcategoryId = productCategory,
+                            CreatedBy = epurseAccountModel.CreatedBy,
+                            AuthorisedBy = epurseAccountModel.AuthorisedBy
+                        };
+                        _logger.LogInformation($"Checking if account exists for category: {productCategory}");
+
+                        var acct = _transactionRecordService.GetEpurseByPartnerIdCategoryId(epurseAccount.PartnerId, productCategory );
+
+                        
+                        if (acct == null)
+                        {
+                            _logger.LogInformation($"Creating Account  for category: {productCategory}");
+                            var createdAccount = await _transactionRecordService.CreateEpurseAccount(epurseAccount, productCategory);
+                            acctsCreated.Add(createdAccount);
+                        }
+                        
+                        
+                        
+
+                        //if (acct != null)
+                        //{
+                        //    return Ok(new
+                        //    {
+                        //        status = "02",
+                        //        message = "Partner account already exists",
+                        //        data = acct
+                        //    });
+                        //}
+
                     }
 
-                    var createdAccount = await _transactionRecordService.CreateEpurseAccount(epurseAccount);
+                    //return Created($"/v1/api/epurse/{createdAccount.PartnerId}", createdAccount);
+
+                    return Ok(acctsCreated);
 
                     //return Created(new
                     //{
@@ -254,7 +276,7 @@ namespace Chams.Vtumanager.Web.Api.Controllers.v1
                     //    message = "Partner already exists",
                     //    data = acct
                     //});
-                    return Created($"/v1/api/epurse/{createdAccount.PartnerId}", createdAccount);
+
                     //return Created($"/v1/api/epurse/{createdAccount.PartnerId}", _mapper.Map<EpurseAccountModel>(createdAccount));
 
                 }
