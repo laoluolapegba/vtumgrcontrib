@@ -8,7 +8,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments.AbujaDisco
     {
 
         public AbujaPostpaidRequestDetails details { get; set; }
-        public int id { get; set; }
+        public string id { get; set; }
         public string paymentCollectorId { get; set; }
         public string paymentMethod { get; set; }
         public string serviceId { get; set; }

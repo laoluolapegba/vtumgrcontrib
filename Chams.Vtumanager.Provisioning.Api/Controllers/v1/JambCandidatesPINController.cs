@@ -1,6 +1,7 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments.Dstv;
+﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.Jamb;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;
@@ -29,14 +30,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     {
         private readonly ILogger<JambCandidatesPINController> _logger;
         
-        private readonly IDstvPaymentsService _billspaymentService;
+        private readonly IJambPaymentsService _billspaymentService;
         private readonly ITransactionRecordService _transactionRecordService;
 
 
         
         public JambCandidatesPINController(
             ILogger<JambCandidatesPINController> logger,
-            IDstvPaymentsService billspaymentService
+            IJambPaymentsService billspaymentService
             )
         {
             _logger = logger;
@@ -45,14 +46,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         }
 
 
-        [HttpPost("renew")]
+        [HttpPost("pinrequest")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(BillPaymentsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> BillPayments(
-            DstvRenewRequest renewRequest,
+            JambPINRequest renewRequest,
             CancellationToken cancellation)
         {
             await Task.Delay(0, cancellation).ConfigureAwait(false);
@@ -61,7 +62,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 if (ModelState.IsValid)
                 {
 
-                    var dstvresponse  = await _billspaymentService.DstvPaymentAsync(renewRequest, cancellation);
+                    var dstvresponse  = await _billspaymentService.JambPINPaymentAsync(renewRequest, cancellation);
 
                     return Ok(new
                     {

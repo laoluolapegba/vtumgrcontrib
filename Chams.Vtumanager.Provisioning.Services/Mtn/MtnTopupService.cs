@@ -20,7 +20,6 @@ using System.Xml.Serialization;
 using System.Xml;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp.Mtn;
 using System.Reflection.Metadata;
-using Chams.Vtumanager.Provisioning.Entities.BillPayments.Dstv;
 
 namespace Chams.Vtumanager.Provisioning.Services.Mtn
 {

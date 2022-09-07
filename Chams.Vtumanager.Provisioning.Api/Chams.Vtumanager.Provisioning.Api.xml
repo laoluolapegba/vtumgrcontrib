@@ -4,12 +4,7 @@
         <name>Chams.Vtumanager.Provisioning.Api</name>
     </assembly>
     <members>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AbujaPostpaidController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AbujaPrepaidController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AbujaDiscoController">
             <summary>
             
             </summary>
@@ -48,32 +43,17 @@
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.EkoElectricPostPaidController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.EkoElectricController">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.EkoElectricPrePaidController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IbadanDiscoController">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IbadanDiscoPostpaidController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IbadanDiscoPrepaidController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IkejaElectricBillPaymentController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IkejaElectricTokenPurchaseController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IkejaElectricController">
             <summary>
             
             </summary>
@@ -83,32 +63,17 @@
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.JosElectricPostpaidController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.JosElectricController">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.JosElectricPrepaidController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KadunaController">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KadunaPostpaidController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KadunaPrepaidController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KedcoPostpaidController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KedcoPrepaidlController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KedcoController">
             <summary>
             
             </summary>
@@ -128,12 +93,7 @@
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.PortHarcourtPrepaidController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.PortharcoutPostpaidController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.PortHarcourtController">
             <summary>
             
             </summary>
@@ -143,27 +103,12 @@
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SmileBundleController">
-            <summary>
-            
-            </summary>
-        </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SmileRechargeController">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SpectranetPaymentPlanController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SpectranetPaymentRefillController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SpectranetPINController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SpectranetController">
             <summary>
             
             </summary>
@@ -202,7 +147,7 @@
             <param name="cancellation"></param>
             <returns></returns>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.WAECPINController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.WaecPINController">
             <summary>
             
             </summary>

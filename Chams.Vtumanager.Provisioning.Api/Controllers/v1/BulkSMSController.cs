@@ -1,9 +1,8 @@
 ﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.BulkSMS;
-using Chams.Vtumanager.Provisioning.Entities.BillPayments.Dstv;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
-using Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.BulkSMS;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;
@@ -48,7 +47,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         }
 
 
-        [HttpPost("renew")]
+        [HttpPost("billpayments")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(BillPaymentsResponse), StatusCodes.Status200OK)]

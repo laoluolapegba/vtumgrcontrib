@@ -1,5 +1,4 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.EtopUp.Mtn;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http.Headers;
@@ -14,18 +13,17 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Linq;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments;
-using Chams.Vtumanager.Provisioning.Entities.BillPayments.Multichoice;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.AbujaDisco;
 
-namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice
+namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
 {
     public class AbujaDiscoPaymentsService : IAbujaDiscoPaymentsService
     {
         private readonly IHttpClientFactory _httpFactory;
-        private readonly ILogger<IMultichoicePaymentsService> _logger;
+        private readonly ILogger<IAbujaDiscoPaymentsService> _logger;
         private readonly IConfiguration _configuration;
         public AbujaDiscoPaymentsService(
-            ILogger<IMultichoicePaymentsService> logger,
+            ILogger<IAbujaDiscoPaymentsService> logger,
             IConfiguration configuration,
             IHttpClientFactory httpFactory)
         {

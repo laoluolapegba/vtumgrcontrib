@@ -14,19 +14,17 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Linq;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments;
-using Chams.Vtumanager.Provisioning.Entities.BillPayments.Multichoice;
-using Chams.Vtumanager.Provisioning.Entities.BillPayments.AbujaDisco;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.BulkSMS;
 
-namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice
+namespace Chams.Vtumanager.Provisioning.Services.BillPayments.BulkSMS
 {
     public class BulkSMSPaymentsService : IBulkSMSPaymentsService
     {
         private readonly IHttpClientFactory _httpFactory;
-        private readonly ILogger<IMultichoicePaymentsService> _logger;
+        private readonly ILogger<IBulkSMSPaymentsService> _logger;
         private readonly IConfiguration _configuration;
         public BulkSMSPaymentsService(
-            ILogger<IMultichoicePaymentsService> logger,
+            ILogger<IBulkSMSPaymentsService> logger,
             IConfiguration configuration,
             IHttpClientFactory httpFactory)
         {

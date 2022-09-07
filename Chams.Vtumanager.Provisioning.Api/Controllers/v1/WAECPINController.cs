@@ -1,6 +1,8 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments.Dstv;
+﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Waec;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.Waec;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;
@@ -25,18 +27,18 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     [ApiController]
     [Produces("application/json")]
     
-    public class WAECPINController : Controller
+    public class WaecPINController : Controller
     {
-        private readonly ILogger<WAECPINController> _logger;
+        private readonly ILogger<WaecPINController> _logger;
         
-        private readonly IDstvPaymentsService _billspaymentService;
+        private readonly IWaecPaymentsService _billspaymentService;
         private readonly ITransactionRecordService _transactionRecordService;
 
 
         
-        public WAECPINController(
-            ILogger<WAECPINController> logger,
-            IDstvPaymentsService billspaymentService
+        public WaecPINController(
+            ILogger<WaecPINController> logger,
+            IWaecPaymentsService billspaymentService
             )
         {
             _logger = logger;
@@ -52,7 +54,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> BillPayments(
-            DstvRenewRequest renewRequest,
+            WaecPINRequest renewRequest,
             CancellationToken cancellation)
         {
             await Task.Delay(0, cancellation).ConfigureAwait(false);
@@ -61,7 +63,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 if (ModelState.IsValid)
                 {
 
-                    var dstvresponse  = await _billspaymentService.DstvPaymentAsync(renewRequest, cancellation);
+                    var dstvresponse  = await _billspaymentService.WaecPINPaymentAsync(renewRequest, cancellation);
 
                     return Ok(new
                     {

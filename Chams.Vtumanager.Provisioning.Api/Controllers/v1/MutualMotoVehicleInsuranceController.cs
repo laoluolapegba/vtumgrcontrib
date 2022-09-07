@@ -1,6 +1,8 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments.Dstv;
+﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Mutual;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.MutualMotorVehicleInsurance;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;
@@ -29,14 +31,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     {
         private readonly ILogger<MutualMotoVehicleInsuranceController> _logger;
         
-        private readonly IDstvPaymentsService _billspaymentService;
+        private readonly IMutualPaymentsService _billspaymentService;
         private readonly ITransactionRecordService _transactionRecordService;
 
 
         
         public MutualMotoVehicleInsuranceController(
             ILogger<MutualMotoVehicleInsuranceController> logger,
-            IDstvPaymentsService billspaymentService
+            IMutualPaymentsService billspaymentService
             )
         {
             _logger = logger;
@@ -52,7 +54,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> BillPayments(
-            DstvRenewRequest renewRequest,
+            MutualMortorInsuranceRequest renewRequest,
             CancellationToken cancellation)
         {
             await Task.Delay(0, cancellation).ConfigureAwait(false);
@@ -61,7 +63,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 if (ModelState.IsValid)
                 {
 
-                    var dstvresponse  = await _billspaymentService.DstvPaymentAsync(renewRequest, cancellation);
+                    var dstvresponse  = await _billspaymentService.MutualMVPaymentAsync(renewRequest, cancellation);
 
                     return Ok(new
                     {

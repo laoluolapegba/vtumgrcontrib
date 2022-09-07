@@ -3,7 +3,7 @@ using Chams.Vtumanager.Provisioning.Entities.BillPayments.BulkSMS;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice
+namespace Chams.Vtumanager.Provisioning.Services.BillPayments.BulkSMS
 {
     public interface IBulkSMSPaymentsService
     {

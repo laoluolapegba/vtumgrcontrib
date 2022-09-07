@@ -32,14 +32,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     {
         private readonly ILogger<MultiChoiceDstvController> _logger;
         
-        private readonly IDstvPaymentsService _billspaymentService;
+        private readonly IMultichoicePaymentsService _billspaymentService;
         private readonly ITransactionRecordService _transactionRecordService;
 
 
         
         public MultiChoiceDstvController(
             ILogger<MultiChoiceDstvController> logger,
-            IDstvPaymentsService billspaymentService
+            IMultichoicePaymentsService billspaymentService
             )
         {
             _logger = logger;

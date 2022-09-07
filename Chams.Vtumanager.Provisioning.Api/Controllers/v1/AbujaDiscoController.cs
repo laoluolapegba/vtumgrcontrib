@@ -2,7 +2,7 @@
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.AbujaDisco;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
-using Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;

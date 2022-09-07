@@ -1,6 +1,8 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments.Dstv;
+﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Smile;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.Smile;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;
@@ -29,14 +31,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     {
         private readonly ILogger<SmileRechargeController> _logger;
         
-        private readonly IDstvPaymentsService _billspaymentService;
+        private readonly ISmilePaymentsService _billspaymentService;
         private readonly ITransactionRecordService _transactionRecordService;
 
 
         
         public SmileRechargeController(
             ILogger<SmileRechargeController> logger,
-            IDstvPaymentsService billspaymentService
+            ISmilePaymentsService billspaymentService
             )
         {
             _logger = logger;
@@ -45,14 +47,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         }
 
 
-        [HttpPost("renew")]
+        [HttpPost("bundle")]
         [Consumes("application/json")]
         [Produces("application/json")]
         [ProducesResponseType(typeof(BillPaymentsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> BillPayments(
-            DstvRenewRequest renewRequest,
+        public async Task<IActionResult> SmileBundle(
+            SmileCommBundleRequest renewRequest,
             CancellationToken cancellation)
         {
             await Task.Delay(0, cancellation).ConfigureAwait(false);
@@ -61,7 +63,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 if (ModelState.IsValid)
                 {
 
-                    var dstvresponse  = await _billspaymentService.DstvPaymentAsync(renewRequest, cancellation);
+                    var dstvresponse  = await _billspaymentService.SmileBundlePaymentAsync(renewRequest, cancellation);
 
                     return Ok(new
                     {
@@ -92,5 +94,52 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
 
         }
 
+
+        [HttpPost("recharge")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(BillPaymentsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SmileRecharge(
+            SmileCommRechargeRequest renewRequest,
+            CancellationToken cancellation)
+        {
+            await Task.Delay(0, cancellation).ConfigureAwait(false);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    var dstvresponse = await _billspaymentService.SmileRechargePaymentAsync(renewRequest, cancellation);
+
+                    return Ok(new
+                    {
+                        dstvresponse
+                    });
+
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        status = "99",
+                        message = ModelState.GetErrorMessages()
+
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Api failure in BillPayments with error message {ex.Message}  error details {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    status = "99",
+                    message = $"Failed to submit BillPayments {JsonConvert.SerializeObject(renewRequest)}"
+
+                });
+            }
+
+        }
     }
 }

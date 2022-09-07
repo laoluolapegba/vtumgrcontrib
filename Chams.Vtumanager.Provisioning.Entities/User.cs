@@ -12,7 +12,7 @@ namespace Chams.Vtumanager.Provisioning.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
-        public int Id { get; set; }
+        public string id { get; set; }
 
         [Column("firstname")]
         public string Username { get; set; }

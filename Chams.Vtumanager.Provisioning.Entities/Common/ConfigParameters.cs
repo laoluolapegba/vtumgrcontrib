@@ -10,7 +10,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.Common
     public class ConfigParameters
     {
         [Key]
-        public int ID { get; set; }
+        public string id { get; set; }
         public string PARAM_NAME { get; set; }
         public string PARAM_VALUE { get; set; }
     }

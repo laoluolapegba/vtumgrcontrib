@@ -1,6 +1,9 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments.Dstv;
+﻿
+using Chams.Vtumanager.Provisioning.Entities.BillPayments;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Showmax;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.Showmax;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;
@@ -29,14 +32,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     {
         private readonly ILogger<ShowmaxVouchers> _logger;
         
-        private readonly IDstvPaymentsService _billspaymentService;
+        private readonly IShowmaxPaymentsService _billspaymentService;
         private readonly ITransactionRecordService _transactionRecordService;
 
 
         
         public ShowmaxVouchers(
             ILogger<ShowmaxVouchers> logger,
-            IDstvPaymentsService billspaymentService
+            IShowmaxPaymentsService billspaymentService
             )
         {
             _logger = logger;
@@ -52,7 +55,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> BillPayments(
-            DstvRenewRequest renewRequest,
+            ShowmaxVoucherRequest renewRequest,
             CancellationToken cancellation)
         {
             await Task.Delay(0, cancellation).ConfigureAwait(false);
@@ -61,7 +64,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 if (ModelState.IsValid)
                 {
 
-                    var dstvresponse  = await _billspaymentService.DstvPaymentAsync(renewRequest, cancellation);
+                    var dstvresponse  = await _billspaymentService.ShowmaxVoucehrPaymentAsync(renewRequest, cancellation);
 
                     return Ok(new
                     {

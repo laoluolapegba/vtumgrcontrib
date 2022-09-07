@@ -31,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="BillPayments\Showmax - Copy\" />
     <Folder Include="NewFolder\" />
   </ItemGroup>
 

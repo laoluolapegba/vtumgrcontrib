@@ -41,6 +41,7 @@ using Chams.Vtumanager.Provisioning.Services.BillPayments;
 using Microsoft.AspNetCore.Diagnostics;
 using Newtonsoft.Json;
 using System.Reflection.PortableExecutable;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice;
 
 namespace Chams.Vtumanager.Provisioning.Api
 {
@@ -129,7 +130,7 @@ namespace Chams.Vtumanager.Provisioning.Api
             services.AddScoped<ITransactionRecordService, TransactionRecordService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IUnitOfWork, UnitOfWork<ChamsProvisioningDbContext>>();
-            services.AddScoped<IDstvPaymentsService, DstvPaymentsService>();
+            services.AddScoped<IMultichoicePaymentsService, MultichoicePaymentsService>();
 
             services.AddHttpClient("BaxiBillsAPI", client =>
             {
