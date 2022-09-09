@@ -12,6 +12,7 @@ using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
 using Chams.Vtumanager.Provisioning.Entities.Epurse;
 using Chams.Vtumanager.Provisioning.Entities.Inventory;
 using Chams.Vtumanager.Provisioning.Entities.Subscription;
+using Chams.Vtumanager.Provisioning.Entities.Product;
 
 namespace Chams.Vtumanager.Provisioning.Data
 {
@@ -60,7 +61,8 @@ namespace Chams.Vtumanager.Provisioning.Data
         
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
         public DbSet<StockLevels> StockLevels { get; set; }
-        //public DbSet<UserProfile> UserProfiles { get; set; }
+
+        //public DbSet<Product> Products { get; set; }
 
         private void OnEntityUpdating()
         {

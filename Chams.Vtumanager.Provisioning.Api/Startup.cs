@@ -137,7 +137,7 @@ namespace Chams.Vtumanager.Provisioning.Api
                 client.BaseAddress = new Uri(_config["BaxiBillsAPI:URL"]);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
-
+            /*
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -159,7 +159,7 @@ namespace Chams.Vtumanager.Provisioning.Api
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:Secret"]))
 
                 };
-            });
+            });*/
 
             services
                 .AddMvc(options =>
@@ -178,7 +178,7 @@ namespace Chams.Vtumanager.Provisioning.Api
                 .SetCompatibilityVersion(CompatibilityVersion.Latest);
 
 
-            
+
 
 
 
@@ -186,6 +186,8 @@ namespace Chams.Vtumanager.Provisioning.Api
             services
                 .AddApiVersionWithExplorer()
                 .AddSwaggerOptions()
+                .AddSwaggerGen();
+                /*
                 .AddSwaggerGen( swagger =>
                 {
                     swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
@@ -215,6 +217,7 @@ namespace Chams.Vtumanager.Provisioning.Api
                    
                 }
                 );
+            */
             services.AddResponseCompression();
             // suppress automatic model state validation when using the 
             // ApiController attribute (as it will return a 400 Bad Request
@@ -316,10 +319,6 @@ namespace Chams.Vtumanager.Provisioning.Api
             
             //app.UseCors("ChamsPolicy");
 
-            //loggerFactory.AddConsole(_config.GetSection("Logging"));
-            //loggerFactory.AddDebug();
-            //loggerFactory.AddFile("logs/ts-{Date}.txt");
-            //app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

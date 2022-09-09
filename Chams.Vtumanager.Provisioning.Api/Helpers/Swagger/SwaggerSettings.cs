@@ -12,11 +12,11 @@ namespace Chams.Vtumanager.Provisioning.Api.Helpers.Swagger
         /// </summary>
         public SwaggerSettings()
         {
-            Name = "Chams.Vtumanager.Provisioning API";
+            Name = "Chamswitch Payments Provisioning API";
             Info = new OpenApiInfo
             {
-                Title = "Chams Vtumanager Provisioning",
-                Description = "Accepts VTU Topup requests"
+                Title = "Chamsswitch Provisioning",
+                Description = "Accepts VTU Topup and payment requests"
             };
         }
 

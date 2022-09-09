@@ -1,6 +1,7 @@
 ﻿using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.Epurse;
+using Chams.Vtumanager.Provisioning.Entities.Inventory;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,5 +25,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         Task<bool> PurchaseStock(StockPurchaseOrder stockPurchaseRequest, bool addCommision);
         int GetPartnerIdbykey(string apiKey);
         Task<BusinessAccount> GetPatnerById(int partnerId);
+        Task<IEnumerable<VtuProducts>> ProductList(int serviceProviderId);
+        Task<TopUpTransactionLog> GetTransactionById(int serviceproviderId, string transactionReference);
     }
 }

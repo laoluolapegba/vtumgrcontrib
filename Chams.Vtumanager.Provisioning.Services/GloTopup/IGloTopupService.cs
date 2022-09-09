@@ -8,5 +8,6 @@ namespace Chams.Vtumanager.Provisioning.Services.GloTopup
     {
         Task<GloAirtimeResultEnvelope.Envelope> GloAirtimeRecharge(PinlessRechargeRequest pinRechargeRequest);
         Task<GloDataResultEnvelope.Envelope> GloDataRecharge(PinlessRechargeRequest pinRechargeRequest);
+        Task<GloDataResultEnvelope.Envelope> QueryTransactionStatus(QueryTransactionStatusRequest queryTransaction);
     }
 }

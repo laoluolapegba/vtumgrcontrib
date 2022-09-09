@@ -20,6 +20,7 @@ using System.Xml.Serialization;
 using System.Xml;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp.Mtn;
 using System.Reflection.Metadata;
+using Chams.Vtumanager.Provisioning.Entities.Common;
 
 namespace Chams.Vtumanager.Provisioning.Services.Mtn
 {
@@ -336,6 +337,7 @@ IHttpClientFactory clientFactory)
             _logger.LogInformation($"Inside MTN Subscription service request");
 
             string gatewayURL = _config["MtnTopupSettings:V3:Url"];
+            string walletId = _config["MtnTopupSettings:V3:WalletId"];
             string apiKey = _config["MtnTopupSettings:V3:API_KEY"];
             string coundtryCode = _config["MtnTopupSettings:V3:CountryCode"];
             string credentials = _config["MtnTopupSettings:V3:Credentials"];
@@ -362,8 +364,8 @@ IHttpClientFactory clientFactory)
             httpClient.DefaultRequestHeaders.Add("Credentials", credentials);
             //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.access_token);
 
-
-            var httpRequest = new HttpRequestMessage(HttpMethod.Post, gatewayURL);
+            string requestUri = gatewayURL + walletId + "/subscriptions";
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, requestUri);
             _logger.LogInformation($"Calling MTN Subscription  {httpRequest.RequestUri}");
 
             using (var httpContent = CreateHttpContent(subscriptionRequest) )
@@ -398,6 +400,246 @@ IHttpClientFactory clientFactory)
             return result;
         }
 
+        public async Task<MtnSubscriptionResponse> QueryTransactionStatus(
+         QueryTransactionStatusRequest statusRequest)
+        {
+            _logger.LogInformation($"Inside MTN MtnQueryStatus service request");
+
+            string gatewayURL = _config["MtnTopupSettings:V3:Url"];
+            string walletId = _config["MtnTopupSettings:V3:WalletId"];
+            string apiKey = _config["MtnTopupSettings:V3:API_KEY"];
+            string coundtryCode = _config["MtnTopupSettings:V3:CountryCode"];
+            string credentials = _config["MtnTopupSettings:V3:Credentials"];
+            string subscriptionProviderId = _config["MtnTopupSettings:V3:subscriptionProviderId"];
+
+            //https://preprod-nigeria.api.mtn.com/v2/customers/subscriptions/2348031011125/status/2021102115573975401084328?customerId=2348031011125&queryType=TRANSACTION_REFERENCE&subscriptionProviderId=ERS
+
+            
+            MtnSubscriptionResponse result = new MtnSubscriptionResponse();
+
+            var httpClient = _clientFactory.CreateClient("MtnTopupClient");
+
+            httpClient.DefaultRequestHeaders.Add("x-api-key", apiKey);
+            httpClient.DefaultRequestHeaders.Add("x-country-code", coundtryCode);
+            httpClient.DefaultRequestHeaders.Add("transactionId", statusRequest.transactionId);
+            httpClient.DefaultRequestHeaders.Add("Credentials", credentials);
+            //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.access_token);
+
+            string requestUri = gatewayURL + "/subscriptions/" + walletId + "/status/" + statusRequest.TransactionReference 
+                + "?customerId=" + walletId + "&queryType=TRANSACTION_REFERENCE&subscriptionProviderId=ERS";
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            _logger.LogInformation($"Calling MTN MtnQueryStatus  {httpRequest.RequestUri}");
+
+            using (var response = await httpClient
+                    .SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead)
+                    .ConfigureAwait(false))
+            {
+                //response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"api call MTN MtnQueryStatus returned with statusCode {response.StatusCode} reason: {response.ReasonPhrase}");
+                    var errorStream = await response.Content.ReadAsStreamAsync();
+                    var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                    _logger.LogWarning($"api call MTN MtnQueryStatus returned with status code: {response.StatusCode} validationErrors: -- {validationErrors} --");
+
+                    result = JsonConvert.DeserializeObject<MtnSubscriptionResponse>(validationErrors.ToString());
+
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    string contentStream = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation($"api call MTN MtnQueryStatus returned with contentstream  {contentStream}");
+                    result = JsonConvert.DeserializeObject<MtnSubscriptionResponse>(contentStream);
+                }
+
+            }
+            //using (var httpContent = CreateHttpContent(subscriptionRequest))
+            //{
+            //    httpRequest.Content = httpContent;
+
+            //}
+
+            return result;
+        }
+
+
+        public async Task<QueryTransactionStatusResponse.Envelope> QueryTransactionStatusbyClientRef(QueryTransactionStatusRequest queryTransaction)
+        {
+            _logger.LogInformation($"calling MTN QueryTransactionStatusV1 svc for transId : {queryTransaction.TransactionReference}");
+            string soapAction = "urn:QyeryTx";
+            _clientId = _config["MtnTopupSettings:V1:Username"];
+            _clientSecret = _config["MtnTopupSettings:V1:Password"];
+            QueryTransactionStatusResponse.Envelope resultEnvelope = new QueryTransactionStatusResponse.Envelope();
+            try
+            {
+
+                var sb = new System.Text.StringBuilder(331);
+                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
+                sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://hostif.vtm.prism.co.za/xsd"">");
+                sb.AppendLine(@"   <soapenv:Header />");
+                sb.AppendLine(@"   <soapenv:Body>");
+                sb.AppendLine(@"      <xsd:querytx>");
+                sb.AppendLine(@"         <xsd:sequence>" + queryTransaction.TransactionReference + "</xsd:sequence>");
+                sb.AppendLine(@"      </xsd:querytx>");
+                sb.AppendLine(@"   </soapenv:Body>");
+                sb.AppendLine(@"</soapenv:Envelope>");
+
+
+                _logger.LogInformation($"MTN QueryTransactionStatusV1 soap request = {sb.ToString()}");  //
+
+
+                var httpClient = _clientFactory.CreateClient("MtnTopupClient");
+
+                HttpClientHandler clientHandler = new HttpClientHandler();
+                clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
+                // Pass the handler to httpclient(from you are calling api)
+                HttpClient client = new HttpClient(clientHandler);
+
+
+
+                var request = new HttpRequestMessage(HttpMethod.Post, _settings.V1.Url)
+                {
+                    Content = new StringContent(Regex.Unescape(sb.ToString()), Encoding.UTF8, "text/xml"),
+                };
+                _logger.LogInformation($"Calling MTN QueryTransactionStatusV1 URL  {request.RequestUri}");
+                //request.Headers.Clear();
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
+                request.Headers.Add("SOAPAction", soapAction);
+
+                //Basic Authentication
+                var authenticationString = $"{_clientId}:{_clientSecret}";
+                var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+                _logger.LogInformation($"Base64 encoded credentials: {base64EncodedAuthenticationString}");
+
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+                using (var response = await httpClient.SendAsync(request,
+                    HttpCompletionOption.ResponseHeadersRead))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorStream = await response.Content.ReadAsStreamAsync();
+                        var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                        _logger.LogWarning($"Mtn QueryTransactionStatusV1 api call returned with status code {response.StatusCode} {validationErrors}");
+                    }
+                    var contentStream = await response.Content.ReadAsStringAsync();
+
+                    _logger.LogInformation($"MTN QueryTransactionStatusV1 response XML = {contentStream}");
+
+
+                    using (var stringReader = new StringReader(contentStream))
+                    {
+                        
+                        using (XmlReader reader = new XmlTextReader(stringReader))
+                        {
+                            var serializer = new XmlSerializer(typeof(MtnResponseEnvelope.Envelope));
+                            resultEnvelope = serializer.Deserialize(reader) as QueryTransactionStatusResponse.Envelope;
+                        }
+                    }
+                    _logger.LogInformation($"MTN QueryTransactionStatusV1 responseObject = {JsonConvert.SerializeObject(resultEnvelope)}");
+
+                }
+            }
+
+
+            catch (Exception ex)
+            {
+                _logger.LogError($"MTN QueryTransactionStatusV1 svc failed for transId : {queryTransaction.TransactionReference} with error {ex}");
+            }
+
+            return resultEnvelope;
+        }
+
+        public async Task<QueryTransactionStatusResponse.Envelope> QueryTransactionStatusbyERSRef(QueryTransactionStatusRequest queryTransaction)
+        {
+            _logger.LogInformation($"calling MTN QueryTransactionStatusV1 svc for transId : {queryTransaction.TransactionReference}");
+            string soapAction = "urn:QyeryTx";
+            _clientId = _config["MtnTopupSettings:V1:Username"];
+            _clientSecret = _config["MtnTopupSettings:V1:Password"];
+            QueryTransactionStatusResponse.Envelope resultEnvelope = new QueryTransactionStatusResponse.Envelope();
+            try
+            {
+                var sb = new System.Text.StringBuilder(347);
+                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
+                sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://hostif.vtm.prism.co.za/xsd"">");
+                sb.AppendLine(@"   <soapenv:Header />");
+                sb.AppendLine(@"   <soapenv:Body>");
+                sb.AppendLine(@"      <xsd:querytx>");
+                sb.AppendLine(@"         <xsd:txRef>"+ queryTransaction.TransactionReference +"</xsd:txRef>");
+                sb.AppendLine(@"      </xsd:querytx>");
+                sb.AppendLine(@"   </soapenv:Body>");
+                sb.AppendLine(@"</soapenv:Envelope>");
+
+                
+
+
+                _logger.LogInformation($"MTN QueryTransactionStatusV1 soap request = {sb.ToString()}");  //
+
+
+                var httpClient = _clientFactory.CreateClient("MtnTopupClient");
+
+                HttpClientHandler clientHandler = new HttpClientHandler();
+                clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
+                // Pass the handler to httpclient(from you are calling api)
+                HttpClient client = new HttpClient(clientHandler);
+
+
+
+                var request = new HttpRequestMessage(HttpMethod.Post, _settings.V1.Url)
+                {
+                    Content = new StringContent(Regex.Unescape(sb.ToString()), Encoding.UTF8, "text/xml"),
+                };
+                _logger.LogInformation($"Calling MTN QueryTransactionStatusV1 URL  {request.RequestUri}");
+                //request.Headers.Clear();
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
+                request.Headers.Add("SOAPAction", soapAction);
+
+                //Basic Authentication
+                var authenticationString = $"{_clientId}:{_clientSecret}";
+                var base64EncodedAuthenticationString = Convert.ToBase64String(System.Text.ASCIIEncoding.ASCII.GetBytes(authenticationString));
+
+                _logger.LogInformation($"Base64 encoded credentials: {base64EncodedAuthenticationString}");
+
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedAuthenticationString);
+                using (var response = await httpClient.SendAsync(request,
+                    HttpCompletionOption.ResponseHeadersRead))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorStream = await response.Content.ReadAsStreamAsync();
+                        var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                        _logger.LogWarning($"Mtn QueryTransactionStatusV1 api call returned with status code {response.StatusCode} {validationErrors}");
+                    }
+                    var contentStream = await response.Content.ReadAsStringAsync();
+
+                    _logger.LogInformation($"MTN QueryTransactionStatusV1 response XML = {contentStream}");
+
+
+                    using (var stringReader = new StringReader(contentStream))
+                    {
+
+                        using (XmlReader reader = new XmlTextReader(stringReader))
+                        {
+                            var serializer = new XmlSerializer(typeof(MtnResponseEnvelope.Envelope));
+                            resultEnvelope = serializer.Deserialize(reader) as QueryTransactionStatusResponse.Envelope;
+                        }
+                    }
+                    _logger.LogInformation($"MTN QueryTransactionStatusV1 responseObject = {JsonConvert.SerializeObject(resultEnvelope)}");
+
+                }
+            }
+
+
+            catch (Exception ex)
+            {
+                _logger.LogError($"MTN QueryTransactionStatusV1 svc failed for transId : {queryTransaction.TransactionReference} with error {ex}");
+            }
+
+            return resultEnvelope;
+        }
 
     }
 }

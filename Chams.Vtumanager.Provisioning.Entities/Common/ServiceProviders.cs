@@ -6,7 +6,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.Common
 {
     public enum ServiceProvider
     {
-        Mtn = 1,
+        MTN = 1,
         Airtel = 2,
         GLO = 3,
         NineMobile = 4

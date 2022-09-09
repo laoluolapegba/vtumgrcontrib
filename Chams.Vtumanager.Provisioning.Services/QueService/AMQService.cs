@@ -43,7 +43,7 @@ namespace Chams.Vtumanager.Provisioning.Services.QueService
 
             switch (rechargeRequest.ServiceProviderId)
             {
-                case (int)ServiceProvider.Mtn:
+                case (int)ServiceProvider.MTN:
                     _logger.LogInformation("queing message in mtn.que.");
                     await _producingService.SendAsync(@object: rechargeRequest, exchangeName: "amq.direct", routingKey: "mtn.queue");
                     break;

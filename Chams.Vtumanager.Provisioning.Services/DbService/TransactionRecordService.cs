@@ -5,6 +5,7 @@ using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.Epurse;
 using Chams.Vtumanager.Provisioning.Entities.Inventory;
 using Chams.Vtumanager.Provisioning.Entities.Partner;
+using Chams.Vtumanager.Provisioning.Entities.Product;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.Authentication;
 using Chams.Vtumanager.Provisioning.Services.QueService;
@@ -47,6 +48,8 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             _apicredRepo = unitOfWork.GetRepository<ApiCredentials>();
             _stockmasterRepo = unitOfWork.GetRepository<StockMaster>();
             _partnerServicesRepo = unitOfWork.GetRepository<PartnerServiceProvider>();
+
+            //_productsRepo = unitOfWork.GetRepository<Product>();
         }
         /// <summary>
         /// 
@@ -429,6 +432,19 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         {
             var partner = _partnerRepo.GetQueryable().Where(a => a.PartnerId == partnerId).FirstOrDefault();
             return partner;
+        }
+
+        public async Task<IEnumerable<VtuProducts>> ProductList(int serviceProviderId)
+        {
+            var products = _productsRepo.GetQueryable().Where(a => a.ServiceProviderId == serviceProviderId).ToList();
+            return products;
+        }
+
+        public async Task<TopUpTransactionLog> GetTransactionById(int serviceproviderId, string transactionReference)
+        {
+
+            var transaction = _requestsRepo.GetQueryable().Where(a => a.serviceproviderid == serviceproviderId && a.transref == transactionReference).FirstOrDefault();
+            return transaction;
         }
     }
 }

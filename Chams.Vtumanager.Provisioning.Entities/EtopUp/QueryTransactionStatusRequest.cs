@@ -7,6 +7,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.EtopUp
     public class QueryTransactionStatusRequest
     {
         public int ServiceProviderId { get; set; }
+        public string transactionId { get; set; }
         public string TransactionReference { get; set; }
     }
 }

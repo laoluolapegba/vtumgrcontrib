@@ -1,6 +1,12 @@
 ﻿using AutoMapper;
+using Chams.Vtumanager.Fulfillment.NineMobile.Services;
 using Chams.Vtumanager.Provisioning.Api.ViewModels;
+using Chams.Vtumanager.Provisioning.Entities.Common;
+using Chams.Vtumanager.Provisioning.Entities.EtopUp;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
+using Chams.Vtumanager.Provisioning.Services.GloTopup;
+using Chams.Vtumanager.Provisioning.Services.Mtn;
+using Chams.Vtumanager.Provisioning.Services.NineMobileEvc;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;
@@ -25,12 +31,16 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     [Route("v{version:apiVersion}/api/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    [Authorize]
+    //[Authorize]
     public class vtuController : ControllerBase
     {
         private readonly ILogger<vtuController> _logger;
         private readonly IAMQService _aMQService;
         private readonly ITransactionRecordService _transactionRecordService;
+        private readonly ILightEvcService _evcService;
+        private readonly IGloTopupService _gloTopupService;
+        private readonly IAirtelPretupsService _airtelPreupsService;
+        private readonly IMtnTopupService _mtnToupService;
 
 
         /// <summary>
@@ -42,12 +52,21 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         public vtuController(
             ILogger<vtuController> logger,
             IAMQService aMQService,
-            ITransactionRecordService transactionRecordService
+            ITransactionRecordService transactionRecordService,
+            ILightEvcService evcService,
+            IGloTopupService gloTopupService,
+            IAirtelPretupsService airtelPreupsService,
+            IMtnTopupService mtnToupService
             )
         {
             _logger = logger;
             _aMQService = aMQService;
             _transactionRecordService = transactionRecordService;
+            _evcService = evcService;
+            _gloTopupService = gloTopupService;
+            _airtelPreupsService = airtelPreupsService;
+            _mtnToupService = mtnToupService;
+
         }
 
 
@@ -62,8 +81,9 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         [Produces("application/json")]
         [ProducesResponseType(typeof(RechargeResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> VtuTopUp(
             RechargeRequest rechargeRequest,
             CancellationToken cancellation)
@@ -81,10 +101,10 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
 
                     if (partnerid < 1)
                     {
-                        return BadRequest(new
+                        return Unauthorized(new
                         {
                             status = "2001",
-                            message = "Authorization Error : Invalid API KEY"
+                            responseMessage = "Authorization Error : Invalid API KEY"
                         });
                     }
 
@@ -94,18 +114,18 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                         return BadRequest(new
                         {
                             status = "2002",
-                            message = "Duplicate transaction",
-                            data = rechargeRequest.TransactionReference
+                            responseMessage = "Duplicate transaction",
+                            details = rechargeRequest.TransactionReference
                         });
                     }
                     await _transactionRecordService.RecordTransaction(rechargeRequest, partnerid);
 
-                    var rsponse = _aMQService.SubmitTopupOrder(rechargeRequest);
+                    var response = _aMQService.SubmitTopupOrder(rechargeRequest);
                     return Ok(new
                     {
                         status = "00",
-                        message = "",
-                        data = rsponse
+                        responseMessage = "Submitted Successfully",
+                        details = response
                     });
 
 
@@ -145,7 +165,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         [ProducesResponseType(typeof(RechargeResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetTransactionbyId(
-            string transactionReference,
+            QueryTransactionStatusRequest statusRequest,
             CancellationToken cancellation)
         {
             await Task.Delay(0, cancellation).ConfigureAwait(false);
@@ -153,7 +173,51 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
             {
                 if (ModelState.IsValid)
                 {
-                    _logger.LogInformation("API ENTRY: Inside GetTransactionbyId API call.");
+                    _logger.LogInformation($"API ENTRY: Inside GetTransactionbyId API call with transref {JsonConvert.SerializeObject(statusRequest)}");
+
+                    var apikey = (string)HttpContext.Request.Headers["x-api-key"];
+
+                    int partnerid = _transactionRecordService.GetPartnerIdbykey(apikey);
+
+                    if (partnerid < 1)
+                    {
+                        return Unauthorized(new
+                        {
+                            status = "2001",
+                            responseMessage = "Authorization Error : Invalid API KEY"
+                        });
+                    }
+                    //fetch transaction from db
+                    var trans = await _transactionRecordService.GetTransactionById(statusRequest.ServiceProviderId, statusRequest.transactionId);
+                    if(trans == null)
+                    {
+                        return NotFound(new
+                        {
+                            status = "2005",
+                            responseMessage = $"Tranasction reference number {statusRequest.TransactionReference} not found"
+                        });
+                    }
+                    switch (trans.serviceproviderid)
+                    {
+                        case (int)ServiceProvider.MTN:
+                            _mtnToupService.QueryTransactionStatus(statusRequest);
+                            break;
+                        case (int)ServiceProvider.Airtel:
+
+                            _airtelPreupsService.QueryTransactionStatus(statusRequest);
+                            break;
+                        case (int)ServiceProvider.GLO:
+                            _gloTopupService.QueryTransactionStatus(statusRequest);
+                            break;
+                        case (int)ServiceProvider.NineMobile:
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    
+
 
                     var header = new { x = 0, y = 1 };//_mapper.Map<HpinPurchaseOrder, HpinOrderHeader >(order);
                     return Ok(new
@@ -177,11 +241,11 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Api failure in VtuTopUp with error message {ex.Message}  error details {ex}");
+                _logger.LogError($"Api failure in GetTransactionbyId with error message {ex.Message}  error details {ex}");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     status = "99",
-                    message = $"Failed to submit vtu topup {JsonConvert.SerializeObject(transactionReference)}"
+                    message = $"Failed to submit vtu topup {JsonConvert.SerializeObject(statusRequest)}"
 
                 });
             }

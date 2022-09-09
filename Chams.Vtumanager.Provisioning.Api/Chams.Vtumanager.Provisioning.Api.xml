@@ -98,6 +98,27 @@
             
             </summary>
         </member>
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.productsController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.productsController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.productsController},Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
+            <summary>
+            
+            </summary>
+            <param name="logger"></param>
+            <param name="aMQService"></param>
+            <param name="transactionRecordService"></param>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.productsController.ListProductByServiceProviderId(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Returns a list of available Databundle products by Serviceprovider
+            </summary>
+            <param name="rechargeRequest"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
+        </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.ShowmaxVouchers">
             <summary>
             
@@ -123,7 +144,7 @@
             
             </summary>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController},Chams.Vtumanager.Provisioning.Services.QueService.IAMQService,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController},Chams.Vtumanager.Provisioning.Services.QueService.IAMQService,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService,Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService,Chams.Vtumanager.Fulfillment.NineMobile.Services.IAirtelPretupsService,Chams.Vtumanager.Provisioning.Services.Mtn.IMtnTopupService)">
             <summary>
             
             </summary>
@@ -139,7 +160,7 @@
             <param name="cancellation"></param>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController.GetTransactionbyId(System.String,System.Threading.CancellationToken)">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController.GetTransactionbyId(Chams.Vtumanager.Provisioning.Entities.EtopUp.QueryTransactionStatusRequest,System.Threading.CancellationToken)">
             <summary>
             Query the status of a transaction
             </summary>
@@ -399,6 +420,31 @@
             </summary>
             <param name="host"></param>
             <returns></returns>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.ProductList.ProductCode">
+            <summary>
+            Unique Product identifier
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.ProductList.ProductDescription">
+            <summary>
+            Product name
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.ProductList.ProductType">
+            <summary>
+            1= VTU, 2= DataBundle
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.ProductList.Price">
+            <summary>
+            Price in Naira
+            </summary>
+        </member>
+        <member name="P:Chams.Vtumanager.Provisioning.Api.ViewModels.ProductList.Validity">
+            <summary>
+            validity in hours
+            </summary>
         </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.ViewModels.RechargeRequest1">
             <summary>

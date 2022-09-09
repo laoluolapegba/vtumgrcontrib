@@ -1,4 +1,5 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.EtopUp;
+﻿using Chams.Vtumanager.Provisioning.Entities.Common;
+using Chams.Vtumanager.Provisioning.Entities.EtopUp;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp.Mtn;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp.NineMobile;
 using System.Threading;
@@ -12,5 +13,8 @@ namespace Chams.Vtumanager.Provisioning.Services.Mtn
         Task<RechargeResponseEnvelope.Envelope> DataRecharge(PinlessRechargeRequest pinlessRechargeRequest);
         Task<AccessTokenResponse> GetAccessToken();
         Task<MtnSubscriptionResponse> MtnSubscription(PinlessRechargeRequest pinlessRechargeRequest);
+        Task<MtnSubscriptionResponse> QueryTransactionStatus(QueryTransactionStatusRequest statusRequest);
+        Task<QueryTransactionStatusResponse.Envelope> QueryTransactionStatusbyERSRef(QueryTransactionStatusRequest queryTransaction);
+        Task<QueryTransactionStatusResponse.Envelope> QueryTransactionStatusbyClientRef(QueryTransactionStatusRequest queryTransaction);
     }
 }

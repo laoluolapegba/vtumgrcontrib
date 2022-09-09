@@ -276,5 +276,94 @@ IHttpClientFactory clientFactory)
             return resultEnvelope;
         }
 
+        public async Task<GloDataResultEnvelope.Envelope> QueryTransactionStatus(QueryTransactionStatusRequest queryTransaction)
+        {
+
+            _logger.LogInformation($"calling Glo QueryTransactionStatus svc for transId : { queryTransaction.transactionId}");
+
+            GloDataResultEnvelope.Envelope resultEnvelope = new GloDataResultEnvelope.Envelope();
+            try
+            {
+
+                string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                var sb = new System.Text.StringBuilder(2079);
+                sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:ext=""http://external.interfaces.ers.seamless.com/"">");
+                sb.AppendLine(@" <soapenv:Header/>");
+                sb.AppendLine(@" <soapenv:Body>");
+                sb.AppendLine(@"    <ext:requestTopup>");
+                sb.AppendLine(@"       <!--Optional:-->");
+                sb.AppendLine(@"       <context>");
+                sb.AppendLine(@"          <channel>WSClient</channel>");
+                sb.AppendLine(@"          <clientComment>" + queryTransaction.transactionId + "</clientComment>");
+                sb.AppendLine(@"          <clientId>ERS</clientId>");
+                sb.AppendLine(@"          <prepareOnly>false</prepareOnly>");
+                sb.AppendLine(@"          <clientReference>" + queryTransaction.transactionId + "</clientReference>");
+                sb.AppendLine(@"          <clientRequestTimeout>500</clientRequestTimeout>");
+                sb.AppendLine(@"          <initiatorPrincipalId>");
+                sb.AppendLine(@"                <id>" + _settings.Initiator.Id + "</id>");
+                sb.AppendLine(@"                <type>RESELLERUSER</type>");
+                sb.AppendLine(@"                <userId>" + _settings.Initiator.UserId + "</userId>");
+                sb.AppendLine(@"          </initiatorPrincipalId>");
+                sb.AppendLine(@"          <password>" + _settings.Initiator.Password + "</password>");
+                sb.AppendLine(@"          <transactionProperties>");
+
+
+
+                _logger.LogInformation($"QueryTransactionStatus soap request = {sb.ToString()}");  //
+
+
+                var httpClient = _clientFactory.CreateClient("GloRechargeClient");
+
+                HttpClientHandler clientHandler = new HttpClientHandler();
+                clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+
+                // Pass the handler to httpclient(from you are calling api)
+                HttpClient client = new HttpClient(clientHandler);
+
+
+                var request = new HttpRequestMessage(HttpMethod.Post, _settings.Url)
+                {
+                    Content = new StringContent(Regex.Unescape(sb.ToString()), Encoding.UTF8, "text/xml"),
+                };
+                _logger.LogInformation($"Calling GloDataRecharge URL  {request.RequestUri}");
+                //request.Headers.Clear();
+                request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
+
+                using (var response = await httpClient.SendAsync(request,
+                    HttpCompletionOption.ResponseHeadersRead))
+                {
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        var errorStream = await response.Content.ReadAsStreamAsync();
+                        var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                        _logger.LogWarning($"QueryTransactionStatus api call returned with status code {response.StatusCode} {validationErrors}");
+                    }
+                    var contentStream = await response.Content.ReadAsStringAsync();
+
+                    _logger.LogInformation($"GloDataRecharge response = {contentStream}");
+
+
+                    using (var stringReader = new StringReader(contentStream))
+                    {
+                        using (XmlReader reader = new XmlTextReader(stringReader))
+                        {
+                            var serializer = new XmlSerializer(typeof(GloDataResultEnvelope.Envelope));
+                            resultEnvelope = serializer.Deserialize(reader) as GloDataResultEnvelope.Envelope;
+                        }
+                    }
+
+                }
+            }
+
+            //try
+            //{
+            //}
+            catch (Exception ex)
+            {
+                _logger.LogError($"QueryTransactionStatus svc failed for transId : {queryTransaction.transactionId} with error {ex}");
+            }
+
+            return resultEnvelope;
+        }
     }
 }

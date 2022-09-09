@@ -4,8 +4,9 @@ using System.Text;
 
 namespace Chams.Vtumanager.Provisioning.Entities.Common
 {
-    public enum TransactionType
+    public enum ProductType
     {
-
+        VTU = 1,
+        DataBundle = 2
     }
 }

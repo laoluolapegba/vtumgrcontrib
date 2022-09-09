@@ -117,7 +117,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                     {
                         switch (item.serviceproviderid)
                         {
-                            case (int)ServiceProvider.Mtn:
+                            case (int)ServiceProvider.MTN:
                                 MtnSubscriptionResponse mtnresult = new MtnSubscriptionResponse();
                                 mtnresult = await _mtnToupService.MtnSubscription(pinlessRechargeRequest);
                                 if (mtnresult != null)
