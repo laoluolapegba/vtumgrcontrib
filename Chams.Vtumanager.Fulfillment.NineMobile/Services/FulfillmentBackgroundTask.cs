@@ -359,7 +359,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
 
             //_evctranLogrepo
             var data = _topupLogRepo.GetQueryable()
-                .Where(a => a.IsProcessed == 0 && a.CountRetries < 1)
+                .Where(a => a.IsProcessed == 0)  //|| a.CountRetries < 6
                 .OrderBy(a => a.tran_date).ToList();
             return data;
         }
@@ -414,6 +414,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
             taskEntity.ProcessedDate = DateTime.Now;
             taskEntity.ErrorCode = errorCode;
             taskEntity.ErrorDesc = errorDesc;
+            taskEntity.IsProcessed = 1;
             taskEntity.TransactionStatus = 2;
             taskEntity.CountRetries = taskEntity.CountRetries + 1;
             await _topupLogRepo.UpdateAsync(taskEntity);

@@ -194,37 +194,36 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                         return NotFound(new
                         {
                             status = "2005",
-                            responseMessage = $"Tranasction reference number {statusRequest.TransactionReference} not found"
+                            responseMessage = $"Transaction reference number {statusRequest.TransactionReference} not found"
                         });
                     }
+                    QueryTxnStatusResponse queryTxnStatusResponse = null;
                     switch (trans.serviceproviderid)
                     {
                         case (int)ServiceProvider.MTN:
-                            _mtnToupService.QueryTransactionStatus(statusRequest);
+                            queryTxnStatusResponse = await _mtnToupService.QueryTransactionStatus(statusRequest);
                             break;
                         case (int)ServiceProvider.Airtel:
-
-                            _airtelPreupsService.QueryTransactionStatus(statusRequest);
+                            queryTxnStatusResponse = await _airtelPreupsService.QueryTransactionStatus(statusRequest);
                             break;
                         case (int)ServiceProvider.GLO:
-                            _gloTopupService.QueryTransactionStatus(statusRequest);
+
+                            queryTxnStatusResponse = await _gloTopupService.QueryTransactionStatus(statusRequest);
+
                             break;
                         case (int)ServiceProvider.NineMobile:
+                            queryTxnStatusResponse = await _evcService.QueryTransactionStatus(statusRequest);
                             break;
 
                         default:
                             break;
                     }
 
-                    
-
-
-                    var header = new { x = 0, y = 1 };//_mapper.Map<HpinPurchaseOrder, HpinOrderHeader >(order);
                     return Ok(new
                     {
                         status = "00",
-                        message = "",
-                        data = header
+                        message = "Successful",
+                        data = queryTxnStatusResponse
                     });
 
 
@@ -245,7 +244,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     status = "99",
-                    message = $"Failed to submit vtu topup {JsonConvert.SerializeObject(statusRequest)}"
+                    message = $"Failed to submit GetTransactionbyId{JsonConvert.SerializeObject(statusRequest)}"
 
                 });
             }
@@ -267,5 +266,94 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
             }
             return null;
         }
+
+
+        /// <summary>
+        /// Returns a list of available Databundle products by Serviceprovider
+        /// </summary>
+        /// <param name="rechargeRequest"></param>
+        /// <param name="cancellation"></param>
+        /// <returns></returns>
+        [HttpGet("{serviceProviderId}")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(typeof(List<ProductList>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
+        public async Task<IActionResult> ListProductByServiceProviderId(
+            int serviceProviderId,
+            CancellationToken cancellation)
+        {
+            await Task.Delay(0, cancellation).ConfigureAwait(false);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    _logger.LogInformation("API ENTRY: Inside ListProductByServiceProviderId API call.");
+
+                    var apikey = (string)HttpContext.Request.Headers["x-api-key"];
+                    int partnerid = _transactionRecordService.GetPartnerIdbykey(apikey);
+
+                    if (partnerid < 1)
+                    {
+                        return Unauthorized(new
+                        {
+                            status = "2001",
+                            responseMessage = "Authorization Error : Invalid API KEY"
+                        });
+                    }
+
+                    var products = await _transactionRecordService.ProductList(serviceProviderId);
+
+                    var vwdata = new List<ProductList>();
+                    foreach (var item in products)
+                    {
+                        var prod = new ProductList
+                        {
+                            ProductDescription = item.ProductName,
+                            Price = item.Price,
+                            ProductCode = item.ProductId,
+                            ProductType = Enum.GetName(typeof(ProductType), item.ServiceProviderId),
+                            Validity = item.Validity,
+                            ServiceProviderName = Enum.GetName(typeof(ServiceProvider), item.ServiceProviderId)
+                        };
+                        vwdata.Add(prod);
+                    }
+                    return Ok(new
+                    {
+                        status = "00",
+                        responseMessage = "Success",
+                        details = vwdata
+                    });
+
+
+                }
+                else
+                {
+                    return BadRequest(new
+                    {
+                        status = "2010",
+                        message = ModelState.GetErrorMessages()
+
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Api failure in ListProductByServiceProviderId with error message {ex.Message}  error details {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    status = "99",
+                    message = $"Failed to submit vtu topup {JsonConvert.SerializeObject(serviceProviderId)}"
+
+                });
+            }
+
+        }
+
+
+        
     }
 }

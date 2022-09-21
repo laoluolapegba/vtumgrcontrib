@@ -400,7 +400,7 @@ IHttpClientFactory clientFactory)
             return result;
         }
 
-        public async Task<MtnSubscriptionResponse> QueryTransactionStatus(
+        public async Task<QueryTxnStatusResponse> QueryTransactionStatus(
          QueryTransactionStatusRequest statusRequest)
         {
             _logger.LogInformation($"Inside MTN MtnQueryStatus service request");
@@ -415,7 +415,8 @@ IHttpClientFactory clientFactory)
             //https://preprod-nigeria.api.mtn.com/v2/customers/subscriptions/2348031011125/status/2021102115573975401084328?customerId=2348031011125&queryType=TRANSACTION_REFERENCE&subscriptionProviderId=ERS
 
             
-            MtnSubscriptionResponse result = new MtnSubscriptionResponse();
+            MtnSubscriptionResponse envelope = null;
+            QueryTxnStatusResponse rsp = new QueryTxnStatusResponse();
 
             var httpClient = _clientFactory.CreateClient("MtnTopupClient");
 
@@ -443,34 +444,37 @@ IHttpClientFactory clientFactory)
                     var validationErrors = errorStream.ReadAndDeserializeFromJson();
                     _logger.LogWarning($"api call MTN MtnQueryStatus returned with status code: {response.StatusCode} validationErrors: -- {validationErrors} --");
 
-                    result = JsonConvert.DeserializeObject<MtnSubscriptionResponse>(validationErrors.ToString());
+                    envelope = JsonConvert.DeserializeObject<MtnSubscriptionResponse>(validationErrors.ToString());
 
                 }
                 if (response.IsSuccessStatusCode)
                 {
                     string contentStream = await response.Content.ReadAsStringAsync();
                     _logger.LogInformation($"api call MTN MtnQueryStatus returned with contentstream  {contentStream}");
-                    result = JsonConvert.DeserializeObject<MtnSubscriptionResponse>(contentStream);
+                    envelope = JsonConvert.DeserializeObject<MtnSubscriptionResponse>(contentStream);
                 }
 
             }
-            //using (var httpContent = CreateHttpContent(subscriptionRequest))
-            //{
-            //    httpRequest.Content = httpContent;
+            if(envelope!=null)
+            {
+                rsp.exchangeReference = envelope.subscriptionDescription;
+                rsp.responseMessage = envelope.statusMessage;
+                rsp.statusId = envelope.statusCode;
+                rsp.transactionReference = envelope.transactionId;
+            }
+            
 
-            //}
-
-            return result;
+            return rsp;
         }
 
 
-        public async Task<QueryTransactionStatusResponse.Envelope> QueryTransactionStatusbyClientRef(QueryTransactionStatusRequest queryTransaction)
+        public async Task<MtnQTxResponseEnvelope.Envelope> QueryTransactionStatusbyClientRef(QueryTransactionStatusRequest queryTransaction)
         {
             _logger.LogInformation($"calling MTN QueryTransactionStatusV1 svc for transId : {queryTransaction.TransactionReference}");
             string soapAction = "urn:QyeryTx";
             _clientId = _config["MtnTopupSettings:V1:Username"];
             _clientSecret = _config["MtnTopupSettings:V1:Password"];
-            QueryTransactionStatusResponse.Envelope resultEnvelope = new QueryTransactionStatusResponse.Envelope();
+            MtnQTxResponseEnvelope.Envelope resultEnvelope = null;
             try
             {
 
@@ -535,7 +539,7 @@ IHttpClientFactory clientFactory)
                         using (XmlReader reader = new XmlTextReader(stringReader))
                         {
                             var serializer = new XmlSerializer(typeof(MtnResponseEnvelope.Envelope));
-                            resultEnvelope = serializer.Deserialize(reader) as QueryTransactionStatusResponse.Envelope;
+                            resultEnvelope = serializer.Deserialize(reader) as MtnQTxResponseEnvelope.Envelope;
                         }
                     }
                     _logger.LogInformation($"MTN QueryTransactionStatusV1 responseObject = {JsonConvert.SerializeObject(resultEnvelope)}");
@@ -552,13 +556,13 @@ IHttpClientFactory clientFactory)
             return resultEnvelope;
         }
 
-        public async Task<QueryTransactionStatusResponse.Envelope> QueryTransactionStatusbyERSRef(QueryTransactionStatusRequest queryTransaction)
+        public async Task<MtnQTxResponseEnvelope.Envelope> QueryTransactionStatusbyERSRef(QueryTransactionStatusRequest queryTransaction)
         {
             _logger.LogInformation($"calling MTN QueryTransactionStatusV1 svc for transId : {queryTransaction.TransactionReference}");
             string soapAction = "urn:QyeryTx";
             _clientId = _config["MtnTopupSettings:V1:Username"];
             _clientSecret = _config["MtnTopupSettings:V1:Password"];
-            QueryTransactionStatusResponse.Envelope resultEnvelope = new QueryTransactionStatusResponse.Envelope();
+            MtnQTxResponseEnvelope.Envelope resultEnvelope = null;
             try
             {
                 var sb = new System.Text.StringBuilder(347);
@@ -624,7 +628,7 @@ IHttpClientFactory clientFactory)
                         using (XmlReader reader = new XmlTextReader(stringReader))
                         {
                             var serializer = new XmlSerializer(typeof(MtnResponseEnvelope.Envelope));
-                            resultEnvelope = serializer.Deserialize(reader) as QueryTransactionStatusResponse.Envelope;
+                            resultEnvelope = serializer.Deserialize(reader) as MtnQTxResponseEnvelope.Envelope;
                         }
                     }
                     _logger.LogInformation($"MTN QueryTransactionStatusV1 responseObject = {JsonConvert.SerializeObject(resultEnvelope)}");

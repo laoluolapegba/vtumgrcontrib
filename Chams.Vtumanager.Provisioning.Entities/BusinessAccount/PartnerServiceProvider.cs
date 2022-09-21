@@ -13,7 +13,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.BusinessAccount
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
-        public int it { get; set; }
+        public int Id { get; set; }
 
         [Column("partner_id")]
         public int PartnerId { get; set; }

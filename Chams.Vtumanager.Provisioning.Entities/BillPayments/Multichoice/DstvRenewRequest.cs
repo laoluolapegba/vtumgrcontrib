@@ -22,7 +22,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments.Multichoice
             public int invoicePeriod { get; set; }
             public int monthsPaidFor { get; set; }
             public string subscriptionType { get; set; }
-            public int amount { get; set; }
+            public decimal amount { get; set; }
         }
 
 

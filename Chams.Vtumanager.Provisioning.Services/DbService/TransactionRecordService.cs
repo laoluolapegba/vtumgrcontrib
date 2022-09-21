@@ -95,7 +95,16 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             _logger.LogInformation($"Saving transaction record : {JsonConvert.SerializeObject(rechargeRequest)}");
             string serviceprovidername = Enum.GetName(typeof(ServiceProvider), rechargeRequest.ServiceProviderId);
             var partner = await GetPatnerById(partnerId);
-            string partnerCode = partner.PartnerCode;
+            string partnerName = partner.PartnerName;
+            var partnerService = _partnerServicesRepo.GetQueryable()
+                .Where(a => a.PartnerId == partnerId && a.ServiceProviderId == rechargeRequest.ServiceProviderId).FirstOrDefault();
+            decimal commission = 0;
+
+            if (partnerService!=null)
+            {
+                commission = partnerService.CommissionPct == null ? 0 : (decimal)partnerService.CommissionPct;
+            }
+            decimal settlementAmt = commission == 0 ? rechargeRequest.rechargeAmount : rechargeRequest.rechargeAmount - (commission / 100 * rechargeRequest.rechargeAmount);
 
             TopUpTransactionLog topUpRequest = new TopUpTransactionLog
             {
@@ -107,10 +116,13 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                 msisdn = rechargeRequest.PhoneNumber,
                 productid = rechargeRequest.ProductId,
                 serviceproviderid = rechargeRequest.ServiceProviderId,
-                sourcesystem = partnerCode,
+                sourcesystem = partnerName,
                 serviceprovidername = serviceprovidername,
                 PartnerId = partnerId,
                 CountRetries = 0,
+                IsProcessed = 0,
+                TransactionStatus = 0,
+                SettlementAmount = settlementAmt
 
 
             };

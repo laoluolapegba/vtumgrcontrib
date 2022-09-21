@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.Xml.Serialization;
 using System.Xml;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp.Glo;
+using Newtonsoft.Json;
 
 namespace Chams.Vtumanager.Provisioning.Services.GloTopup
 {
@@ -276,36 +277,52 @@ IHttpClientFactory clientFactory)
             return resultEnvelope;
         }
 
-        public async Task<GloDataResultEnvelope.Envelope> QueryTransactionStatus(QueryTransactionStatusRequest queryTransaction)
+        public async Task<QueryTxnStatusResponse> QueryTransactionStatus(QueryTransactionStatusRequest queryTransaction)
         {
 
             _logger.LogInformation($"calling Glo QueryTransactionStatus svc for transId : { queryTransaction.transactionId}");
 
-            GloDataResultEnvelope.Envelope resultEnvelope = new GloDataResultEnvelope.Envelope();
+            GloQueryTxnResponse.Envelope resultEnvelope = null ;
+            QueryTxnStatusResponse queryTxnStatusResponse = new QueryTxnStatusResponse();
             try
             {
 
                 string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                var sb = new System.Text.StringBuilder(2079);
+
+                var sb = new System.Text.StringBuilder(1158);
+                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
                 sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:ext=""http://external.interfaces.ers.seamless.com/"">");
-                sb.AppendLine(@" <soapenv:Header/>");
-                sb.AppendLine(@" <soapenv:Body>");
-                sb.AppendLine(@"    <ext:requestTopup>");
-                sb.AppendLine(@"       <!--Optional:-->");
-                sb.AppendLine(@"       <context>");
-                sb.AppendLine(@"          <channel>WSClient</channel>");
-                sb.AppendLine(@"          <clientComment>" + queryTransaction.transactionId + "</clientComment>");
-                sb.AppendLine(@"          <clientId>ERS</clientId>");
-                sb.AppendLine(@"          <prepareOnly>false</prepareOnly>");
-                sb.AppendLine(@"          <clientReference>" + queryTransaction.transactionId + "</clientReference>");
-                sb.AppendLine(@"          <clientRequestTimeout>500</clientRequestTimeout>");
-                sb.AppendLine(@"          <initiatorPrincipalId>");
-                sb.AppendLine(@"                <id>" + _settings.Initiator.Id + "</id>");
-                sb.AppendLine(@"                <type>RESELLERUSER</type>");
-                sb.AppendLine(@"                <userId>" + _settings.Initiator.UserId + "</userId>");
-                sb.AppendLine(@"          </initiatorPrincipalId>");
-                sb.AppendLine(@"          <password>" + _settings.Initiator.Password + "</password>");
-                sb.AppendLine(@"          <transactionProperties>");
+                sb.AppendLine(@"   <soapenv:Header />");
+                sb.AppendLine(@"   <soapenv:Body>");
+                sb.AppendLine(@"      <ext:executeReport>");
+                sb.AppendLine(@"         <context>");
+                sb.AppendLine(@"            <channel>WSClient</channel>");
+                sb.AppendLine(@"            <clientComment>?</clientComment>");
+                sb.AppendLine(@"            <clientId>ERS</clientId>");
+                sb.AppendLine(@"            <clientReference>?</clientReference>");
+                sb.AppendLine(@"            <clientRequestTimeout>500</clientRequestTimeout>");
+                sb.AppendLine(@"            <initiatorPrincipalId>");
+                sb.AppendLine(@"               <id>DIST1</id>");
+                sb.AppendLine(@"               <type>RESELLERUSER</type>");
+                sb.AppendLine(@"               <userId>9900</userId>");
+                sb.AppendLine(@"            </initiatorPrincipalId>");
+                sb.AppendLine(@"            <password>2015</password>");
+                sb.AppendLine(@"         </context>");
+                sb.AppendLine(@"         <reportId>LAST_TRANSACTION</reportId>");
+                sb.AppendLine(@"         <language>en</language>");
+                sb.AppendLine(@"         <parameters>");
+                sb.AppendLine(@"            <parameter>");
+                sb.AppendLine(@"               <!--Zero or more repetitions:-->");
+                sb.AppendLine(@"               <entry>");
+                sb.AppendLine(@"                  <key>?</key>");
+                sb.AppendLine(@"                  <value>?</value>");
+                sb.AppendLine(@"               </entry>");
+                sb.AppendLine(@"            </parameter>");
+                sb.AppendLine(@"         </parameters>");
+                sb.AppendLine(@"      </ext:executeReport>");
+                sb.AppendLine(@"   </soapenv:Body>");
+                sb.AppendLine(@"</soapenv:Envelope>");
+
 
 
 
@@ -325,7 +342,7 @@ IHttpClientFactory clientFactory)
                 {
                     Content = new StringContent(Regex.Unescape(sb.ToString()), Encoding.UTF8, "text/xml"),
                 };
-                _logger.LogInformation($"Calling GloDataRecharge URL  {request.RequestUri}");
+                _logger.LogInformation($"Calling GloQueryTransactionStatus URL  {request.RequestUri}");
                 //request.Headers.Clear();
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
 
@@ -340,18 +357,26 @@ IHttpClientFactory clientFactory)
                     }
                     var contentStream = await response.Content.ReadAsStringAsync();
 
-                    _logger.LogInformation($"GloDataRecharge response = {contentStream}");
+                    _logger.LogInformation($"Glo QueryTransactionStatus response = {contentStream}");
 
 
                     using (var stringReader = new StringReader(contentStream))
                     {
                         using (XmlReader reader = new XmlTextReader(stringReader))
                         {
-                            var serializer = new XmlSerializer(typeof(GloDataResultEnvelope.Envelope));
-                            resultEnvelope = serializer.Deserialize(reader) as GloDataResultEnvelope.Envelope;
+                            var serializer = new XmlSerializer(typeof(GloQueryTxnResponse.Envelope));
+                            resultEnvelope = serializer.Deserialize(reader) as GloQueryTxnResponse.Envelope;
                         }
                     }
 
+                }
+
+                if(resultEnvelope !=null)
+                {
+                    queryTxnStatusResponse.statusId = resultEnvelope.Body.executeReportResponse.@return.resultCode.ToString();
+                    queryTxnStatusResponse.responseMessage = resultEnvelope.Body.executeReportResponse.@return.resultDescription;
+                    queryTxnStatusResponse.exchangeReference = resultEnvelope.Body.executeReportResponse.@return.report.contentString;
+                    queryTxnStatusResponse.transactionReference = queryTransaction.transactionId;
                 }
             }
 
@@ -360,10 +385,10 @@ IHttpClientFactory clientFactory)
             //}
             catch (Exception ex)
             {
-                _logger.LogError($"QueryTransactionStatus svc failed for transId : {queryTransaction.transactionId} with error {ex}");
+                _logger.LogError($"Glo QueryTransactionStatus svc failed for transId : {queryTransaction.transactionId} with error {JsonConvert.SerializeObject(ex)}");
             }
 
-            return resultEnvelope;
+            return queryTxnStatusResponse;
         }
     }
 }

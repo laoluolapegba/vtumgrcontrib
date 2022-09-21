@@ -35,8 +35,16 @@ namespace Chams.Vtumanager.Provisioning.Entities.Common
         public int channelid { get; set; }
         [Column("sourcesystem")]
         public string sourcesystem { get; set; }
+       
+        /// <summary>
+        /// Indicates if transaction has been processed at least once. 0 = notprocessed, 1= Processed
+        /// </summary>
         [Column("is_processed")]
+       
         public int IsProcessed { get; set; }
+        /// <summary>
+        /// 0 = NotProcessed, 1 = Succecss, 2 = Failed
+        /// </summary>
         [Column("transaction_status")]
         public int TransactionStatus { get; set; }
         [Column("count_retries")]
@@ -51,5 +59,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.Common
         public string external_transref { get; set; }
         [Column("partner_id")]
         public int PartnerId { get; set; }
+        [Column("settlement_amount")]
+        public decimal SettlementAmount { get; set; }
     }
 }

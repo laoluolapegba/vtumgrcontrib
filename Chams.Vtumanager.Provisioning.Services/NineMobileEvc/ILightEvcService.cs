@@ -15,5 +15,6 @@ namespace Chams.Vtumanager.Provisioning.Services.NineMobileEvc
         
         Task<RechargeResponseEnvelope.Envelope> PinlessRecharge(PinlessRechargeRequest pinlessRechargeRequest);
         Task<QueryBalanceResponseEnvelope.Envelope> QueryEvcBalance(QueryBalanceRequest queryBalanceRequest);
+        Task<QueryTxnStatusResponse> QueryTransactionStatus(QueryTransactionStatusRequest statusRequest);
     }
 }

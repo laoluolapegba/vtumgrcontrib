@@ -24,6 +24,8 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\nimcController.cs" />
+    <Compile Remove="Controllers\v1\ProductsController.cs" />
+    <Compile Remove="Controllers\v1\rest\ProductsController.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,6 +61,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Helpers\tmp\" />
     <Folder Include="logs\" />
   </ItemGroup>
 

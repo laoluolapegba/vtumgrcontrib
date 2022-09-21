@@ -98,26 +98,10 @@
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.productsController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest.billerController">
             <summary>
             
             </summary>
-        </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.productsController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.productsController},Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
-            <summary>
-            
-            </summary>
-            <param name="logger"></param>
-            <param name="aMQService"></param>
-            <param name="transactionRecordService"></param>
-        </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.productsController.ListProductByServiceProviderId(System.Int32,System.Threading.CancellationToken)">
-            <summary>
-            Returns a list of available Databundle products by Serviceprovider
-            </summary>
-            <param name="rechargeRequest"></param>
-            <param name="cancellation"></param>
-            <returns></returns>
         </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.ShowmaxVouchers">
             <summary>
@@ -165,6 +149,14 @@
             Query the status of a transaction
             </summary>
             <param name="transactionReference"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController.ListProductByServiceProviderId(System.Int32,System.Threading.CancellationToken)">
+            <summary>
+            Returns a list of available Databundle products by Serviceprovider
+            </summary>
+            <param name="rechargeRequest"></param>
             <param name="cancellation"></param>
             <returns></returns>
         </member>

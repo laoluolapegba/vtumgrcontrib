@@ -13,8 +13,8 @@ namespace Chams.Vtumanager.Provisioning.Services.Mtn
         Task<RechargeResponseEnvelope.Envelope> DataRecharge(PinlessRechargeRequest pinlessRechargeRequest);
         Task<AccessTokenResponse> GetAccessToken();
         Task<MtnSubscriptionResponse> MtnSubscription(PinlessRechargeRequest pinlessRechargeRequest);
-        Task<MtnSubscriptionResponse> QueryTransactionStatus(QueryTransactionStatusRequest statusRequest);
-        Task<QueryTransactionStatusResponse.Envelope> QueryTransactionStatusbyERSRef(QueryTransactionStatusRequest queryTransaction);
-        Task<QueryTransactionStatusResponse.Envelope> QueryTransactionStatusbyClientRef(QueryTransactionStatusRequest queryTransaction);
+        Task<QueryTxnStatusResponse> QueryTransactionStatus(QueryTransactionStatusRequest statusRequest);
+        Task<MtnQTxResponseEnvelope.Envelope> QueryTransactionStatusbyERSRef(QueryTransactionStatusRequest queryTransaction);
+        Task<MtnQTxResponseEnvelope.Envelope> QueryTransactionStatusbyClientRef(QueryTransactionStatusRequest queryTransaction);
     }
 }

@@ -274,85 +274,102 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
         /// </summary>
         /// <param name="queryTransactionStatusRequest"></param>
         /// <returns></returns>
-        public async Task<RequestBalanceResp> QueryTransactionStatus(QueryTransactionStatusRequest queryTransactionStatusRequest)
+        public async Task<QueryTxnStatusResponse> QueryTransactionStatus(QueryTransactionStatusRequest queryTransactionStatusRequest)
         {
 
             string _url = _config["PretupsSettings:Url"];
-            _logger.LogInformation($"calling QueryTransactionStatus svc for transId : {queryTransactionStatusRequest.TransactionReference}");
+            _logger.LogInformation($"calling Airtel QueryTransactionStatus svc for transId : {queryTransactionStatusRequest.TransactionReference}");
 
-            RequestBalanceResp resultEnvelope = new RequestBalanceResp();
+            QueryTxnStatusResponse queryTransaction = new QueryTxnStatusResponse();
+
+            QueryTxnResponseEnvelope.COMMAND airteairtelEnvelope  = null;
+
             try
             {
+                string tranDate = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
 
-                var sb = new System.Text.StringBuilder(1244);
 
-                _logger.LogInformation($"Airtel QueryTransactionStatus soap request = {sb.ToString()}");  //
+                var sb = new System.Text.StringBuilder(396);
+                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
+                sb.AppendLine(@"<!DOCTYPE COMMAND PUBLIC ""-//Ocam//DTD XML Command 1.0//EN"" ""xml/command.dtd"">");
+                sb.AppendLine(@"<COMMAND>");
+                sb.AppendLine(@"<TYPE>EXRCSTATREQ</TYPE>");
+                sb.AppendLine(@"<DATE />");
+                sb.AppendLine(@"<EXTNWCODE>NG</EXTNWCODE>");
+                sb.AppendLine(@"<MSISDN>"+ _settings.PartnerMsisdn + "</MSISDN>");
+                sb.AppendLine(@"<PIN>" + _settings.PIN + "</PIN>");
+                sb.AppendLine(@"<LOGINID />");
+                sb.AppendLine(@"<PASSWORD />");
+                sb.AppendLine(@"<EXTCODE />");
+                sb.AppendLine(@"<EXTREFNUM>" +  queryTransactionStatusRequest.TransactionReference + "</EXTREFNUM>");
+                sb.AppendLine(@"<TXNID />");
+                sb.AppendLine(@"<LANGUAGE1>1</LANGUAGE1>");
+                sb.AppendLine(@"</COMMAND>");
+
+
+                _logger.LogInformation($"Airtel DataRecharge soap request = {sb.ToString()}");
+
 
                 var httpClient = _clientFactory.CreateClient("PretupsRechargeClient");
 
+                HttpClientHandler clientHandler = new HttpClientHandler();
+                clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
-                var request = new HttpRequestMessage(HttpMethod.Post, _url) //_settings.queryBalance.Url
+                // Pass the handler to httpclient(from you are calling api)
+                HttpClient client = new HttpClient(clientHandler);
+
+
+
+                var request = new HttpRequestMessage(HttpMethod.Post, _settings.Url)
                 {
                     Content = new StringContent(Regex.Unescape(sb.ToString()), Encoding.UTF8, "text/xml"),
                 };
-                _logger.LogInformation($"Calling QueryBalanceRequest URL  {request.RequestUri}");
+                _logger.LogInformation($"Calling Airtel QueryTransactionStatus URL  {request.RequestUri}");
                 //request.Headers.Clear();
                 request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
-
 
                 using (var response = await httpClient.SendAsync(request,
                     HttpCompletionOption.ResponseHeadersRead))
                 {
                     if (!response.IsSuccessStatusCode)
                     {
-                        if (response.StatusCode == System.Net.HttpStatusCode.UnprocessableEntity)
-                        {
-                            var errorStream = await response.Content.ReadAsStreamAsync();
-                            var validationErrors = errorStream.ReadAndDeserializeFromJson();
-                            _logger.LogWarning($"QueryTransactionStatus api call returned with status code {response.StatusCode} {validationErrors}");
-
-                        }
-                        if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                        {
-                            var errorStream = await response.Content.ReadAsStreamAsync();
-                            var validationErrors = errorStream.ReadAndDeserializeFromJson();
-                            // show this to the user
-                            _logger.LogWarning($"QueryTransactionStatus api call returned with status code {response.StatusCode} {validationErrors}");
-
-                        }
-                        else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                        {
-                            // trigger a login flow
-                            var errorStream = await response.Content.ReadAsStreamAsync();
-                            var validationErrors = errorStream.ReadAndDeserializeFromJson();
-                            _logger.LogWarning($"QueryTransactionStatus call returned with status code {response.StatusCode} {validationErrors}");
-                        }
-                        else
-                        {
-                            response.EnsureSuccessStatusCode();
-                        }
+                        var errorStream = await response.Content.ReadAsStreamAsync();
+                        var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                        _logger.LogWarning($"Airtel QueryTransactionStatus api call returned with status code {response.StatusCode} {validationErrors}");
                     }
                     var contentStream = await response.Content.ReadAsStringAsync();
 
-                    _logger.LogInformation($"QueryTransactionStatus response = {contentStream}");
+                    _logger.LogInformation($"Airtel QueryTransactionStatus response = {contentStream}");
+
+
                     using (var stringReader = new StringReader(contentStream))
                     {
                         using (XmlReader reader = new XmlTextReader(stringReader))
                         {
-                            var serializer = new XmlSerializer(typeof(RequestBalanceResp));
-                            resultEnvelope = serializer.Deserialize(reader) as RequestBalanceResp;
+                            var serializer = new XmlSerializer(typeof(QueryTxnResponseEnvelope.COMMAND));
+                            airteairtelEnvelope = serializer.Deserialize(reader) as QueryTxnResponseEnvelope.COMMAND;
                         }
                     }
 
                 }
+
+                if (airteairtelEnvelope != null)
+                {
+                    queryTransaction.exchangeReference = airteairtelEnvelope.EXTREFNUM;
+                    queryTransaction.statusId = airteairtelEnvelope.TXNSTATUS.ToString();
+                    queryTransaction.transactionReference = airteairtelEnvelope.TXNID;
+                    queryTransaction.responseMessage = airteairtelEnvelope.MESSAGE;
+
+                }
             }
 
+           
             catch (Exception ex)
             {
-                _logger.LogError($"QueryTransactionStatus for {queryTransactionStatusRequest.TransactionReference}failed with {ex}");
+                _logger.LogError($"Airtel QueryTransactionStatus svc failed for transId : {JsonConvert.SerializeObject(queryTransactionStatusRequest)} with error {JsonConvert.SerializeObject(ex)}");
             }
 
-            return resultEnvelope;
+            return queryTransaction;
         }
     }
 }

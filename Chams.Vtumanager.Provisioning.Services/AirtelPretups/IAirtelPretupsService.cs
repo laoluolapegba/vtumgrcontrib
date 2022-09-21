@@ -8,6 +8,6 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
     {
         Task<PretupsRechargeResponseEnvelope.COMMAND> AirtimeRecharge(PinlessRechargeRequest pinRechargeRequest);
         Task<PretupsRechargeResponseEnvelope.COMMAND> DataRecharge(PinlessRechargeRequest pinRechargeRequest);
-        Task<RequestBalanceResp> QueryTransactionStatus(QueryTransactionStatusRequest queryTransactionStatusRequest);
+        Task<QueryTxnStatusResponse> QueryTransactionStatus(QueryTransactionStatusRequest queryTransactionStatusRequest);
     }
 }
