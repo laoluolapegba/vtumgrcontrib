@@ -62,7 +62,7 @@ namespace Chams.Vtumanager.Provisioning.Data
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
         public DbSet<StockLevels> StockLevels { get; set; }
 
-        //public DbSet<Product> Products { get; set; }
+        public DbSet<CarrierPrefix> CarrierPrefixes { get; set; }
 
         private void OnEntityUpdating()
         {

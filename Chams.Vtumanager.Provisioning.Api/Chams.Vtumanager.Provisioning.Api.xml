@@ -4,124 +4,55 @@
         <name>Chams.Vtumanager.Provisioning.Api</name>
     </assembly>
     <members>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AbujaDiscoController">
+        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.generalservicesController">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AuthenticationController">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.generalservicesController.#ctor(Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController},Chams.Vtumanager.Provisioning.Services.QueService.IAMQService,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService,Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco.IBillerPaymentsService)">
             <summary>
             
             </summary>
+            <param name="logger"></param>
+            <param name="aMQService"></param>
+            <param name="transactionRecordService"></param>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AuthenticationController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Chams.Vtumanager.Provisioning.Services.Authentication.IAuthenticationService,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Api.Controllers.v1.AuthenticationController})">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.generalservicesController.WalletBalance(System.Threading.CancellationToken)">
             <summary>
-            
+            Request Wallet Balance
             </summary>
-            <param name="config"></param>
-            <param name="authenticationService"></param>
-        </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.AuthenticationController.Login(Chams.Vtumanager.Provisioning.Api.ViewModels.UserLogin)">
-            <summary>
-            Login
-            </summary>
-            <param name="userLogin"></param>
+            <param name="rechargeRequest"></param>
+            <param name="cancellation"></param>
             <returns></returns>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.BulkSMSController">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.generalservicesController.ServiceList(System.Threading.CancellationToken)">
             <summary>
-            
+            Returns a list of available bill payment services
             </summary>
+            <param name="transactionReference"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.CarpaddyController">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.generalservicesController.ListProductByServiceProviderId(System.Int32,System.Threading.CancellationToken)">
             <summary>
-            
+            Returns a list of available Databundle products by Serviceprovider
             </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.CornerstoneController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.EkoElectricController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IbadanDiscoController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.IkejaElectricController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.JambCandidatesPINController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.JosElectricController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KadunaController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.KedcoController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.MultiChoiceDstvController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.MultiChoiceGotvController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.MutualMotoVehicleInsuranceController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.PortHarcourtController">
-            <summary>
-            
-            </summary>
+            <param name="rechargeRequest"></param>
+            <param name="cancellation"></param>
+            <returns></returns>
         </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest.billerController">
             <summary>
             
             </summary>
         </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.ShowmaxVouchers">
+        <member name="M:Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest.RawRequestHelper.GetRawBodyAsync(Microsoft.AspNetCore.Http.HttpRequest,System.Text.Encoding)">
             <summary>
-            
+            this method helps to accept raw string from a request 
             </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SmileRechargeController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.SpectranetController">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.StartimesController">
-            <summary>
-            
-            </summary>
+            <param name="request"></param>
+            <param name="encoding"></param>
+            <returns></returns>
         </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.vtuController">
             <summary>
@@ -159,11 +90,6 @@
             <param name="rechargeRequest"></param>
             <param name="cancellation"></param>
             <returns></returns>
-        </member>
-        <member name="T:Chams.Vtumanager.Provisioning.Api.Controllers.v1.WaecPINController">
-            <summary>
-            
-            </summary>
         </member>
         <member name="T:Chams.Vtumanager.Provisioning.Api.Helpers.Swagger.ConfigureSwaggerGenOptions">
             <summary>

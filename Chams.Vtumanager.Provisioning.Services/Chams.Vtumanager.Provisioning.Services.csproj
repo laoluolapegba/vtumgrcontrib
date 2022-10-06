@@ -6,8 +6,11 @@
 
   <ItemGroup>
     <Compile Remove="AzureAuthentication\**" />
+    <Compile Remove="NewFolder\**" />
     <EmbeddedResource Remove="AzureAuthentication\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
     <None Remove="AzureAuthentication\**" />
+    <None Remove="NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,11 +31,6 @@
     <ProjectReference Include="..\Chams.Vtumanager.Provisioning.Data\Chams.Vtumanager.Provisioning.Data.csproj" />
     <ProjectReference Include="..\Chams.Vtumanager.Provisioning.Entities\Chams.Vtumanager.Provisioning.Entities.csproj" />
     <ProjectReference Include="..\Chams.Vtumanager.Provisioning.Infrastructure\Chams.Vtumanager.Provisioning.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="BillPayments\Showmax - Copy\" />
-    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

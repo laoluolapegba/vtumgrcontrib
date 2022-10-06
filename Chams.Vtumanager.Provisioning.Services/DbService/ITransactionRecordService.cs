@@ -1,4 +1,5 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
+﻿using Chams.Vtumanager.Provisioning.Entities;
+using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.Epurse;
 using Chams.Vtumanager.Provisioning.Entities.Inventory;
@@ -23,9 +24,11 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         bool IsEpurseExist(int partnerId, int tenantId);
         Task<IEnumerable<StockBalanceView>> GetStockbalancesbyPartnerId(int partnerId);
         Task<bool> PurchaseStock(StockPurchaseOrder stockPurchaseRequest, bool addCommision);
-        int GetPartnerIdbykey(string apiKey);
+        //int GetPartnerIdbykey(string apiKey);
+        Task<ApiCredentials> GetPartnerbyAPIkey(string apiKey);
         Task<BusinessAccount> GetPatnerById(int partnerId);
         Task<IEnumerable<VtuProducts>> ProductList(int serviceProviderId);
         Task<TopUpTransactionLog> GetTransactionById(int serviceproviderId, string transactionReference);
+        CarrierPrefix GetServiceProviderByPrefix(string prefix);
     }
 }

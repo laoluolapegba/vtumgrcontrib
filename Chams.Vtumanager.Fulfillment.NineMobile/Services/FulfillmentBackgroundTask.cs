@@ -118,6 +118,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                         switch (item.serviceproviderid)
                         {
                             case (int)ServiceProvider.MTN:
+                                /*
                                 MtnSubscriptionResponse mtnresult = new MtnSubscriptionResponse();
                                 mtnresult = await _mtnToupService.MtnSubscription(pinlessRechargeRequest);
                                 if (mtnresult != null)
@@ -144,23 +145,22 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                 {
                                     await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                 }
+                                */
 
                                 if (item.transtype == 1)
                                 {
-                                    
-
-                                    /*
                                     MtnResponseEnvelope.Envelope mtnenv1 = new MtnResponseEnvelope.Envelope();
                                     mtnenv1 = await _mtnToupService.AirtimeRecharge(pinlessRechargeRequest);
                                     if (mtnenv1.body != null)
                                     {
                                         if (mtnenv1.body.vendResponse.responseCode == 0 && mtnenv1.body.vendResponse.statusId == "0")
                                         {
+                                            externaltransref = mtnenv1.body.vendResponse.txRefId;
                                             await UpdateTaskStatusAsync(item.RecordId,
                                                 mtnenv1.body.vendResponse.responseCode.ToString(),
-                                                mtnenv1.body.vendResponse.responseMessage
-                                                );
-                                            evctransId = mtnenv1.body.vendResponse.txRefId.ToString();
+                                                mtnenv1.body.vendResponse.responseMessage,
+                                                externaltransref
+                                                );                                            
                                         }
                                         else
                                         {
@@ -174,9 +174,9 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     {
                                         await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                     }
-                                    */
+
                                 }
-                                
+
                                 break;
                             case (int)ServiceProvider.Airtel:
                                 if (item.transtype == 1)

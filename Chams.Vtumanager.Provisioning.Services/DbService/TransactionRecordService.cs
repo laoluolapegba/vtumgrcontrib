@@ -22,7 +22,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
 {
     public class TransactionRecordService : ITransactionRecordService
     {
-        private readonly ILogger<TransactionRecordService> _logger;
+        private readonly ILogger<ITransactionRecordService> _logger;
         private readonly IRepository<TopUpTransactionLog> _requestsRepo;
         private readonly IRepository<EpurseAccountMaster> _epurserepo;
         private readonly IRepository<BusinessAccount> _partnerRepo;
@@ -32,9 +32,10 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         private readonly IRepository<ApiCredentials> _apicredRepo;
         private readonly IRepository<StockMaster> _stockmasterRepo;
         private readonly IRepository<PartnerServiceProvider> _partnerServicesRepo;
+        private readonly IRepository<CarrierPrefix> _carrierRepo;
 
         public TransactionRecordService(
-            ILogger<TransactionRecordService> logger,
+            ILogger<ITransactionRecordService> logger,
 
             IUnitOfWork unitOfWork)
         {
@@ -48,7 +49,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             _apicredRepo = unitOfWork.GetRepository<ApiCredentials>();
             _stockmasterRepo = unitOfWork.GetRepository<StockMaster>();
             _partnerServicesRepo = unitOfWork.GetRepository<PartnerServiceProvider>();
-
+            _carrierRepo = unitOfWork.GetRepository<CarrierPrefix>();
             //_productsRepo = unitOfWork.GetRepository<Product>();
         }
         /// <summary>
@@ -65,24 +66,27 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             return requestObkect.Count() > 0;
 
         }
-        public int GetPartnerIdbykey(string apiKey)
+        public async Task<ApiCredentials> GetPartnerbyAPIkey(string apiKey)
         {
-            int partnerid = 0;
+            //int partnerid = 0;
+            ApiCredentials creds = null;
             try
             {
-                _logger.LogInformation($"Checking if GetPartnerIdbykey from Database");
-                var requestObject = _apicredRepo.GetQueryable()
+                _logger.LogInformation($"Checking GetPartnerbyAPIkey from Database");                
+
+                creds = _apicredRepo.GetQueryable()
 
                     .Where(a => a.ApiKey == apiKey && a.Active == true).FirstOrDefault();
-                partnerid = requestObject.Id;
+                
+                //partnerid = requestObject.Id;
             }
             catch(Exception ex)
             {
                 _logger.LogError($"Failed to get partnerId by apikey");
-                partnerid = 0;
+                //return creds;
             }
 
-            return partnerid;
+            return creds;
         }
         /// <summary>
         /// 
@@ -171,6 +175,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         }
         public EpurseAccountMaster GetEpurseByPartnerIdCategoryId(int PartnerId, int productcategoryId)
         {
+            _logger.LogInformation($"Get Epurse data  for partnerId: {PartnerId} productcategory :{productcategoryId}");
 
             var epurseAccounts = _epurserepo.GetQueryable()
                 .Where(a => a.PartnerId == PartnerId && a.ProductcategoryId == productcategoryId).FirstOrDefault();
@@ -457,6 +462,12 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
 
             var transaction = _requestsRepo.GetQueryable().Where(a => a.serviceproviderid == serviceproviderId && a.transref == transactionReference).FirstOrDefault();
             return transaction;
+        }
+
+        public CarrierPrefix GetServiceProviderByPrefix(string prefix)
+        {
+            var carrier = _carrierRepo.GetQueryable().Where(a => a.Prefix == prefix).FirstOrDefault();
+            return carrier;
         }
     }
 }

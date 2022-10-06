@@ -26,6 +26,27 @@
     <Compile Remove="Controllers\nimcController.cs" />
     <Compile Remove="Controllers\v1\ProductsController.cs" />
     <Compile Remove="Controllers\v1\rest\ProductsController.cs" />
+    <Compile Remove="Helpers\tmp\AbujaDiscoController.cs" />
+    <Compile Remove="Helpers\tmp\AuthenticationController.cs" />
+    <Compile Remove="Helpers\tmp\BulkSMSController.cs" />
+    <Compile Remove="Helpers\tmp\CarpaddyController.cs" />
+    <Compile Remove="Helpers\tmp\CornerstoneController.cs" />
+    <Compile Remove="Helpers\tmp\EkoElectricController.cs" />
+    <Compile Remove="Helpers\tmp\IbadanDiscoController.cs" />
+    <Compile Remove="Helpers\tmp\IkejaElectricPurchaseController.cs" />
+    <Compile Remove="Helpers\tmp\JambCandidatesPINController.cs" />
+    <Compile Remove="Helpers\tmp\JosElectricController.cs" />
+    <Compile Remove="Helpers\tmp\KadunaController.cs" />
+    <Compile Remove="Helpers\tmp\KedcoController.cs" />
+    <Compile Remove="Helpers\tmp\MultiChoiceDstvController.cs" />
+    <Compile Remove="Helpers\tmp\MultiChoiceGotvController.cs" />
+    <Compile Remove="Helpers\tmp\MutualMotoVehicleInsuranceController.cs" />
+    <Compile Remove="Helpers\tmp\PortHarcourtController.cs" />
+    <Compile Remove="Helpers\tmp\ShowmaxVouchers.cs" />
+    <Compile Remove="Helpers\tmp\SmileRechargeController.cs" />
+    <Compile Remove="Helpers\tmp\SpectranetController.cs" />
+    <Compile Remove="Helpers\tmp\StartimesController.cs" />
+    <Compile Remove="Helpers\tmp\WaecPINController.cs" />
   </ItemGroup>
 
   <ItemGroup>

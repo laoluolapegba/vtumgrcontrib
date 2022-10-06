@@ -94,6 +94,10 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                             var partner = await _transaactionRecordService.GetPatnerById(mst.PartnerId);
                             string partnerCode = partner.PartnerCode;
                             //string timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff", CultureInfo.InvariantCulture);
+
+                            //validate the number 
+                            int serviceproviderId = CarrierLookup(item.Msisdn);
+
                             TopUpTransactionLog topUpRequest = new TopUpTransactionLog
                             {
                                 tran_date = DateTime.Now,
@@ -103,7 +107,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                                 channelid = channelId,
                                 msisdn = item.Msisdn,
                                 productid = item.ProductCode,
-                                serviceproviderid = item.ServiceProviderId,
+                                serviceproviderid = serviceproviderId,
                                 sourcesystem = partnerCode,
                                 serviceprovidername = serviceprovidername,
                                 PartnerId = mst.PartnerId,
@@ -135,6 +139,24 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
             _logger.LogInformation($"BulkTopup Prepaid background worker processed {successCount} successfully" + " at " + DateTime.Now);
 
         }
+
+        private int CarrierLookup(string msisdn)
+        {
+            int serviceprovider = 0;
+            try
+            {
+                string prefix = msisdn.Substring(0, 4);
+                var carrier = _transaactionRecordService.GetServiceProviderByPrefix(prefix);
+                return carrier.ServiceProviderId;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogInformation($"failed to lookup carrier info for MSISDN : {msisdn}");
+            }
+
+            return serviceprovider;
+        }
+
         /// <summary>
         /// 
         /// </summary>

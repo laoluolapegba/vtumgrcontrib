@@ -43,6 +43,11 @@ using Newtonsoft.Json;
 using System.Reflection.PortableExecutable;
 using Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice;
 using Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco;
+using Chams.Vtumanager.Provisioning.Services.NineMobileEvc;
+using Chams.Vtumanager.Provisioning.Services.GloTopup;
+using Chams.Vtumanager.Provisioning.Services.Mtn;
+using Chams.Vtumanager.Fulfillment.NineMobile.Services;
+using Chams.Vtumanager.Provisioning.Api.Helpers;
 
 namespace Chams.Vtumanager.Provisioning.Api
 {
@@ -133,6 +138,12 @@ namespace Chams.Vtumanager.Provisioning.Api
             services.AddScoped<IUnitOfWork, UnitOfWork<ChamsProvisioningDbContext>>();
             services.AddScoped<IMultichoicePaymentsService, MultichoicePaymentsService>();
             services.AddScoped<IBillerPaymentsService, BillerPaymentsService>();
+            services.AddScoped<ILightEvcService, LightEvcService>();
+
+            services.AddScoped<IGloTopupService, GloTopupService>();
+            services.AddScoped<IMtnTopupService, MtnTopupService>();
+            services.AddScoped<IAirtelPretupsService, AirtelPretupsService>();
+            
             services.AddHttpClient("BaxiBillsAPI", client =>
             {
                 client.BaseAddress = new Uri(_config["BaxiBillsAPI:URL"]);
@@ -312,7 +323,10 @@ namespace Chams.Vtumanager.Provisioning.Api
                 //    Path.Combine(env.WebRootPath, "yaml")),
                 //RequestPath = new PathString("/yaml")
             });
-
+            app.UseWhen(
+                ctx => ctx.Request.Path.StartsWithSegments("/v1/api/rest/biller/exchange"),
+                ab => ab.UseMiddleware<EnableRequestBodyBufferingMiddleware>()
+            );
             app.UseRouting();
             app.UseAuthentication();
             

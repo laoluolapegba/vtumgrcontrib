@@ -38,7 +38,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
 
 
         #region General Bill payments
-        public async Task<BillPaymentsResponse> BillerPayAsync(BillpaymentRequestRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> BillerPayAsync(string paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside BillerPayAsync service request");
@@ -121,8 +121,166 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
             return result;
         }
 
+        public async Task<BillPaymentsResponse> ProxyAsync(ProxyRequest proxyRequest, CancellationToken cancellationToken)
+        {
 
-        
+            _logger.LogInformation($"Inside BillerPayAsync service request");
+
+            BillPaymentsResponse result = new BillPaymentsResponse();
+
+            string gatewayURL = _configuration["BaxiBillsAPI:URL"];
+
+            var httpClient = _httpFactory.CreateClient("BaxiBillsAPI");
+
+            string baxi_Username = _configuration["BaxiBillsAPI:BAXI_USERNAME"];
+            string BAXI_SEC_TOKEN = _configuration["BaxiBillsAPI:BAXI_SEC_TOKEN"];
+
+
+            string jsonRequest = JsonConvert.SerializeObject(proxyRequest); //  JsonConvert.SerializeObject(dstvRequest);
+
+            string sha256 = sha256hash(jsonRequest);
+
+
+            string hashedPayload = HexString2B64String(sha256);
+            //Console.WriteLine("hashedPayload=" + hashedPayload);
+            var x_mspdate = DateTime.UtcNow; // DateTime.Now.ToString("R"); Wed, 17 Aug 2022 21:14:00 GMT
+            Int32 unixTimestamp = (int)x_mspdate.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+            string serveletPath = _configuration["BaxiBillsAPI:ServletPath"];
+
+            StringBuilder strToSign = new StringBuilder();
+            strToSign.Append("POST");
+            //strToSign.Append( Environment.NewLine);
+            strToSign.Append(serveletPath);
+            //strToSign.Append(Environment.NewLine);
+            strToSign.Append(unixTimestamp);
+            strToSign.Append(hashedPayload);
+
+            //var requestData = "POST/rest/consumer/v2/exchange16607235533RvQHdls/XuKe4a28q8HeK2xDZTYd7oo1YPCUedRsGM=";
+            //POST/rest/consumer/v2/exchange16607238733RvQHdls/XuKe4a28q8HeK2xDZTYd7oo1YPCUedRsGM=
+
+            string signature = HexString2B64String(ComputeHMAC_SHA1(strToSign.ToString(), BAXI_SEC_TOKEN));
+
+            string authHeader = "Baxi" + " " + baxi_Username + ":" + signature;  //Baxi baxi_ZN1GmmLtE:mmKFvIJUA9ZEQyFoIJlrFYpR3gU=
+            //authHeader = "Baxi baxi_ZN1GmmLtE:+tcdGZB7tqwXrnRsgLRcMVW5Ydg=";
+
+            httpClient.DefaultRequestHeaders.Add("Authorization", authHeader); //[{"key":"x-msp-date","value":"{{x-msp-date}}","type":"text"}]
+            httpClient.DefaultRequestHeaders.Add("x-msp-date", x_mspdate.ToString("R")); // x_mspdate.ToString("R"));
+
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, gatewayURL + "/proxy");
+            _logger.LogInformation($"Calling BillerPayAsync  {httpRequest.RequestUri}");
+
+            using (var httpContent = CreateHttpContent(proxyRequest))
+            {
+                httpRequest.Content = httpContent;
+
+                using (var response = await httpClient
+                    .SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead)
+                    .ConfigureAwait(false))
+                {
+                    //response.EnsureSuccessStatusCode();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogInformation($"api call BillerPayAsync returned with statusCode {response.StatusCode} reason: {response.ReasonPhrase}");
+                        var errorStream = await response.Content.ReadAsStringAsync();
+
+                        //var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                        _logger.LogWarning($"api call BillerPayAsync returned with status code: {response.StatusCode} validationErrors: -- {errorStream} --");
+                        //var dstverror = JsonConvert.DeserializeObject<DstvError>(errorStream.ToString());
+
+                        result = JsonConvert.DeserializeObject<BillPaymentsResponse>(errorStream.ToString());
+
+                    }
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string contentStream = await response.Content.ReadAsStringAsync();
+                        _logger.LogInformation($"api call BillerPayAsync returned with contentstream  {contentStream}");
+                        result = JsonConvert.DeserializeObject<BillPaymentsResponse>(contentStream);
+                    }
+
+                }
+            }
+
+            return result;
+        }
+        public async Task<BillPaymentsResponse> ServiceListAsync()
+        {
+            _logger.LogInformation($"Inside ServiceListAsync service request");
+
+            BillPaymentsResponse result = new BillPaymentsResponse();
+
+            string gatewayURL = _configuration["BaxiBillsAPI:URL"];
+
+            var httpClient = _httpFactory.CreateClient("BaxiBillsAPI");
+
+            string baxi_Username = _configuration["BaxiBillsAPI:BAXI_USERNAME"];
+            string BAXI_SEC_TOKEN = _configuration["BaxiBillsAPI:BAXI_SEC_TOKEN"];
+
+            string sha256 = string.Empty;
+
+            string jsonRequest = ""; // JsonConvert.SerializeObject(paymentRequest); 
+
+            if (!string.IsNullOrEmpty(jsonRequest))
+            {
+                sha256 = sha256hash(jsonRequest);
+            }
+
+
+            string hashedPayload = HexString2B64String(sha256);
+            //Console.WriteLine("hashedPayload=" + hashedPayload);
+            var x_mspdate = DateTime.UtcNow; // DateTime.Now.ToString("R"); Wed, 17 Aug 2022 21:14:00 GMT
+            Int32 unixTimestamp = (int)x_mspdate.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+            string serveletPath = _configuration["BaxiBillsAPI:ServletPath"];
+
+            StringBuilder strToSign = new StringBuilder();
+            strToSign.Append("POST");
+            //strToSign.Append( Environment.NewLine);
+            strToSign.Append(serveletPath);
+            //strToSign.Append(Environment.NewLine);
+            strToSign.Append(unixTimestamp);
+            strToSign.Append(hashedPayload);
+
+
+            string signature = HexString2B64String(ComputeHMAC_SHA1(strToSign.ToString(), BAXI_SEC_TOKEN));
+
+            string authHeader = "Baxi" + " " + baxi_Username + ":" + signature;  //Baxi baxi_ZN1GmmLtE:mmKFvIJUA9ZEQyFoIJlrFYpR3gU=
+            //authHeader = "Baxi baxi_ZN1GmmLtE:+tcdGZB7tqwXrnRsgLRcMVW5Ydg=";
+
+            httpClient.DefaultRequestHeaders.Add("Authorization", authHeader); //[{"key":"x-msp-date","value":"{{x-msp-date}}","type":"text"}]
+            httpClient.DefaultRequestHeaders.Add("x-msp-date", x_mspdate.ToString("R")); // x_mspdate.ToString("R"));
+
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, gatewayURL + "/services");
+            _logger.LogInformation($"Calling BillerPayAsync  {httpRequest.RequestUri}");
+
+            using (var response = await httpClient
+                   .SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead)
+                   .ConfigureAwait(false))
+            {
+                //response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"api call BillerPayAsync returned with statusCode {response.StatusCode} reason: {response.ReasonPhrase}");
+                    var errorStream = await response.Content.ReadAsStringAsync();
+
+                    //var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                    _logger.LogWarning($"api call BillerPayAsync returned with status code: {response.StatusCode} validationErrors: -- {errorStream} --");
+                    //var dstverror = JsonConvert.DeserializeObject<DstvError>(errorStream.ToString());
+
+                    result = JsonConvert.DeserializeObject<BillPaymentsResponse>(errorStream.ToString());
+
+                }
+                if (response.IsSuccessStatusCode)
+                {
+                    string contentStream = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation($"api call ServiceListAsync returned with contentstream  {contentStream}");
+                    result = JsonConvert.DeserializeObject<BillPaymentsResponse>(contentStream);
+                }
+
+            }
+
+            return result;
+        }
 
         #endregion
         /// <summary>
@@ -195,5 +353,6 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
             return resultantArray;
         }
 
+        
     }
 }

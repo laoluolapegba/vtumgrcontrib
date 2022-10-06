@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Chams.Vtumanager.Fulfillment.NineMobile.Services;
 using Chams.Vtumanager.Provisioning.Api.ViewModels;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco;
 using Chams.Vtumanager.Provisioning.Services.GloTopup;
 using Chams.Vtumanager.Provisioning.Services.Mtn;
 using Chams.Vtumanager.Provisioning.Services.NineMobileEvc;
@@ -32,15 +34,13 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
     [ApiController]
     [Produces("application/json")]
     //[Authorize]
-    public class vtuController : ControllerBase
+    public class generalservicesController : ControllerBase
     {
         private readonly ILogger<vtuController> _logger;
         private readonly IAMQService _aMQService;
         private readonly ITransactionRecordService _transactionRecordService;
-        private readonly ILightEvcService _evcService;
-        private readonly IGloTopupService _gloTopupService;
-        private readonly IAirtelPretupsService _airtelPreupsService;
-        private readonly IMtnTopupService _mtnToupService;
+        private readonly IBillerPaymentsService _billspaymentService;
+
 
 
         /// <summary>
@@ -49,43 +49,38 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         /// <param name="logger"></param>
         /// <param name="aMQService"></param>
         /// <param name="transactionRecordService"></param>
-        public vtuController(
+        public generalservicesController(
             ILogger<vtuController> logger,
             IAMQService aMQService,
             ITransactionRecordService transactionRecordService,
-            ILightEvcService evcService,
-            IGloTopupService gloTopupService,
-            IAirtelPretupsService airtelPreupsService,
-            IMtnTopupService mtnToupService
+            IBillerPaymentsService billspaymentService
             )
         {
             _logger = logger;
             _aMQService = aMQService;
             _transactionRecordService = transactionRecordService;
-            _evcService = evcService;
-            _gloTopupService = gloTopupService;
-            _airtelPreupsService = airtelPreupsService;
-            _mtnToupService = mtnToupService;
+            _billspaymentService = billspaymentService;
+
+
 
         }
 
 
         /// <summary>
-        /// Submit a Virtual Top Up service request
+        /// Request Wallet Balance
         /// </summary>
         /// <param name="rechargeRequest"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        [HttpPost("topup")]
+        [HttpGet("balance")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(RechargeResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         //[Authorize]
-        public async Task<IActionResult> VtuTopUp(
-            RechargeRequest rechargeRequest,
+        public async Task<IActionResult> WalletBalance(
             CancellationToken cancellation)
         {
             await Task.Delay(0, cancellation).ConfigureAwait(false);
@@ -93,7 +88,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
             {
                 if (ModelState.IsValid)
                 {
-                    _logger.LogInformation("API ENTRY: Inside VtuTopUp API call.");
+                    _logger.LogInformation("API ENTRY: Inside wallet balance API call.");
 
                     var apikey = (string)HttpContext.Request.Headers["x-api-key"];
 
@@ -107,38 +102,23 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                             responseMessage = "Authorization Error : Invalid API KEY"
                         });
                     }
-                    string prefix = rechargeRequest.PhoneNumber.Substring(0, 4);
-                    var carrier = _transactionRecordService.GetServiceProviderByPrefix(prefix);
-                    if (carrier.ServiceProviderId == 0 || carrier.ServiceProviderId != rechargeRequest.ServiceProviderId)
+                    int billpayentsCategory = (int)ProductCategory.BillPayments;
+                    _logger.LogInformation($"Fetching wallet balance for partnerId {partner.Id}, productCategory {billpayentsCategory}");
+
+                    var epurseBalance =  _transactionRecordService.GetEpurseByPartnerIdCategoryId(partner.Id, billpayentsCategory);
+
+                    if(epurseBalance == null )
                     {
-                        return BadRequest(new
+                        return Ok(new
                         {
-                            status = "2002",
-                            responseMessage = "Phone Number / Carrier mismatch"
+                            status = "20008",
+                            responseMessage = "Product category not authorized for this partner"
                         });
                     }
-
-                    bool isDuplicate = _transactionRecordService.IsTransactionExist(rechargeRequest.TransactionReference, partner.Id);
-                    if(isDuplicate)
-                    {
-                        return BadRequest(new
-                        {
-                            status = "2003",
-                            responseMessage = "Duplicate transaction",
-                            details = rechargeRequest.TransactionReference
-                        });
-                    }
-
-                    
-
-                    await _transactionRecordService.RecordTransaction(rechargeRequest, partner.Id);
-
-                    var response = _aMQService.SubmitTopupOrder(rechargeRequest);
                     return Ok(new
                     {
-                        status = "00",
-                        responseMessage = "Submitted Successfully",
-                        details = response
+                        balance = epurseBalance.MainAcctBalance,
+                        lastDeposit = epurseBalance.LastDebitDate
                     });
 
 
@@ -155,11 +135,11 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Api failure in VtuTopUp with error message {ex.Message}  error details {ex}");
+                _logger.LogError($"Api failure in wallet balance with error message {ex.Message}  error details {ex}");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     status = "99",
-                    message = $"Failed to submit vtu topup {JsonConvert.SerializeObject(rechargeRequest)}"
+                    message = $"Failed to submit get wallet balance "
 
                 });
             }
@@ -167,18 +147,17 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         }
 
         /// <summary>
-        /// Query the status of a transaction
+        /// Returns a list of available bill payment services
         /// </summary>
         /// <param name="transactionReference"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
-        [HttpGet("GetTransactionbyId")]
+        [HttpGet("servicelist")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(RechargeResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ServiceLisrResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetTransactionbyId(
-            QueryTransactionStatusRequest statusRequest,
+        public async Task<IActionResult> ServiceList(
             CancellationToken cancellation)
         {
             await Task.Delay(0, cancellation).ConfigureAwait(false);
@@ -186,7 +165,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
             {
                 if (ModelState.IsValid)
                 {
-                    _logger.LogInformation($"API ENTRY: Inside GetTransactionbyId API call with transref {JsonConvert.SerializeObject(statusRequest)}");
+                    _logger.LogInformation($"API ENTRY: Inside ServiceList API cal");
 
                     var apikey = (string)HttpContext.Request.Headers["x-api-key"];
 
@@ -200,45 +179,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                             responseMessage = "Authorization Error : Invalid API KEY"
                         });
                     }
-                    //fetch transaction from db
-                    var trans = await _transactionRecordService.GetTransactionById(statusRequest.ServiceProviderId, statusRequest.transactionId);
-                    if(trans == null)
-                    {
-                        return NotFound(new
-                        {
-                            status = "2005",
-                            responseMessage = $"Transaction reference number {statusRequest.TransactionReference} not found"
-                        });
-                    }
-                    QueryTxnStatusResponse queryTxnStatusResponse = null;
-                    switch (trans.serviceproviderid)
-                    {
-                        case (int)ServiceProvider.MTN:
-                            queryTxnStatusResponse = await _mtnToupService.QueryTransactionStatus(statusRequest);
-                            break;
-                        case (int)ServiceProvider.Airtel:
-                            queryTxnStatusResponse = await _airtelPreupsService.QueryTransactionStatus(statusRequest);
-                            break;
-                        case (int)ServiceProvider.GLO:
-
-                            queryTxnStatusResponse = await _gloTopupService.QueryTransactionStatus(statusRequest);
-
-                            break;
-                        case (int)ServiceProvider.NineMobile:
-                            queryTxnStatusResponse = await _evcService.QueryTransactionStatus(statusRequest);
-                            break;
-
-                        default:
-                            break;
-                    }
+                    var serviceresponse = await _billspaymentService.ServiceListAsync();
 
                     return Ok(new
                     {
-                        status = "00",
-                        message = "Successful",
-                        data = queryTxnStatusResponse
+                        serviceresponse
                     });
 
+                    
 
                 }
                 else
@@ -253,11 +201,11 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Api failure in GetTransactionbyId with error message {ex.Message}  error details {ex}");
+                _logger.LogError($"Api failure in ServiceList with error message {ex.Message}  error details {ex}");
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     status = "99",
-                    message = $"Failed to submit GetTransactionbyId{JsonConvert.SerializeObject(statusRequest)}"
+                    message = $"Failed to submit ServiceList"
 
                 });
             }
@@ -307,6 +255,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                     _logger.LogInformation("API ENTRY: Inside ListProductByServiceProviderId API call.");
 
                     var apikey = (string)HttpContext.Request.Headers["x-api-key"];
+
                     var partner = _transactionRecordService.GetPartnerbyAPIkey(apikey);
 
                     if (partner == null)
