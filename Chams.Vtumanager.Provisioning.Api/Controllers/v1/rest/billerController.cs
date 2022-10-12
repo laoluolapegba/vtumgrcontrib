@@ -57,12 +57,12 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest
         [ProducesResponseType(typeof(BillPaymentsResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> BillPay([FromBody] string renewRequest, CancellationToken cancellation)
+        public async Task<IActionResult> BillPay(BillpaymentRequest renewRequest, CancellationToken cancellation)
         {
+            //public async Task<IActionResult> BillPay([FromBody] string renewRequest, CancellationToken cancellation)
             await Task.Delay(0, cancellation).ConfigureAwait(false);
             try
             {
-
 
                 /*
                  * 
@@ -81,59 +81,59 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest
                 Request.Body.Position = 0
                 
                 */
-                var rawRequestBody = await Request.GetRawBodyAsync();
+                //var rawRequestBody = await Request.GetRawBodyAsync();
 
-                _logger.LogInformation($"Inside API Call biller.exchange with request : {rawRequestBody}");
-                string  apikey = (string)HttpContext.Request.Headers["x-api-key"];
-
-                //_logger.LogInformation($"my API Key : {apikey}");
-                //apikey = "CHAMSS-PHExG8qddpxcKduT72VesGoa4Z";
-                var partnerKey = await _transactionRecordService.GetPartnerbyAPIkey(apikey);
-
-                if (partnerKey == null)
-                {
-                    return Unauthorized(new
-                    {
-                        status = "2001",
-                        responseMessage = "Authorization Error : Invalid API KEY"
-                    });
-                }
-                // check balance
+                _logger.LogInformation($"Inside API Call biller.exchange with request : {JsonConvert.SerializeObject(renewRequest)}");
                 
 
-                int billpayentsCategory = (int)ProductCategory.BillPayments;
-                _logger.LogInformation($"Fetching wallet balance for partnerId {partnerKey.PartnerId}, productCategory {billpayentsCategory}");
-
-                var epurseBalance = _transactionRecordService.GetEpurseByPartnerIdCategoryId(partnerKey.PartnerId, billpayentsCategory);
-                if (epurseBalance == null)
+                if (ModelState.IsValid)
                 {
+
+                    string apikey = (string)HttpContext.Request.Headers["x-api-key"];
+
+                    //_logger.LogInformation($"my API Key : {apikey}");
+                    //apikey = "CHAMSS-PHExG8qddpxcKduT72VesGoa4Z";
+                    var partnerKey = await _transactionRecordService.GetPartnerbyAPIkey(apikey);
+
+                    if (partnerKey == null)
+                    {
+                        return Unauthorized(new
+                        {
+                            status = "2001",
+                            responseMessage = "Authorization Error : Invalid API KEY"
+                        });
+                    }
+                    // check balance
+
+
+                    int billpayentsCategory = (int)ProductCategory.BillPayments;
+                    _logger.LogInformation($"Fetching wallet balance for partnerId {partnerKey.PartnerId}, productCategory {billpayentsCategory}");
+
+                    var epurseBalance = _transactionRecordService.GetEpurseByPartnerIdCategoryId(partnerKey.PartnerId, billpayentsCategory);
+                    if (epurseBalance == null)
+                    {
+                        return Ok(new
+                        {
+                            status = "20008",
+                            responseMessage = "Product category not authorized for this partner"
+                        });
+                    }
+                    var apiresponse = await _billspaymentService.BillerPayAsync(renewRequest, cancellation);
+
                     return Ok(new
                     {
-                        status = "20008",
-                        responseMessage = "Product category not authorized for this partner"
+                        apiresponse
                     });
                 }
-                var apiresponse = await _billspaymentService.BillerPayAsync(renewRequest, cancellation);
-
-                return Ok(new
+                else
                 {
-                    apiresponse
-                });
+                    return BadRequest(new
+                    {
+                        status = "99",
+                        message = ModelState.GetErrorMessages()
 
-                //if (ModelState.IsValid)
-                //{
-
-
-                //}
-                //else
-                //{
-                //    return BadRequest(new
-                //    {
-                //        status = "99",
-                //        message = ModelState.GetErrorMessages()
-
-                //    });
-                //}
+                    });
+                }
             }
             catch (Exception ex)
             {

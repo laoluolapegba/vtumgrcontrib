@@ -14,7 +14,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<TopUpTransactionLog>> GetPendingJobs();
+        Task<IEnumerable<TopUpTransactionLog>> GetPendingJobs(int threadNo);
         /// <summary>
         /// 
         /// </summary>

@@ -21,6 +21,7 @@ using Chams.Vtumanager.Provisioning.Services.AirtelPretups;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp.Mtn;
 using Chams.Vtumanager.Provisioning.Services.Mtn;
 using Chams.Vtumanager.Provisioning.Entities.Inventory;
+using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 
 namespace Chams.Vtumanager.Provisioning.Hangfire.Services
 {
@@ -38,6 +39,8 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
         private readonly IGloTopupService _gloTopupService;
         private readonly IAirtelPretupsService _airtelPreupsService;
         private readonly IMtnTopupService _mtnToupService;
+        private readonly ITransactionRecordService _transactionRecordingService;
+        private readonly IConfiguration _config;
 
         /// <summary>
         /// 
@@ -61,7 +64,9 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
             IAirtelPretupsService airtelPreupsService,
             IMtnTopupService mtnToupService,
             IConfiguration config,
-            IHttpClientFactory _httpClientFactory
+            IHttpClientFactory _httpClientFactory,
+            ITransactionRecordService transactionRecoringService
+            
             )
         {
             _logger = logger;
@@ -73,6 +78,8 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
             _gloTopupService = gloTopupService;
             _airtelPreupsService = airtelPreupsService;
             _mtnToupService = mtnToupService;
+            _transactionRecordingService = transactionRecoringService;
+            _config = config;
         }
         /// <summary>
         /// 
@@ -84,9 +91,10 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
             //try
             //{
             int successCount = 0;
+            int _threadNo = int.Parse(_config["ThreadNo"]);
             string externaltransref  = string.Empty;
 
-            var pendingJobs = await GetPendingJobs();
+            var pendingJobs = await GetPendingJobs(_threadNo);
             _logger.LogInformation($"Fulfillment worker found {pendingJobs.Count()} pending requests at " + DateTime.Now);
             if (pendingJobs != null && pendingJobs.Count() > 0)
             {
@@ -101,13 +109,19 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                     };
                     _logger.LogInformation($"Checking current stock balance for partner:{item.PartnerId} telco: {item.serviceproviderid}");
 
-                    int balance = GetPartnerStockBalance(item.PartnerId, item.serviceproviderid);
+                    int balance = 0;
+                    var stockdata = await _transactionRecordingService.GetPartnerStockBalance(item.PartnerId, item.serviceproviderid);
 
+                    if(stockdata != null)
+                    {
+                        balance = stockdata.QuantityOnHand;
+                    }
                     _logger.LogInformation($"Current stock balance for partner:{item.PartnerId} telco: {item.serviceproviderid} is {balance}");
+
                     if(balance<item.transamount)
                     {
                         _logger.LogInformation($"Not sufficient stock balance for partner:{item.PartnerId} telco: {item.serviceproviderid} is {balance}");
-                        string errorMessage = $"Insufficient Stock Balance for {item.PartnerId} ,telco {item.serviceprovidername}";
+                        string errorMessage = $"Insufficient {item.serviceprovidername} Stock Balance for {item.sourcesystem} ";
                         await UpdateTaskStatusAsync(item.RecordId, "20014", errorMessage, "0");
                         continue;
 
@@ -353,24 +367,24 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
         /// 
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<TopUpTransactionLog>> GetPendingJobs()
+        public async Task<IEnumerable<TopUpTransactionLog>> GetPendingJobs(int threadNo)
         {
             DateTime dt = DateTime.Today;
 
             //_evctranLogrepo
-            var data = _topupLogRepo.GetQueryable()
-                .Where(a => a.IsProcessed == 0)  //|| a.CountRetries < 6
+            var data = _topupLogRepo.GetQueryable(a => a.IsProcessed == 0 && a.ThreadNo == threadNo)
+                //.Where()  //|| a.CountRetries < 6
                 .OrderBy(a => a.tran_date).ToList();
             return data;
         }
-        private int GetPartnerStockBalance(int partnerId, int serviceProviderId)
-        {
+        //private StockMaster GetPartnerStockBalance(int partnerId, int serviceProviderId)
+        //{
             
-            var data = _stockmaster.GetQueryable()
-                .Where(a => a.PartnerId == partnerId && a.ServiceProviderId == serviceProviderId).FirstOrDefault();
+        //    var stockData = _stockmaster.GetQueryable()
+        //        .Where(a => a.PartnerId == partnerId && a.ServiceProviderId == serviceProviderId).FirstOrDefault();
                 
-            return data.QuantityOnHand;
-        }
+        //    return stockData;
+        //}
 
         /// <summary>
         /// 

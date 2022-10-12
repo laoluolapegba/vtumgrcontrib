@@ -14,6 +14,10 @@ using System.Security.Cryptography;
 using System.Linq;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.AbujaDisco;
+using static Chams.Vtumanager.Provisioning.Entities.BillPayments.Multichoice.DstvRequest;
+using static Chams.Vtumanager.Provisioning.Entities.BillPayments.ServiceLisrResponse;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Multichoice;
+using Newtonsoft.Json.Linq;
 
 namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
 {
@@ -38,7 +42,8 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
 
 
         #region General Bill payments
-        public async Task<BillPaymentsResponse> BillerPayAsync(string paymentRequest, CancellationToken cancellationToken)
+
+        public async Task<BillPaymentsResponse> BillerPayAsync(BillpaymentRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside BillerPayAsync service request");
@@ -51,37 +56,159 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
 
             string baxi_Username = _configuration["BaxiBillsAPI:BAXI_USERNAME"];
             string BAXI_SEC_TOKEN = _configuration["BaxiBillsAPI:BAXI_SEC_TOKEN"];
+            string serveletPath = _configuration["BaxiBillsAPI:ServletPath"];
+
+            _logger.LogInformation($"baxiusername :  {baxi_Username}");
+            _logger.LogInformation($"BAXI_SEC_TOKEN :  {BAXI_SEC_TOKEN}");
+            _logger.LogInformation($"serveletPath :  {serveletPath}");
 
 
-            string jsonRequest = JsonConvert.SerializeObject(paymentRequest); //  JsonConvert.SerializeObject(dstvRequest);
+            
+            string requestBody = JsonConvert.SerializeObject(paymentRequest);
 
-            string sha256 = sha256hash(jsonRequest);
+            //_logger.LogInformation($"requestBody :  {requestBody}");
 
+            string sha256 = sha256hash(requestBody);
+
+            //_logger.LogInformation($"sha256 :  {sha256}");
 
             string hashedPayload = HexString2B64String(sha256);
-            //Console.WriteLine("hashedPayload=" + hashedPayload);
-            var x_mspdate = DateTime.UtcNow; // DateTime.Now.ToString("R"); Wed, 17 Aug 2022 21:14:00 GMT
-            Int32 unixTimestamp = (int)x_mspdate.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-            string serveletPath = _configuration["BaxiBillsAPI:ServletPath"];
+
+            //_logger.LogInformation($"hashedPayload :  {hashedPayload}");
+
+            var x_mspdate = DateTime.Now.ToString("R");  //"Wed, 12 Oct 2022 16:26:36 GMT"; //  // Thu, 06 Oct 2022 19:49:43 GMT  //DateTime.UtcNow; 
+
+            _logger.LogInformation($"x_mspdate :  {x_mspdate}");
+
+            DateTime x = DateTime.Parse(x_mspdate);
+
+            var unixTimestamp = ((DateTimeOffset)x).ToUnixTimeSeconds();
+
+            //_logger.LogInformation($"unixTimestamp :  {unixTimestamp}");
+            
+
 
             StringBuilder strToSign = new StringBuilder();
             strToSign.Append("POST");
-            //strToSign.Append( Environment.NewLine);
+
             strToSign.Append(serveletPath);
-            //strToSign.Append(Environment.NewLine);
+
             strToSign.Append(unixTimestamp);
             strToSign.Append(hashedPayload);
 
-            //var requestData = "POST/rest/consumer/v2/exchange16607235533RvQHdls/XuKe4a28q8HeK2xDZTYd7oo1YPCUedRsGM=";
-            //POST/rest/consumer/v2/exchange16607238733RvQHdls/XuKe4a28q8HeK2xDZTYd7oo1YPCUedRsGM=
 
             string signature = HexString2B64String(ComputeHMAC_SHA1(strToSign.ToString(), BAXI_SEC_TOKEN));
 
-            string authHeader = "Baxi" + " " + baxi_Username + ":" + signature;  //Baxi baxi_ZN1GmmLtE:mmKFvIJUA9ZEQyFoIJlrFYpR3gU=
-            //authHeader = "Baxi baxi_ZN1GmmLtE:+tcdGZB7tqwXrnRsgLRcMVW5Ydg=";
+            _logger.LogInformation($"signature :  {signature}");
+
+            string authHeader = "Baxi" + " " + baxi_Username + ":" + signature;
+
+            _logger.LogInformation($"authHeader :  {authHeader}");
 
             httpClient.DefaultRequestHeaders.Add("Authorization", authHeader); //[{"key":"x-msp-date","value":"{{x-msp-date}}","type":"text"}]
-            httpClient.DefaultRequestHeaders.Add("x-msp-date", x_mspdate.ToString("R")); // x_mspdate.ToString("R"));
+            httpClient.DefaultRequestHeaders.Add("x-msp-date", x_mspdate); // x_mspdate.ToString("R"));
+
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, gatewayURL);
+            _logger.LogInformation($"Calling BillerPayAsync  {httpRequest.RequestUri}");
+
+            using (var httpContent = CreateHttpContent(paymentRequest))
+            {
+                httpRequest.Content = httpContent;
+
+                using (var response = await httpClient
+                    .SendAsync(httpRequest, HttpCompletionOption.ResponseHeadersRead)
+                    .ConfigureAwait(false))
+                {
+                    //response.EnsureSuccessStatusCode();
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogInformation($"api call BillerPayAsync returned with statusCode {response.StatusCode} reason: {response.ReasonPhrase}");
+                        var errorStream = await response.Content.ReadAsStringAsync();
+
+                        //var validationErrors = errorStream.ReadAndDeserializeFromJson();
+                        _logger.LogWarning($"api call BillerPayAsync returned with status code: {response.StatusCode} validationErrors: -- {errorStream} --");
+                        //var dstverror = JsonConvert.DeserializeObject<DstvError>(errorStream.ToString());
+
+                        result = JsonConvert.DeserializeObject<BillPaymentsResponse>(errorStream.ToString());
+
+                    }
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string contentStream = await response.Content.ReadAsStringAsync();
+                        _logger.LogInformation($"api call BillerPayAsync returned with contentstream  {contentStream}");
+                        result = JsonConvert.DeserializeObject<BillPaymentsResponse>(contentStream);
+                    }
+
+                }
+            }
+
+            return result;
+        }
+        public async Task<BillPaymentsResponse> BillerPayAsyncV2(string paymentRequest, CancellationToken cancellationToken)
+        {
+
+            _logger.LogInformation($"Inside BillerPayAsync service request");
+
+            BillPaymentsResponse result = new BillPaymentsResponse();
+
+            string gatewayURL = _configuration["BaxiBillsAPI:URL"];
+
+            var httpClient = _httpFactory.CreateClient("BaxiBillsAPI");
+
+            string baxi_Username = _configuration["BaxiBillsAPI:BAXI_USERNAME"];
+            string BAXI_SEC_TOKEN = _configuration["BaxiBillsAPI:BAXI_SEC_TOKEN"];
+            string serveletPath = _configuration["BaxiBillsAPI:ServletPath"];
+
+            _logger.LogInformation($"baxiusername :  {baxi_Username}");
+            _logger.LogInformation($"BAXI_SEC_TOKEN :  {BAXI_SEC_TOKEN}");
+            _logger.LogInformation($"serveletPath :  {serveletPath}");
+
+            string requestBody = JsonConvert.SerializeObject(paymentRequest);
+
+            _logger.LogInformation($"requestBody :  {requestBody}");
+
+
+            string sha256 = sha256hash(requestBody);
+
+            //_logger.LogInformation($"sha256 :  {sha256}");
+
+            string hashedPayload = HexString2B64String(sha256);
+            
+            //_logger.LogInformation($"hashedPayload :  {hashedPayload}");
+
+            var x_mspdate = DateTime.Now.ToString("R");  // "Thu, 06 Oct 2022 20:41:45 GMT"; //   //DateTime.UtcNow; 
+
+            //_logger.LogInformation($"x_mspdate :  {x_mspdate}");
+
+            DateTime x = DateTime.Parse(x_mspdate);
+
+            var unixTimestamp = ((DateTimeOffset)x).ToUnixTimeSeconds();
+
+            //_logger.LogInformation($"unixTimestamp :  {unixTimestamp}");
+            
+
+
+            StringBuilder strToSign = new StringBuilder();
+            strToSign.Append("POST");
+            
+            strToSign.Append(serveletPath);
+            
+            strToSign.Append(unixTimestamp);
+            strToSign.Append(hashedPayload);
+
+
+            string signature = HexString2B64String(ComputeHMAC_SHA1(strToSign.ToString(), BAXI_SEC_TOKEN));
+
+            //_logger.LogInformation($"signature :  {signature}");
+
+            string authHeader = "Baxi" + " " + baxi_Username + ":" + signature;
+
+
+            _logger.LogInformation($"authHeader :  {authHeader}");
+
+            httpClient.DefaultRequestHeaders.Add("Authorization", authHeader); //[{"key":"x-msp-date","value":"{{x-msp-date}}","type":"text"}]
+            httpClient.DefaultRequestHeaders.Add("x-msp-date", x_mspdate); // x_mspdate.ToString("R"));
 
 
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, gatewayURL);
@@ -225,7 +352,6 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
                 sha256 = sha256hash(jsonRequest);
             }
 
-
             string hashedPayload = HexString2B64String(sha256);
             //Console.WriteLine("hashedPayload=" + hashedPayload);
             var x_mspdate = DateTime.UtcNow; // DateTime.Now.ToString("R"); Wed, 17 Aug 2022 21:14:00 GMT
@@ -311,13 +437,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
             }
             return httpContent;
         }
-        public static byte[] ComputeHMAC_SHA256(byte[] data, byte[] salt)
-        {
-            using (var hmac = new HMACSHA256(salt))
-            {
-                return hmac.ComputeHash(data);
-            }
-        }
+        
 
         public static string ComputeHMAC_SHA1(string input, string keystring)
         {
@@ -328,17 +448,40 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
             return myhmacsha1.ComputeHash(stream).Aggregate("", (s, e) => s + String.Format("{0:x2}", e), s => s);
         }
 
+        
         public static string sha256hash(string stringtohash)
         {
-            return String.Concat(System.Security.Cryptography.SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(stringtohash)).Select(item => item.ToString("x2")));
+
+            //SHA256Managed hasher = new SHA256Managed();
+
+            //byte[] pwdBytes = new UTF8Encoding().GetBytes(stringtohash);
+            //byte[] keyBytes = hasher.ComputeHash(pwdBytes);
+
+            //hasher.Dispose();
+            //return Convert.ToBase64String(keyBytes);
+
+
+            Encoding enc = Encoding.UTF8;
+            var hashBuilder = new StringBuilder();
+            using var hash = SHA256.Create();
+            byte[] result = hash.ComputeHash(enc.GetBytes(stringtohash));
+            foreach (var b in result)
+                hashBuilder.Append(b.ToString("x2"));
+            string hashResult = hashBuilder.ToString();
+            return hashResult;
+
+            //SHA256Managed is obsolete
+            //var crypt = new System.Security.Cryptography.SHA256Managed();
+            //var hash = new System.Text.StringBuilder();
+            //byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(stringtohash));
+            //foreach (byte theByte in crypto)
+            //{
+            //    hash.Append(theByte.ToString("x2"));
+            //}
+            //return hash.ToString();
         }
 
-        public static string EncodetoBase64(string toEncode)
-        {
-            byte[] toEncodeAsBytes = System.Text.ASCIIEncoding.UTF8.GetBytes(toEncode);
-            string returnVal = System.Convert.ToBase64String(toEncodeAsBytes);
-            return returnVal;
-        }
+        
         public static string HexString2B64String(string input)
         {
             return System.Convert.ToBase64String(HexStringToHex(input));
@@ -352,7 +495,37 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
             }
             return resultantArray;
         }
+        private static string sha256generator_(string strtoHash)
+        {
+            var crypt = new System.Security.Cryptography.SHA256Managed();
+            var hash = new System.Text.StringBuilder();
+            byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(strtoHash));
+            foreach (byte theByte in crypto)
+            {
+                hash.Append(theByte.ToString("x2"));
+            }
+            return hash.ToString();
+        }
+        private static string GetHash(HashAlgorithm hashAlgorithm, string input)
+        {
 
-        
+            // Convert the input string to a byte array and compute the hash.
+            byte[] data = hashAlgorithm.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            // Create a new Stringbuilder to collect the bytes
+            // and create a string.
+            var sBuilder = new StringBuilder();
+
+            // Loop through each byte of the hashed data
+            // and format each one as a hexadecimal string.
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+
+            // Return the hexadecimal string.
+            return sBuilder.ToString();
+        }
+
     }
 }

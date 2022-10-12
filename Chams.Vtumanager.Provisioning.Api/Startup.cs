@@ -323,10 +323,10 @@ namespace Chams.Vtumanager.Provisioning.Api
                 //    Path.Combine(env.WebRootPath, "yaml")),
                 //RequestPath = new PathString("/yaml")
             });
-            app.UseWhen(
-                ctx => ctx.Request.Path.StartsWithSegments("/v1/api/rest/biller/exchange"),
-                ab => ab.UseMiddleware<EnableRequestBodyBufferingMiddleware>()
-            );
+            //app.UseWhen(
+            //    ctx => ctx.Request.Path.StartsWithSegments("/v1/api/rest/biller/exchange"),
+            //    ab => ab.UseMiddleware<EnableRequestBodyBufferingMiddleware>()
+            //);
             app.UseRouting();
             app.UseAuthentication();
             

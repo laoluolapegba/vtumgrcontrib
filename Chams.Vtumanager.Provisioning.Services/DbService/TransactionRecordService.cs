@@ -50,7 +50,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             _stockmasterRepo = unitOfWork.GetRepository<StockMaster>();
             _partnerServicesRepo = unitOfWork.GetRepository<PartnerServiceProvider>();
             _carrierRepo = unitOfWork.GetRepository<CarrierPrefix>();
-            //_productsRepo = unitOfWork.GetRepository<Product>();
+            
         }
         /// <summary>
         /// 
@@ -96,42 +96,53 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         public async Task<bool> RecordTransaction(RechargeRequest rechargeRequest, int partnerId)
         {
             bool transactionStatus = false;
-            _logger.LogInformation($"Saving transaction record : {JsonConvert.SerializeObject(rechargeRequest)}");
+            _logger.LogInformation($"Saving transaction record : {JsonConvert.SerializeObject(rechargeRequest)} from partnerID {partnerId}");
             string serviceprovidername = Enum.GetName(typeof(ServiceProvider), rechargeRequest.ServiceProviderId);
             var partner = await GetPatnerById(partnerId);
-            string partnerName = partner.PartnerName;
-            var partnerService = _partnerServicesRepo.GetQueryable()
-                .Where(a => a.PartnerId == partnerId && a.ServiceProviderId == rechargeRequest.ServiceProviderId).FirstOrDefault();
-            decimal commission = 0;
-
-            if (partnerService!=null)
+            if(partner!=null)
             {
-                commission = partnerService.CommissionPct == null ? 0 : (decimal)partnerService.CommissionPct;
+                string partnerName = partner.PartnerName;
+                _logger.LogInformation($"fetching available prod categories for  partner : {partnerName} ");
+                int prepaidpayentsCategory = (int)ProductCategory.Prepaid;
+                var partnerService = _partnerServicesRepo.GetQueryable()
+                .Where(a => a.PartnerId == partnerId && a.ServiceProviderId == rechargeRequest.ServiceProviderId
+                && a.ProductCategoryid == prepaidpayentsCategory).FirstOrDefault();
+
+                decimal commission = 0;
+
+                if (partnerService != null)
+                {
+                    _logger.LogInformation($"available prod categories for  partner : {partnerName} ");
+                    commission = partnerService.CommissionPct == null ? 0 : (decimal)partnerService.CommissionPct;
+                }
+                decimal settlementAmt = commission == 0 ? rechargeRequest.rechargeAmount : rechargeRequest.rechargeAmount - (commission / 100 * rechargeRequest.rechargeAmount);
+
+                TopUpTransactionLog topUpRequest = new TopUpTransactionLog
+                {
+                    tran_date = DateTime.Now,
+                    transamount = rechargeRequest.rechargeAmount,
+                    transref = rechargeRequest.TransactionReference,
+                    transtype = rechargeRequest.TransactionType,
+                    channelid = rechargeRequest.ChannelId,
+                    msisdn = rechargeRequest.PhoneNumber,
+                    productid = rechargeRequest.ProductId,
+                    serviceproviderid = rechargeRequest.ServiceProviderId,
+                    sourcesystem = partnerName,
+                    serviceprovidername = serviceprovidername,
+                    PartnerId = partnerId,
+                    CountRetries = 0,
+                    IsProcessed = 0,
+                    TransactionStatus = 0,
+                    SettlementAmount = settlementAmt
+
+
+                };
+                var requestObkect = await _requestsRepo.AddAsync(topUpRequest);
+                await _requestsRepo.SaveAsync();
+
             }
-            decimal settlementAmt = commission == 0 ? rechargeRequest.rechargeAmount : rechargeRequest.rechargeAmount - (commission / 100 * rechargeRequest.rechargeAmount);
-
-            TopUpTransactionLog topUpRequest = new TopUpTransactionLog
-            {
-                tran_date = DateTime.Now,
-                transamount = rechargeRequest.rechargeAmount,
-                transref = rechargeRequest.TransactionReference,
-                transtype = rechargeRequest.TransactionType,
-                channelid = rechargeRequest.ChannelId,
-                msisdn = rechargeRequest.PhoneNumber,
-                productid = rechargeRequest.ProductId,
-                serviceproviderid = rechargeRequest.ServiceProviderId,
-                sourcesystem = partnerName,
-                serviceprovidername = serviceprovidername,
-                PartnerId = partnerId,
-                CountRetries = 0,
-                IsProcessed = 0,
-                TransactionStatus = 0,
-                SettlementAmount = settlementAmt
 
 
-            };
-            var requestObkect = await _requestsRepo.AddAsync(topUpRequest);
-            await _requestsRepo.SaveAsync();
 
             return transactionStatus;
 
@@ -468,6 +479,31 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         {
             var carrier = _carrierRepo.GetQueryable().Where(a => a.Prefix == prefix).FirstOrDefault();
             return carrier;
+        }
+
+        public async Task<StockMaster> GetPartnerStockBalance(int partnerId, int serviceProviderId)
+        {
+            //var stockData = _stockmasterRepo.GetQueryable()
+            //        .Where(a => a.PartnerId == partnerId && a.ServiceProviderId == serviceProviderId).FirstOrDefault();
+            StockMaster stockObj = null;
+
+            stockObj = _stockmasterRepo.GetQueryable(a => a.PartnerId == partnerId && a.ServiceProviderId == serviceProviderId).FirstOrDefault();
+            if (stockObj == null)
+            {
+                StockMaster masterrecord = new StockMaster
+                {
+                    ServiceProviderId = serviceProviderId,
+                    PartnerId = partnerId,
+                    TenantId = 1,
+                    QuantityOnHand = 0
+                };
+
+
+                _logger.LogInformation($"transactionrecord adding stock master: {JsonConvert.SerializeObject(masterrecord)}");
+                await _stockmasterRepo.AddAsync(masterrecord);
+
+            }
+            return stockObj;
         }
     }
 }

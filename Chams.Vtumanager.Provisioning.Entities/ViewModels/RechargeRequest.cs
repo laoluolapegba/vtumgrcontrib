@@ -20,6 +20,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.ViewModels
         /// <summary>
         /// Telecommunication Operator 
         /// </summary>
+        [Required]
         public int ServiceProviderId { get; set; }
         /// <summary>
         /// Airtime or Data
@@ -38,6 +39,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.ViewModels
         /// <summary>
         /// Recharge amount
         /// </summary>
+        [Required]
         public decimal rechargeAmount { get; set; }
         /// <summary>
         /// Source channel - ussd, sms, web, mobile

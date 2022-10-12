@@ -61,5 +61,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.Common
         public int PartnerId { get; set; }
         [Column("settlement_amount")]
         public decimal SettlementAmount { get; set; }
+        [Column("thread_no")]
+        public int ThreadNo { get; set; }
     }
 }

@@ -13,11 +13,11 @@ namespace Chams.Vtumanager.Provisioning.Entities.ViewModels
         /// <summary>
         /// 
         /// </summary>
-        public int ResponseCode { get; set; }
+        public string status { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string ResponseDescription { get; set; }
+        public string responseMessage { get; set; }
         /// <summary>
         /// 
         /// </summary>

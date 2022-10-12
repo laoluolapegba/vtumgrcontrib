@@ -91,64 +91,101 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
             await Task.Delay(0, cancellation).ConfigureAwait(false);
             try
             {
+                RechargeResponse rechargeResponse = new RechargeResponse();
+
                 if (ModelState.IsValid)
                 {
                     _logger.LogInformation("API ENTRY: Inside VtuTopUp API call.");
 
                     var apikey = (string)HttpContext.Request.Headers["x-api-key"];
 
-                    var partner = _transactionRecordService.GetPartnerbyAPIkey(apikey);
+                    var partner = await _transactionRecordService.GetPartnerbyAPIkey(apikey);
 
                     if (partner == null)
                     {
+                        rechargeResponse.status = "2001";
+                        rechargeResponse.responseMessage = "Authorization Error : Invalid API KEY";
+                        rechargeResponse.TransactionReference = rechargeRequest.TransactionReference;
+
                         return Unauthorized(new
                         {
-                            status = "2001",
-                            responseMessage = "Authorization Error : Invalid API KEY"
+                            rechargeResponse
                         });
                     }
-                    string prefix = rechargeRequest.PhoneNumber.Substring(0, 4);
-                    var carrier = _transactionRecordService.GetServiceProviderByPrefix(prefix);
-                    if (carrier.ServiceProviderId == 0 || carrier.ServiceProviderId != rechargeRequest.ServiceProviderId)
+                    //string prefix = rechargeRequest.PhoneNumber.Substring(0, 4);
+                    //var carrier = _transactionRecordService.GetServiceProviderByPrefix(prefix);
+                    //if (carrier.ServiceProviderId == 0 || carrier.ServiceProviderId != rechargeRequest.ServiceProviderId)
+                    //{
+                    //    return BadRequest(new
+                    //    {
+                    //        status = "2002",
+                    //        responseMessage = "Phone Number / Carrier mismatch"
+                    //    });
+                    //}
+                    _logger.LogInformation($"Checking current stock balance for partner:{partner.PartnerId} telco: {rechargeRequest.ServiceProviderId}");
+                    int balance = 0;
+                    var stockdata = await _transactionRecordService.GetPartnerStockBalance(partner.PartnerId,  rechargeRequest.ServiceProviderId);
+
+                    if (stockdata != null)
                     {
+                        balance = stockdata.QuantityOnHand;
+                    }
+                    if (balance < rechargeRequest.rechargeAmount)
+                    {
+                        _logger.LogInformation($"Not sufficient stock balance for partner:{partner.PartnerId} telco: {rechargeRequest.ServiceProviderId} is {balance}");
+
+                        rechargeResponse.status = "2003";
+                        rechargeResponse.responseMessage = "Insufficient Stock Balance";
+                        rechargeResponse.TransactionReference = rechargeRequest.TransactionReference;
+
                         return BadRequest(new
                         {
-                            status = "2002",
-                            responseMessage = "Phone Number / Carrier mismatch"
-                        });
-                    }
+                            rechargeResponse
 
-                    bool isDuplicate = _transactionRecordService.IsTransactionExist(rechargeRequest.TransactionReference, partner.Id);
+                        });
+
+                    }
+                    bool isDuplicate = _transactionRecordService.IsTransactionExist(rechargeRequest.TransactionReference, partner.PartnerId);
                     if(isDuplicate)
                     {
+                        rechargeResponse.status = "2004";
+                        rechargeResponse.responseMessage = "Duplicate transaction";
+                        rechargeResponse.TransactionReference = rechargeRequest.TransactionReference;
+
                         return BadRequest(new
                         {
-                            status = "2003",
-                            responseMessage = "Duplicate transaction",
-                            details = rechargeRequest.TransactionReference
+                            rechargeResponse
+
                         });
                     }
 
                     
 
-                    await _transactionRecordService.RecordTransaction(rechargeRequest, partner.Id);
+                    await _transactionRecordService.RecordTransaction(rechargeRequest, partner.PartnerId);
 
                     var response = _aMQService.SubmitTopupOrder(rechargeRequest);
+
+                    rechargeResponse.status = "00";
+                    rechargeResponse.responseMessage = "Submitted Successfully";
+                    rechargeResponse.TransactionReference = rechargeRequest.TransactionReference;
+
                     return Ok(new
                     {
-                        status = "00",
-                        responseMessage = "Submitted Successfully",
-                        details = response
+
+                        rechargeResponse
                     });
 
 
                 }
                 else
                 {
+ 
+                    
+
                     return BadRequest(new
                     {
                         status = "2010",
-                        message = ModelState.GetErrorMessages()
+                        responseMessage = ModelState.GetErrorMessages()
 
                     });
                 }
@@ -159,7 +196,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     status = "99",
-                    message = $"Failed to submit vtu topup {JsonConvert.SerializeObject(rechargeRequest)}"
+                    responseMessage = $"Failed to submit vtu topup for transaction reference :{rechargeRequest.TransactionReference}"
 
                 });
             }
@@ -235,7 +272,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                     return Ok(new
                     {
                         status = "00",
-                        message = "Successful",
+                        responseMessage = "Successful",
                         data = queryTxnStatusResponse
                     });
 
@@ -246,7 +283,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                     return BadRequest(new
                     {
                         status = "99",
-                        message = ModelState.GetErrorMessages()
+                        responseMessage = ModelState.GetErrorMessages()
 
                     });
                 }
@@ -257,7 +294,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     status = "99",
-                    message = $"Failed to submit GetTransactionbyId{JsonConvert.SerializeObject(statusRequest)}"
+                    responseMessage = $"Failed to submit GetTransactionbyId{JsonConvert.SerializeObject(statusRequest)}"
 
                 });
             }
@@ -348,7 +385,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                     return BadRequest(new
                     {
                         status = "2010",
-                        message = ModelState.GetErrorMessages()
+                        responseMessage = ModelState.GetErrorMessages()
 
                     });
                 }
@@ -359,7 +396,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
                     status = "99",
-                    message = $"Failed to submit vtu topup {JsonConvert.SerializeObject(serviceProviderId)}"
+                    responseMessage = $"Failed to submit vtu topup {JsonConvert.SerializeObject(serviceProviderId)}"
 
                 });
             }

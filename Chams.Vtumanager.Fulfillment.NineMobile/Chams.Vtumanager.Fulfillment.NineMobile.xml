@@ -384,7 +384,7 @@
             
             </summary>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask},Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService,Chams.Vtumanager.Fulfillment.NineMobile.Services.IAirtelPretupsService,Chams.Vtumanager.Provisioning.Services.Mtn.IMtnTopupService,Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory)">
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.#ctor(Chams.Vtumanager.Provisioning.Data.IUnitOfWork,AutoMapper.IMapper,Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask},Chams.Vtumanager.Provisioning.Services.NineMobileEvc.ILightEvcService,Chams.Vtumanager.Provisioning.Services.GloTopup.IGloTopupService,Chams.Vtumanager.Fulfillment.NineMobile.Services.IAirtelPretupsService,Chams.Vtumanager.Provisioning.Services.Mtn.IMtnTopupService,Microsoft.Extensions.Configuration.IConfiguration,System.Net.Http.IHttpClientFactory,Chams.Vtumanager.Provisioning.Services.TransactionRecordService.ITransactionRecordService)">
             <summary>
             
             </summary>
@@ -405,7 +405,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.GetPendingJobs">
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.FulfillmentBackgroundTask.GetPendingJobs(System.Int32)">
             <summary>
             
             </summary>
@@ -434,7 +434,7 @@
             
             </summary>
         </member>
-        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IFulfillmentBackgroundTask.GetPendingJobs">
+        <member name="M:Chams.Vtumanager.Provisioning.Hangfire.Services.IFulfillmentBackgroundTask.GetPendingJobs(System.Int32)">
             <summary>
             
             </summary>
