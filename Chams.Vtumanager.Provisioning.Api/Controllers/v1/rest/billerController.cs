@@ -84,56 +84,57 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest
                 //var rawRequestBody = await Request.GetRawBodyAsync();
 
                 _logger.LogInformation($"Inside API Call biller.exchange with request : {JsonConvert.SerializeObject(renewRequest)}");
-                
 
-                if (ModelState.IsValid)
+                string apikey = (string)HttpContext.Request.Headers["x-api-key"];
+
+                //_logger.LogInformation($"my API Key : {apikey}");
+                //apikey = "CHAMSS-PHExG8qddpxcKduT72VesGoa4Z";
+                var partnerKey = await _transactionRecordService.GetPartnerbyAPIkey(apikey);
+
+                if (partnerKey == null)
                 {
-
-                    string apikey = (string)HttpContext.Request.Headers["x-api-key"];
-
-                    //_logger.LogInformation($"my API Key : {apikey}");
-                    //apikey = "CHAMSS-PHExG8qddpxcKduT72VesGoa4Z";
-                    var partnerKey = await _transactionRecordService.GetPartnerbyAPIkey(apikey);
-
-                    if (partnerKey == null)
+                    return Unauthorized(new
                     {
-                        return Unauthorized(new
-                        {
-                            status = "2001",
-                            responseMessage = "Authorization Error : Invalid API KEY"
-                        });
-                    }
-                    // check balance
+                        status = "2001",
+                        responseMessage = "Authorization Error : Invalid API KEY"
+                    });
+                }
+                // check balance
 
 
-                    int billpayentsCategory = (int)ProductCategory.BillPayments;
-                    _logger.LogInformation($"Fetching wallet balance for partnerId {partnerKey.PartnerId}, productCategory {billpayentsCategory}");
+                int billpayentsCategory = (int)ProductCategory.BillPayments;
+                _logger.LogInformation($"Fetching wallet balance for partnerId {partnerKey.PartnerId}, productCategory {billpayentsCategory}");
 
-                    var epurseBalance = _transactionRecordService.GetEpurseByPartnerIdCategoryId(partnerKey.PartnerId, billpayentsCategory);
-                    if (epurseBalance == null)
-                    {
-                        return Ok(new
-                        {
-                            status = "20008",
-                            responseMessage = "Product category not authorized for this partner"
-                        });
-                    }
-                    var apiresponse = await _billspaymentService.BillerPayAsync(renewRequest, cancellation);
-
+                var epurseBalance = _transactionRecordService.GetEpurseByPartnerIdCategoryId(partnerKey.PartnerId, billpayentsCategory);
+                if (epurseBalance == null)
+                {
                     return Ok(new
                     {
-                        apiresponse
+                        status = "20008",
+                        responseMessage = "Product category not authorized for this partner"
                     });
                 }
-                else
-                {
-                    return BadRequest(new
-                    {
-                        status = "99",
-                        message = ModelState.GetErrorMessages()
+                var apiresponse = await _billspaymentService.BillerPayAsync(renewRequest, cancellation);
 
-                    });
-                }
+                return Ok(new
+                {
+                    apiresponse
+                });
+
+                //if (ModelState.IsValid)
+                //{
+
+
+                //}
+                //else
+                //{
+                //    return BadRequest(new
+                //    {
+                //        status = "99",
+                //        message = ModelState.GetErrorMessages()
+
+                //    });
+                //}
             }
             catch (Exception ex)
             {

@@ -35,7 +35,20 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
             public string phoneNumber { get; set; }
             public string customerReference { get; set; }
             public string customerAddress { get; set; }
-
+            public string billingMethod { get; set; }
+            public string description { get; set; }
+            public string accountNumber { get; set; }
+            public string tariff { get; set; }
+            public string customerMobileNumber { get; set; }
+            public string meterNumber { get; set; }
+            public string customerPhone { get; set; }
+            public string accessCode { get; set; }
+            public string customerPhoneNumber { get; set; }
+            public int numberOfPins { get; set; }
+            public int pinValue { get; set; }
+            public string purchaseType { get; set; }
+            public string confirmationCode { get; set; }
+            public string serviceType { get; set; }
         }
 
     }
