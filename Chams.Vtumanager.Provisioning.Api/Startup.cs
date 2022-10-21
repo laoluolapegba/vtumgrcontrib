@@ -123,6 +123,8 @@ namespace Chams.Vtumanager.Provisioning.Api
 
             services.Configure<SwaggerSettings>(_config.GetSection(nameof(SwaggerSettings)));
 
+            services.AddAutoMapper(typeof(Startup));
+
             // Auto Mapper Configurations
             var mappingConfig = new MapperConfiguration(mc =>
             {

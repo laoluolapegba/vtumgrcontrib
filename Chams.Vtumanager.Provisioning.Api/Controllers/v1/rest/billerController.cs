@@ -1,4 +1,5 @@
-﻿using Chams.Vtumanager.Provisioning.Entities.BillPayments;
+﻿using AutoMapper;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.AbujaDisco;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
@@ -35,6 +36,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest
         private readonly ILogger<billerController> _logger;
         
         private readonly IBillerPaymentsService _billspaymentService;
+        private readonly IMapper _mapper;
         private readonly ITransactionRecordService _transactionRecordService;
 
 
@@ -42,12 +44,14 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest
         public billerController(
             ILogger<billerController> logger,
             ITransactionRecordService transactionRecordService,
-            IBillerPaymentsService billspaymentService
+            IBillerPaymentsService billspaymentService,
+            IMapper mapper
             )
         {
             _logger = logger;
             _transactionRecordService = transactionRecordService;
             _billspaymentService = billspaymentService;
+            _mapper = mapper;
         }
 
 
@@ -85,56 +89,59 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest
 
                 _logger.LogInformation($"Inside API Call biller.exchange with request : {JsonConvert.SerializeObject(renewRequest)}");
 
-                string apikey = (string)HttpContext.Request.Headers["x-api-key"];
 
-                //_logger.LogInformation($"my API Key : {apikey}");
-                //apikey = "CHAMSS-PHExG8qddpxcKduT72VesGoa4Z";
-                var partnerKey = await _transactionRecordService.GetPartnerbyAPIkey(apikey);
 
-                if (partnerKey == null)
+                if (ModelState.IsValid)
                 {
-                    return Unauthorized(new
+
+                    string apikey = (string)HttpContext.Request.Headers["x-api-key"];
+
+                    //_logger.LogInformation($"my API Key : {apikey}");
+                    //apikey = "CHAMSS-PHExG8qddpxcKduT72VesGoa4Z";
+                    var partnerKey = await _transactionRecordService.GetPartnerbyAPIkey(apikey);
+
+                    if (partnerKey == null)
                     {
-                        status = "2001",
-                        responseMessage = "Authorization Error : Invalid API KEY"
-                    });
-                }
-                // check balance
+                        return Unauthorized(new
+                        {
+                            status = "2001",
+                            responseMessage = "Authorization Error : Invalid API KEY"
+                        });
+                    }
+                    // check balance
 
 
-                int billpayentsCategory = (int)ProductCategory.BillPayments;
-                _logger.LogInformation($"Fetching wallet balance for partnerId {partnerKey.PartnerId}, productCategory {billpayentsCategory}");
+                    int billpayentsCategory = (int)ProductCategory.BillPayments;
+                    _logger.LogInformation($"Fetching wallet balance for partnerId {partnerKey.PartnerId}, productCategory {billpayentsCategory}");
 
-                var epurseBalance = _transactionRecordService.GetEpurseByPartnerIdCategoryId(partnerKey.PartnerId, billpayentsCategory);
-                if (epurseBalance == null)
-                {
+                    var epurseBalance = _transactionRecordService.GetEpurseByPartnerIdCategoryId(partnerKey.PartnerId, billpayentsCategory);
+                    if (epurseBalance == null)
+                    {
+                        return Ok(new
+                        {
+                            status = "20008",
+                            responseMessage = "Product category not authorized for this partner"
+                        });
+                    }
+                    //var newrequest = _mapper.Map<BillpaymentRequest, BillpaymentBaxiRequest>(renewRequest);
+                    //var dto =_mapper.Map<DestinationDto>(SourceDto);
+
+                    var apiresponse = await _billspaymentService.BillerPayAsync(renewRequest, cancellation);
+
                     return Ok(new
                     {
-                        status = "20008",
-                        responseMessage = "Product category not authorized for this partner"
+                        apiresponse
                     });
                 }
-                var apiresponse = await _billspaymentService.BillerPayAsync(renewRequest, cancellation);
-
-                return Ok(new
+                else
                 {
-                    apiresponse
-                });
+                    return BadRequest(new
+                    {
+                        status = "99",
+                        message = ModelState.GetErrorMessages()
 
-                //if (ModelState.IsValid)
-                //{
-
-
-                //}
-                //else
-                //{
-                //    return BadRequest(new
-                //    {
-                //        status = "99",
-                //        message = ModelState.GetErrorMessages()
-
-                //    });
-                //}
+                    });
+                }
             }
             catch (Exception ex)
             {

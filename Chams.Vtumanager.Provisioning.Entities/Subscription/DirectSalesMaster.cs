@@ -12,7 +12,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.Subscription
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [Column("partner_id")]
         public int PartnerId { get; set; }

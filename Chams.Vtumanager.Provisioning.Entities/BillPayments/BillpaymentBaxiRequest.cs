@@ -1,26 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
 {
-    public class BillpaymentRequest
+    public class BillpaymentBaxiRequest
     {
 
-        public BillpaymentRequestDetails details { get; set; }
+        public BillpaymentDetails details { get; set; }
         public string id { get; set; }
         public string paymentCollectorId { get; set; }
         public string paymentMethod { get; set; }
         public string serviceId { get; set; }
-        public string serviceHandlerId { get; set; }
 
-        public class BillpaymentRequestDetails
+        public class BillpaymentDetails
         {
-            //public BillpaymentDetails()
-            //{
-            //    meterNumber = "";
-            //}
+            
             public string[] productsCodes { get; set; }
             public int customerNumber { get; set; }
             public long smartcardNumber { get; set; }
@@ -28,7 +23,8 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
             public int invoicePeriod { get; set; }
             public int monthsPaidFor { get; set; }
             public string subscriptionType { get; set; }
-            public decimal amount { get; set; }
+            //public int amount { get; set; }
+            public int amount { get; set; }
 
             /// <summary>
             /// /others
@@ -45,7 +41,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
             public string accountNumber { get; set; }
             public string tariff { get; set; }
             public string customerMobileNumber { get; set; }
-            //public string meterNumber { get; set; }
+            public string meterNumber { get; set; }
             public string customerPhone { get; set; }
             public string accessCode { get; set; }
             public string customerPhoneNumber { get; set; }
@@ -54,7 +50,6 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
             public string purchaseType { get; set; }
             public string confirmationCode { get; set; }
             public string serviceType { get; set; }
-            public string policyId { get; set; }
         }
 
     }

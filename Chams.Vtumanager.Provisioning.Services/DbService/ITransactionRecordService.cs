@@ -31,5 +31,6 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
         Task<TopUpTransactionLog> GetTransactionById(int serviceproviderId, string transactionReference);
         CarrierPrefix GetServiceProviderByPrefix(string prefix);
         Task<StockMaster> GetPartnerStockBalance(int partnerId, int serviceProviderId);
+        int CarrierLookup1(string msisdn); 
     }
 }

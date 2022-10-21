@@ -92,6 +92,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
             //{
             int successCount = 0;
             int _threadNo = int.Parse(_config["ThreadNo"]);
+            int mtnVersion = int.Parse(_config["MtnTopupSettings:Version"]);
             string externaltransref  = string.Empty;
 
             var pendingJobs = await GetPendingJobs(_threadNo);
@@ -107,18 +108,20 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                         transId = item.transref,
                         ProductCode = item.productid
                     };
+                    ///Check balance
+
                     _logger.LogInformation($"Checking current stock balance for partner:{item.PartnerId} telco: {item.serviceproviderid}");
 
                     int balance = 0;
                     var stockdata = await _transactionRecordingService.GetPartnerStockBalance(item.PartnerId, item.serviceproviderid);
 
-                    if(stockdata != null)
+                    if (stockdata != null)
                     {
                         balance = stockdata.QuantityOnHand;
                     }
                     _logger.LogInformation($"Current stock balance for partner:{item.PartnerId} telco: {item.serviceproviderid} is {balance}");
 
-                    if(balance<item.transamount)
+                    if (balance < item.transamount)
                     {
                         _logger.LogInformation($"Not sufficient stock balance for partner:{item.PartnerId} telco: {item.serviceproviderid} is {balance}");
                         string errorMessage = $"Insufficient {item.serviceprovidername} Stock Balance for {item.sourcesystem} ";
@@ -126,61 +129,65 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                         continue;
 
                     }
-
+                    ///end check balance
                     try
                     {
                         switch (item.serviceproviderid)
                         {
                             case (int)ServiceProvider.MTN:
-                                /*
-                                MtnSubscriptionResponse mtnresult = new MtnSubscriptionResponse();
-                                mtnresult = await _mtnToupService.MtnSubscription(pinlessRechargeRequest);
-                                if (mtnresult != null)
+                                if(mtnVersion == 1)
                                 {
-                                    if (mtnresult.statusCode == "0000" && mtnresult.statusMessage == "Successful")
+                                    if (item.transtype == 1)
                                     {
-                                        externaltransref = mtnresult.subscriptionDescription;
-                                        await UpdateTaskStatusAsync(item.RecordId,
-                                            mtnresult.statusCode,
-                                            mtnresult.statusMessage,
-                                            externaltransref
-                                            );
+                                        MtnResponseEnvelope.Envelope mtnenv1 = new MtnResponseEnvelope.Envelope();
+                                        mtnenv1 = await _mtnToupService.AirtimeRecharge(pinlessRechargeRequest);
+                                        if (mtnenv1.body != null)
+                                        {
+                                            if (mtnenv1.body.vendResponse.responseCode == 0 && mtnenv1.body.vendResponse.statusId == "0")
+                                            {
+                                                externaltransref = mtnenv1.body.vendResponse.txRefId;
+                                                await UpdateTaskStatusAsync(item.RecordId,
+                                                    mtnenv1.body.vendResponse.responseCode.ToString(),
+                                                    mtnenv1.body.vendResponse.responseMessage,
+                                                    externaltransref
+                                                    );
+                                            }
+                                            else
+                                            {
+                                                await UpdateFailedTaskStatusAsync(item.RecordId,
+                                                    mtnenv1.body.vendResponse.responseCode.ToString(),
+                                                    mtnenv1.body.vendResponse.responseMessage
+                                                    );
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
+                                        }
 
-                                    }
-                                    else
-                                    {
-                                        await UpdateFailedTaskStatusAsync(item.RecordId,
-                                            mtnresult.status.ToString(),
-                                            mtnresult.message
-                                            );
                                     }
                                 }
                                 else
                                 {
-                                    await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
-                                }
-                                */
-
-                                if (item.transtype == 1)
-                                {
-                                    MtnResponseEnvelope.Envelope mtnenv1 = new MtnResponseEnvelope.Envelope();
-                                    mtnenv1 = await _mtnToupService.AirtimeRecharge(pinlessRechargeRequest);
-                                    if (mtnenv1.body != null)
+                                    MtnSubscriptionResponse mtnresult = new MtnSubscriptionResponse();
+                                    mtnresult = await _mtnToupService.MtnSubscription(pinlessRechargeRequest);
+                                    if (mtnresult != null)
                                     {
-                                        if (mtnenv1.body.vendResponse.responseCode == 0 && mtnenv1.body.vendResponse.statusId == "0")
+                                        if (mtnresult.statusCode == "0000" && mtnresult.statusMessage == "Successful")
                                         {
-                                            externaltransref = mtnenv1.body.vendResponse.txRefId;
+                                            externaltransref = mtnresult.subscriptionDescription;
                                             await UpdateTaskStatusAsync(item.RecordId,
-                                                mtnenv1.body.vendResponse.responseCode.ToString(),
-                                                mtnenv1.body.vendResponse.responseMessage,
+                                                mtnresult.statusCode,
+                                                mtnresult.statusMessage,
                                                 externaltransref
-                                                );                                            
+                                                );
+
                                         }
                                         else
                                         {
                                             await UpdateFailedTaskStatusAsync(item.RecordId,
-                                                mtnenv1.body.vendResponse.responseCode.ToString(),
-                                                mtnenv1.body.vendResponse.responseMessage
+                                                mtnresult.status.ToString(),
+                                                mtnresult.message
                                                 );
                                         }
                                     }
@@ -188,8 +195,13 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     {
                                         await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                     }
-
                                 }
+                                
+                                
+                                /*
+
+                                
+                                */
 
                                 break;
                             case (int)ServiceProvider.Airtel:

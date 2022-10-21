@@ -29,7 +29,6 @@
             <summary>
             Returns a list of available bill payment services
             </summary>
-            <param name="transactionReference"></param>
             <param name="cancellation"></param>
             <returns></returns>
         </member>

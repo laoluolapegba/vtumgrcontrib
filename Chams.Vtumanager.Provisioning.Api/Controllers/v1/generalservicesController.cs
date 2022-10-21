@@ -92,7 +92,7 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
 
                     var apikey = (string)HttpContext.Request.Headers["x-api-key"];
 
-                    var partner = _transactionRecordService.GetPartnerbyAPIkey(apikey);
+                    var partner = await _transactionRecordService.GetPartnerbyAPIkey(apikey);
 
                     if (partner == null)
                     {
@@ -102,10 +102,10 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
                             responseMessage = "Authorization Error : Invalid API KEY"
                         });
                     }
-                    int billpayentsCategory = (int)ProductCategory.BillPayments;
-                    _logger.LogInformation($"Fetching wallet balance for partnerId {partner.Id}, productCategory {billpayentsCategory}");
+                    int billpayentsCategory = (int)ProductCategory.BillPayments; //1 =billpayentsCategory
+                    _logger.LogInformation($"Fetching wallet balance for partnerId {partner.PartnerId}, productCategory {billpayentsCategory}");
 
-                    var epurseBalance =  _transactionRecordService.GetEpurseByPartnerIdCategoryId(partner.Id, billpayentsCategory);
+                    var epurseBalance =  _transactionRecordService.GetEpurseByPartnerIdCategoryId(partner.PartnerId, billpayentsCategory);
 
                     if(epurseBalance == null )
                     {
@@ -149,13 +149,12 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1
         /// <summary>
         /// Returns a list of available bill payment services
         /// </summary>
-        /// <param name="transactionReference"></param>
         /// <param name="cancellation"></param>
         /// <returns></returns>
         [HttpGet("servicelist")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        [ProducesResponseType(typeof(ServiceLisrResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<ServiceListResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ServiceList(
             CancellationToken cancellation)

@@ -6,7 +6,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
 {
     public class BillPaymentsResponse
     {
-        public int transactionNumber { get; set; }
+        public string transactionNumber { get; set; }
         public ResponseDetails details { get; set; }
         public string status { get; set; }
         public string message { get; set; }

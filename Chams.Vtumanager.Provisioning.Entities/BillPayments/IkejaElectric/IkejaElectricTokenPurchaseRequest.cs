@@ -4,19 +4,19 @@ using System.Text;
 
 namespace Chams.Vtumanager.Provisioning.Entities.BillPayments.IkejaElectric
 {
-    public class IkejaElectricRequest
+    public class IkejaElectricTokenPurchaseRequest
     {
 
-        public IkejaElectricDetails details { get; set; }
+        public IkejaElectricTokenPurchaseDetails details { get; set; }
         public string id { get; set; }
         public string paymentCollectorId { get; set; }
         public string paymentMethod { get; set; }
         public string serviceId { get; set; }
 
-        public class IkejaElectricDetails
+        public class IkejaElectricTokenPurchaseDetails
         {
-            public string meterNumber { get; set; }
-            public float amount { get; set; }
+            public string accountNumber { get; set; }
+            public decimal amount { get; set; }
             public string phoneNumber { get; set; }
             public string email { get; set; }
             public string customerName { get; set; }

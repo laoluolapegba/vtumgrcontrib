@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Chams.Vtumanager.Provisioning.Data;
+using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp;
+using Chams.Vtumanager.Provisioning.Entities.Partner;
 using Chams.Vtumanager.Provisioning.Entities.Subscription;
+using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Hangfire.Services;
 using Chams.Vtumanager.Provisioning.Services.GloTopup;
 using Chams.Vtumanager.Provisioning.Services.Mtn;
@@ -33,6 +36,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
         private readonly IRepository<DirectSalesDetail> _bulkrequestDetailsRepo;
         private readonly IRepository<DirectSalesMaster> _bulkrequestMasterRepo;
         private readonly ITransactionRecordService _transaactionRecordService;
+        private readonly IRepository<PartnerServiceProvider> _partnerServicesRepo;
 
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
             _bulkrequestDetailsRepo = unitOfWork.GetRepository<DirectSalesDetail>();
             _bulkrequestMasterRepo = unitOfWork.GetRepository<DirectSalesMaster>();
             _transaactionRecordService = transaactionRecordService;
-
+            _partnerServicesRepo = unitOfWork.GetRepository<PartnerServiceProvider>();
         }
         /// <summary>
         /// 
@@ -82,57 +86,99 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
             {
                 var pendingJobs = await GetPendingJobs(mst.Id);
                 _logger.LogInformation($"BulkTopup Prepaid worker found {pendingJobs.Count()} pending  requests at " + DateTime.Now);
-                if (pendingJobs != null && pendingJobs.Count() > 0)
+                try
                 {
-                    foreach (var item in pendingJobs)
+                    if (pendingJobs != null && pendingJobs.Count() > 0)
                     {
-                        try
+                        foreach (var item in pendingJobs)
                         {
-                            _logger.LogInformation($"Logging BulkTopup Prepaid transaction record : {JsonConvert.SerializeObject(item.Id)}");
-                            string serviceprovidername = Enum.GetName(typeof(ServiceProvider), item.ServiceProviderId);
-                            int channelId = (int)Channel.Web;
-                            var partner = await _transaactionRecordService.GetPatnerById(mst.PartnerId);
-                            string partnerCode = partner.PartnerCode;
-                            //string timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff", CultureInfo.InvariantCulture);
-
-                            //validate the number 
-                            int serviceproviderId = CarrierLookup(item.Msisdn);
-
-                            TopUpTransactionLog topUpRequest = new TopUpTransactionLog
+                            try
                             {
-                                tran_date = DateTime.Now,
-                                transamount = item.Amount,
-                                transref = item.TransRef,
-                                transtype = item.RequestType,
-                                channelid = channelId,
-                                msisdn = item.Msisdn,
-                                productid = item.ProductCode,
-                                serviceproviderid = serviceproviderId,
-                                sourcesystem = partnerCode,
-                                serviceprovidername = serviceprovidername,
-                                PartnerId = mst.PartnerId,
-                                CountRetries = 0,
-                            };
-                            var requestObkect = await _topupLogRepo.AddAsync(topUpRequest);
-                            await _topupLogRepo.SaveAsync();
+                                
 
-                            _logger.LogInformation($"Updating task detail record : {JsonConvert.SerializeObject(item.Id)}");
-                            await UpdateTaskStatusAsync(item.Id, "", "");
-                            _logger.LogInformation($"Updated task detail record : {JsonConvert.SerializeObject(item.Id)}");
+                                _logger.LogInformation($"Logging BulkTopup Prepaid transaction record : {JsonConvert.SerializeObject(item.Id)}");
+                                string serviceprovidername = Enum.GetName(typeof(ServiceProvider), item.ServiceProviderId);
+                                int channelId = (int)Channel.Web;
+                                var partner = await _transaactionRecordService.GetPatnerById(mst.PartnerId);
+                                string partnerCode = partner.PartnerCode;
+                                //string timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff", CultureInfo.InvariantCulture);
 
-                        }
-                        catch (Exception ex)
-                        {
-                            
-                            _logger.LogError($"Error processing BulkTopup Prepaid message {item.Id}: {ex}");
+                                _logger.LogInformation($"Checking for Duplicate transaction record : {item.TransRef} partmer: {partner.PartnerId}");
+
+                                bool isdup = _transaactionRecordService.IsTransactionExist(item.TransRef, partner.PartnerId);
+                                if(isdup)
+                                {
+                                    _logger.LogInformation($"{item.TransRef} already exists");
+                                    continue;
+                                }
+
+                                _logger.LogInformation($"transaction record : {item.TransRef} not found");
+
+                                //validate the number 
+                                //int serviceproviderId = _transaactionRecordService.CarrierLookup(item.Msisdn);
+
+                                int prepaidpayentsCategory = (int)ProductCategory.Prepaid;
+                                var partnerService = _partnerServicesRepo.GetQueryable()
+                                .Where(a => a.PartnerId == partner.PartnerId && a.ServiceProviderId == item.ServiceProviderId
+                                && a.ProductCategoryid == prepaidpayentsCategory).FirstOrDefault();
+
+                                decimal commission = 0;
+
+                                if (partnerService != null)
+                                {
+                                    _logger.LogInformation($"available prod categories for  partner : {partner.PartnerName} ");
+                                    commission = partnerService.CommissionPct == null ? 0 : (decimal)partnerService.CommissionPct;
+                                }
+                                decimal settlementAmt = commission == 0 ? item.Amount : item.Amount - (commission / 100 * item.Amount);
+
+                                TopUpTransactionLog topUpRequest = new TopUpTransactionLog
+                                {
+                                    tran_date = DateTime.Now,
+                                    transamount = item.Amount,
+                                    transref = item.TransRef,
+                                    transtype = item.RequestType,
+                                    channelid = channelId,
+                                    msisdn = item.Msisdn,
+                                    productid = item.ProductCode,
+                                    serviceproviderid = item.ServiceProviderId,
+                                    sourcesystem = partnerCode,
+                                    serviceprovidername = serviceprovidername,
+                                    PartnerId = mst.PartnerId,
+                                    CountRetries = 0,
+                                    IsProcessed = 0,
+                                    TransactionStatus = 0,
+                                    SettlementAmount = settlementAmt,
+                                    ThreadNo = 1
+                                };
+                                var requestObkect = await _topupLogRepo.AddAsync(topUpRequest);
+                                await _topupLogRepo.SaveAsync();
+
+                                _logger.LogInformation($"Updating task detail record : {JsonConvert.SerializeObject(item.Id)}");
+                                await UpdateTaskStatusAsync(item.Id, "", "");
+                                _logger.LogInformation($"Updated task detail record : {JsonConvert.SerializeObject(item.Id)}");
+
+                            }
+                            catch (Exception ex)
+                            {
+
+                                _logger.LogError($"Error processing BulkTopup Prepaid message direct_sales_record id:{item.Id}: {ex}");
+                                continue;
+                            }
+
                         }
 
                     }
-
+                    _logger.LogInformation($"Updating task master record : {JsonConvert.SerializeObject(mst.Id)}");
+                    await UpdateMasterTaskStatusAsync(mst.Id, "", "");
+                    _logger.LogInformation($"Updated task master record : {JsonConvert.SerializeObject(mst.Id)}");
                 }
-                _logger.LogInformation($"Updating task master record : {JsonConvert.SerializeObject(mst.Id)}");
-                await UpdateMasterTaskStatusAsync(mst.Id, "", "");
-                _logger.LogInformation($"Updated task master record : {JsonConvert.SerializeObject(mst.Id)}");
+                catch (Exception ex)
+                {
+
+                    _logger.LogError($"Error processing BulkTopup Prepaid message direct_sales id:  {mst.Id}: {ex}");
+                    continue;
+                }
+               
             }
 
 
@@ -140,22 +186,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
 
         }
 
-        private int CarrierLookup(string msisdn)
-        {
-            int serviceprovider = 0;
-            try
-            {
-                string prefix = msisdn.Substring(0, 4);
-                var carrier = _transaactionRecordService.GetServiceProviderByPrefix(prefix);
-                return carrier.ServiceProviderId;
-            }
-            catch(Exception ex)
-            {
-                _logger.LogInformation($"failed to lookup carrier info for MSISDN : {msisdn}");
-            }
-
-            return serviceprovider;
-        }
+        
 
         /// <summary>
         /// 

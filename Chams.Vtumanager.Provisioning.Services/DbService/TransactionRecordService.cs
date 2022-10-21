@@ -103,6 +103,7 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
             {
                 string partnerName = partner.PartnerName;
                 _logger.LogInformation($"fetching available prod categories for  partner : {partnerName} ");
+
                 int prepaidpayentsCategory = (int)ProductCategory.Prepaid;
                 var partnerService = _partnerServicesRepo.GetQueryable()
                 .Where(a => a.PartnerId == partnerId && a.ServiceProviderId == rechargeRequest.ServiceProviderId
@@ -133,7 +134,8 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
                     CountRetries = 0,
                     IsProcessed = 0,
                     TransactionStatus = 0,
-                    SettlementAmount = settlementAmt
+                    SettlementAmount = settlementAmt,
+                    ThreadNo = 1
 
 
                 };
@@ -504,6 +506,23 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
 
             }
             return stockObj;
+        }
+
+        public int CarrierLookup1(string msisdn)
+        {
+            int serviceprovider = 0;
+            try
+            {
+                string prefix = msisdn.Substring(0, 4);
+                var carrier = GetServiceProviderByPrefix(prefix);
+                return carrier.ServiceProviderId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"failed to lookup carrier info for MSISDN : {msisdn}");
+            }
+
+            return serviceprovider;
         }
     }
 }

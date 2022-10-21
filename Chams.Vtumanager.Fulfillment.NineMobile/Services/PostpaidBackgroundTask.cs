@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Chams.Vtumanager.Provisioning.Data;
+using Chams.Vtumanager.Provisioning.Entities.BusinessAccount;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.EtopUp;
 using Chams.Vtumanager.Provisioning.Entities.Subscription;
@@ -32,6 +33,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
         private readonly IRepository<TopUpTransactionLog> _topupLogRepo;
         private readonly IRepository<Subscriber> _postpaidSubsRepo;
         private readonly ITransactionRecordService _transaactionRecordService;
+        private readonly IRepository<PartnerServiceProvider> _partnerServicesRepo;
 
 
         /// <summary>
@@ -61,6 +63,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
             _topupLogRepo = unitOfWork.GetRepository<TopUpTransactionLog>();
             _postpaidSubsRepo = unitOfWork.GetRepository<Subscriber>();
             _transaactionRecordService = transaactionRecordService;
+            _partnerServicesRepo = unitOfWork.GetRepository<PartnerServiceProvider>();
 
         }
         /// <summary>
@@ -89,6 +92,31 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                         var partner = await _transaactionRecordService.GetPatnerById(item.PartnerId);
                         string partnerCode = partner.PartnerCode;
                         string transref = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff", CultureInfo.InvariantCulture);
+
+                        bool isdup = _transaactionRecordService.IsTransactionExist(transref, partner.PartnerId);
+                        if (isdup)
+                        {
+                            continue;
+                        }
+
+
+                        int prepaidpayentsCategory = (int)ProductCategory.Prepaid;
+                        var partnerService = _partnerServicesRepo.GetQueryable()
+                        .Where(a => a.PartnerId == partner.PartnerId && a.ServiceProviderId == item.ServiceProviderId
+                        && a.ProductCategoryid == prepaidpayentsCategory).FirstOrDefault();
+
+                        //validate the number 
+                        //int serviceproviderId = _transaactionRecordService.CarrierLookup(item.Phone);
+
+
+                        decimal commission = 0;
+
+                        if (partnerService != null)
+                        {
+                            _logger.LogInformation($"available prod categories for  partner : {partner.PartnerName} ");
+                            commission = partnerService.CommissionPct == null ? 0 : (decimal)partnerService.CommissionPct;
+                        }
+                        decimal settlementAmt = commission == 0 ? item.CreditAmount : item.CreditAmount - (commission / 100 * item.CreditAmount);
                         TopUpTransactionLog topUpRequest = new TopUpTransactionLog
                         {
                             tran_date = DateTime.Now,
@@ -103,6 +131,10 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                             serviceprovidername = serviceprovidername,
                             PartnerId = item.PartnerId,
                             CountRetries = 0,
+                            IsProcessed = 0,
+                            TransactionStatus = 0,
+                            SettlementAmount = settlementAmt,
+                            ThreadNo = 1
                         };
                         var requestObkect = await _topupLogRepo.AddAsync(topUpRequest);
                         await _topupLogRepo.SaveAsync();

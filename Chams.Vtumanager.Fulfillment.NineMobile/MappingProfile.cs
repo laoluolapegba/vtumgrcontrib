@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Sales_Mgmt.Services.Smtp.Hangfire
     {
         public MappingProfile()
         {
-             
+           
         }
     }
 }

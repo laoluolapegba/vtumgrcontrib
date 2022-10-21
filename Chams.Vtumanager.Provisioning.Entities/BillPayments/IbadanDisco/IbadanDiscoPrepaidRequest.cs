@@ -4,16 +4,16 @@ using System.Text;
 
 namespace Chams.Vtumanager.Provisioning.Entities.IbadanDisco
 {
-    public class IbadanDiscoRequest
+    public class IbadanDiscoPrepaidRequest
     {
 
-        public IbadanDiscoDetails details { get; set; }
+        public IbadanDiscoPrepaidRequestDetails details { get; set; }
         public string id { get; set; }
         public string paymentCollectorId { get; set; }
         public string paymentMethod { get; set; }
         public string serviceId { get; set; }
 
-        public class IbadanDiscoDetails
+        public class IbadanDiscoPrepaidRequestDetails
         {
             public string customerReference { get; set; }
             public string customerType { get; set; }
