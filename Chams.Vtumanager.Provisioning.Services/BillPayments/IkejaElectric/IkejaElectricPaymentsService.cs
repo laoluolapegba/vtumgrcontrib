@@ -39,7 +39,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.IkejaELectric
 
 
         #region IkejaElectricDisco
-        public async Task<BillPaymentsResponse> IkejaElectricPrepaidAsync(IkejaElectricRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> IkejaElectricPrepaidAsync(IkejaElectricTokenPurchaseRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside EkoElectricPrepaidAsync service request");
@@ -123,7 +123,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.IkejaELectric
         }
 
 
-        public async Task<BillPaymentsResponse> IkejaElectricPostpaidAsync(IkejaElectricRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> IkejaElectricPostpaidAsync(IkejaElectricPostpaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside EkoElectricPostpaidAsync service request");

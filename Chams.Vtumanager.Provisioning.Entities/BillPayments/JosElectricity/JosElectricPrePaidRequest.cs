@@ -4,16 +4,16 @@ using System.Text;
 
 namespace Chams.Vtumanager.Provisioning.Entities.BillPayments.JosElectricity
 {
-    public class JosElectricRequest
+    public class JosElectricPrePaidRequest
     {
 
-        public JosElectricity details { get; set; }
+        public JosElectricityPrePaidDetails details { get; set; }
         public string id { get; set; }
         public string paymentCollectorId { get; set; }
         public string paymentMethod { get; set; }
         public string serviceId { get; set; }
 
-        public class JosElectricity
+        public class JosElectricityPrePaidDetails
         {
             public string accessCode { get; set; }
             public string customerPhoneNumber { get; set; }

@@ -7,13 +7,13 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments.Multichoice
     public class GotvRequest
     {
 
-        public GotvDetails details { get; set; }
+        public GotvRequestDetails details { get; set; }
         public string id { get; set; }
         public string paymentCollectorId { get; set; }
         public string paymentMethod { get; set; }
         public string serviceId { get; set; }
 
-        public class GotvDetails
+        public class GotvRequestDetails
         {
             public string[] productsCodes { get; set; }
             public int customerNumber { get; set; }

@@ -40,7 +40,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Kedco
 
 
         #region PH
-        public async Task<BillPaymentsResponse> PortHarcourtPrepaidAsync(PortHarcourtElectricRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> PortHarcourtPrepaidAsync(PortHarcourtElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside PortHarcourtPrepaidAsync service request");
@@ -124,7 +124,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Kedco
         }
 
 
-        public async Task<BillPaymentsResponse> PortHarcourtPostpaidAsync(PortHarcourtElectricRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> PortHarcourtPostpaidAsync(PortHarcourtElectricPostpaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside PortHarcourtPostpaidAsync service request");

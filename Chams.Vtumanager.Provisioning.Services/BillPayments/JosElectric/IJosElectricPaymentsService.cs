@@ -7,7 +7,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.JosElectric
 {
     public interface IJosElectricPaymentsService
     {
-        Task<BillPaymentsResponse> JosElectricPostpaidAsync(JosElectricRequest paymentRequest, CancellationToken cancellationToken);
-        Task<BillPaymentsResponse> JosElectricPrepaidAsync(JosElectricRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> JosElectricPostpaidAsync(JosElectricPostPaidRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> JosElectricPrepaidAsync(JosElectricPrePaidRequest paymentRequest, CancellationToken cancellationToken);
     }
 }

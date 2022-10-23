@@ -15,7 +15,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments.Multichoice
 
         public class BoxOfficerequestDetails
         {
-            public object[] productsCodes { get; set; }
+            public string[] productsCodes { get; set; }
             public int customerNumber { get; set; }
             public long smartcardNumber { get; set; }
             public string customerName { get; set; }

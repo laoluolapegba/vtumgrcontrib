@@ -26,6 +26,17 @@ using Chams.Vtumanager.Provisioning.Entities.BillPayments.Carpaddy;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.Cornerstone;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.EkoElectric;
 using Chams.Vtumanager.Provisioning.Entities.IbadanDisco;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.Jamb;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.JosElectricity;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Kaduna;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Kedco;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Mutual;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.PortharcourtElectric;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Showmax;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Smile;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Spectranet;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Startimes;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.Waec;
 
 namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
 {
@@ -57,7 +68,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
         public async Task<BillPaymentsResponse> BillerPayAsync(BillpaymentRequest paymentRequest, CancellationToken cancellationToken)
         {
 
-            _logger.LogInformation($"Inside BillerPayAsync service request");
+            _logger.LogInformation($"Inside BillerPayAsync service request with service id: {paymentRequest.serviceId}");
             string requestBodyString = string.Empty;
             object requestBodyObj  = null;
 
@@ -81,8 +92,16 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
                     requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
                     break;
                 case "BCA":
-                    requestBodyObj = _mapper.Map<BillpaymentRequest, CornerstoneRequest>(paymentRequest);
-                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    if(paymentRequest.details.subriskCode!=null)
+                    {
+                        requestBodyObj = _mapper.Map<BillpaymentRequest, MutualMortorInsuranceRequest>(paymentRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else {
+                        requestBodyObj = _mapper.Map<BillpaymentRequest, CornerstoneRequest>(paymentRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    
                     break;
                 case "AVA":
                     requestBodyObj = _mapper.Map<BillpaymentRequest, EkoElectricPostpaidRequest>(paymentRequest);
@@ -109,7 +128,100 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
                     requestBodyObj = _mapper.Map<BillpaymentRequest, IkejaElectricTokenPurchaseRequest>(paymentRequest);
                     requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
                     break;
-
+                case "ACA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, JambPINRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CKB":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, JosElectricPostPaidRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CKA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, JosElectricPostPaidRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CDA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, KadunaElectricPrepaidRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CDB":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, KadunaElectricPostpaidRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AVB":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, KedcoElectricPrepaidRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AVC":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, KedcoElectricPostpaidRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AQA":
+                    if(paymentRequest.details.productsCodes.Length > 0)
+                    {
+                        requestBodyObj = _mapper.Map<BillpaymentRequest, DstvRequest>(paymentRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else
+                    {
+                        requestBodyObj = _mapper.Map<BillpaymentRequest, DstvBoxOfficeRequest>(paymentRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    
+                    break;
+                case "AQC":
+                    if(paymentRequest.details.productsCodes.Length> 0)
+                    {
+                        requestBodyObj = _mapper.Map<BillpaymentRequest, GotvRenew>(paymentRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else
+                    {
+                        requestBodyObj = _mapper.Map<BillpaymentRequest, GotvRequest>(paymentRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    break;
+                
+                case "BIA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, PortHarcourtElectricPrepaidRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "BIB":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, PortHarcourtElectricPostpaidRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CPA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, ShowmaxVoucherRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "ANA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, SmileCommRechargeRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "ANB":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, SmileCommBundleRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "BGB":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, SpectranetPaymentPlanRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "BGA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, SpectranetPINRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "BGC":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, SpectranetRefillRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AWA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, StartimesRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "ASA":
+                    requestBodyObj = _mapper.Map<BillpaymentRequest, WaecPINRequest>(paymentRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
                 default:
                     break;
             }

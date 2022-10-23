@@ -40,7 +40,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice
 
 
         #region IbadanDisco
-        public async Task<BillPaymentsResponse> IbadanDiscoPrepaidAsync(IbadanDiscoRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> IbadanDiscoPrepaidAsync(IbadanDiscoPrepaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside EkoElectricPrepaidAsync service request");
@@ -124,7 +124,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Multichoice
         }
 
 
-        public async Task<BillPaymentsResponse> IbadanDiscoPostpaidAsync(IbadanDiscoRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> IbadanDiscoPostpaidAsync(IbadanDiscoPostpaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside EkoElectricPostpaidAsync service request");

@@ -7,7 +7,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.PortHarcourt
 {
     public interface IPortHarcourtPaymentsService
     {
-        Task<BillPaymentsResponse> PortHarcourtPostpaidAsync(PortHarcourtElectricRequest paymentRequest, CancellationToken cancellationToken);
-        Task<BillPaymentsResponse> PortHarcourtPrepaidAsync(PortHarcourtElectricRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> PortHarcourtPostpaidAsync(PortHarcourtElectricPostpaidRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> PortHarcourtPrepaidAsync(PortHarcourtElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken);
     }
 }

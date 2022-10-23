@@ -118,7 +118,7 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
                 //sb.AppendLine(@"   <SELECTOR>1</SELECTOR>");
                 //sb.AppendLine(@"</COMMAND>");
 
-                _logger.LogInformation($"AirtimeRecharge soap request = {sb.ToString()}");  //
+                _logger.LogInformation($"Airtel AirtimeRecharge soap request = {sb.ToString()}");  //
 
 
                 var httpClient = _clientFactory.CreateClient("PretupsRechargeClient");
@@ -195,22 +195,21 @@ namespace Chams.Vtumanager.Fulfillment.NineMobile.Services
 
 
                 var sb = new System.Text.StringBuilder(468);
-                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
-                sb.AppendLine(@"<!DOCTYPE COMMAND PUBLIC ""-//Ocam//DTD XML Command1.0//EN"" ""xml/command.dtd"">");
-                sb.AppendLine(@"<COMMAND>");
-                sb.AppendLine(@"<TYPE>VASSELLREQ</TYPE>");
-                sb.AppendLine(@"<DATE>" + tranDate + "</DATE>");
-                sb.AppendLine(@"<EXTNWCODE>NG</EXTNWCODE>");
-                sb.AppendLine(@"<MSISDN>" + _settings.PartnerMsisdn + "</MSISDN>");
-                sb.AppendLine(@"<PIN>" + _settings.PIN + "</PIN>");
-                sb.AppendLine(@"<LOGINID/>");
-                sb.AppendLine(@"<PASSWORD/>");
-                sb.AppendLine(@"<EXTCODE/>");
-                sb.AppendLine(@"<EXTREFNUM>" + _settings.PartnerCode + "</EXTREFNUM>");
-                sb.AppendLine(@"<SUBSMSISDN>" + pinRechargeRequest.Msisdn + "</SUBSMSISDN>");
-                sb.AppendLine(@"<AMT>" + pinRechargeRequest.Amount + "</AMT>");
-                sb.AppendLine(@"<SUBSERVICE>" + pinRechargeRequest.ProductCode + "</SUBSERVICE>");
-                sb.AppendLine(@"</COMMAND>");
+                sb.Append(@"<?xml version=""1.0""?>");
+                sb.Append(@"<COMMAND>");
+                sb.Append(@"<TYPE>VASSELLREQ</TYPE>");
+                sb.Append(@"<DATE>" + tranDate + "</DATE>");
+                sb.Append(@"<EXTNWCODE>NG</EXTNWCODE>");
+                sb.Append(@"<MSISDN>" + _settings.PartnerMsisdn + "</MSISDN>");
+                sb.Append(@"<PIN>" + _settings.PIN + "</PIN>");
+                sb.Append(@"<LOGINID/>");
+                sb.Append(@"<PASSWORD/>");
+                sb.Append(@"<EXTCODE/>");
+                sb.Append(@"<EXTREFNUM>" + _settings.PartnerCode + "</EXTREFNUM>");
+                sb.Append(@"<SUBSMSISDN>" + pinRechargeRequest.Msisdn + "</SUBSMSISDN>");
+                sb.Append(@"<AMT>" + pinRechargeRequest.Amount + "</AMT>");
+                sb.Append(@"<SUBSERVICE>" + pinRechargeRequest.ProductCode + "</SUBSERVICE>");
+                sb.Append(@"</COMMAND>");
 
                 _logger.LogInformation($"Airtel DataRecharge soap request = {sb.ToString()}");
 

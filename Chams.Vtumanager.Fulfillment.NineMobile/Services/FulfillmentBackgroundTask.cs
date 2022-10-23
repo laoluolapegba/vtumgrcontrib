@@ -132,6 +132,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                     ///end check balance
                     try
                     {
+                        _logger.LogInformation($"Start processing request {pinlessRechargeRequest.transId} ");
                         switch (item.serviceproviderid)
                         {
                             case (int)ServiceProvider.MTN:
@@ -162,9 +163,39 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                         }
                                         else
                                         {
+                                            _logger.LogInformation($"Mtn airtime Web Service Failed : {item.serviceproviderid} for request {pinlessRechargeRequest.transId}");
                                             await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                         }
 
+                                    }
+                                    else
+                                    {
+                                        MtnResponseEnvelope.Envelope mtnenv1 = new MtnResponseEnvelope.Envelope();
+                                        mtnenv1 = await _mtnToupService.AirtimeRecharge(pinlessRechargeRequest);
+                                        if (mtnenv1.body != null)
+                                        {
+                                            if (mtnenv1.body.vendResponse.responseCode == 0 && mtnenv1.body.vendResponse.statusId == "0")
+                                            {
+                                                externaltransref = mtnenv1.body.vendResponse.txRefId;
+                                                await UpdateTaskStatusAsync(item.RecordId,
+                                                    mtnenv1.body.vendResponse.responseCode.ToString(),
+                                                    mtnenv1.body.vendResponse.responseMessage,
+                                                    externaltransref
+                                                    );
+                                            }
+                                            else
+                                            {
+                                                await UpdateFailedTaskStatusAsync(item.RecordId,
+                                                    mtnenv1.body.vendResponse.responseCode.ToString(),
+                                                    mtnenv1.body.vendResponse.responseMessage
+                                                    );
+                                            }
+                                        }
+                                        else
+                                        {
+                                            _logger.LogInformation($"Mtn Data Web Service Failed : {item.serviceproviderid} for request {pinlessRechargeRequest.transId}");
+                                            await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
+                                        }
                                     }
                                 }
                                 else
@@ -193,6 +224,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     }
                                     else
                                     {
+                                        _logger.LogInformation($"Mtn version 3 Web Service Failed : {item.serviceproviderid} for request {pinlessRechargeRequest.transId}");
                                         await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                     }
                                 }
@@ -231,6 +263,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     }
                                     else
                                     {
+                                        _logger.LogInformation($"Web Service Failed : {item.serviceproviderid} for request {pinlessRechargeRequest.transId}");
                                         await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                     }
                                 }
@@ -260,6 +293,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     }
                                     else
                                     {
+                                        _logger.LogInformation($"Web Service Failed : {item.serviceproviderid} for request {pinlessRechargeRequest.transId}");
                                         await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                     }
                                 }
@@ -293,6 +327,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     }
                                     else
                                     {
+                                        _logger.LogInformation($"Web Service Failed : {item.serviceproviderid} for request {pinlessRechargeRequest.transId}");
                                         await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                     }
                                 }
@@ -323,6 +358,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     }
                                     else
                                     {
+                                        _logger.LogInformation($"Web Service Failed : {item.serviceproviderid} for request {pinlessRechargeRequest.transId}");
                                         await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                     }
                                 }
@@ -353,6 +389,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                 }
                                 else
                                 {
+                                    _logger.LogInformation($"9Mobile Web Service Failed : {item.serviceproviderid} for request {pinlessRechargeRequest.transId}");
                                     await UpdateFailedTaskStatusAsync(item.RecordId, "99", "Web Service Failed");
                                 }
                                 break;
@@ -360,7 +397,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                 break;
                         }
                         successCount++;
-
+                        _logger.LogInformation($"End processing request {pinlessRechargeRequest.transId} ");
                     }
                     catch (Exception ex)
                     {

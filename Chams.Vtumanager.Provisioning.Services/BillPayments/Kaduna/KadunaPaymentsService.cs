@@ -43,7 +43,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Kedco
 
 
         #region Kaduna
-        public async Task<BillPaymentsResponse> KadunaPrepaidAsync(KadunaRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> KadunaPrepaidAsync(KadunaElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside KadunaPrepaidAsync service request");
@@ -127,7 +127,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Kedco
         }
 
 
-        public async Task<BillPaymentsResponse> KadunaPostpaidAsync(KadunaRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> KadunaPostpaidAsync(KadunaElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside KadunaPostpaidAsync service request");

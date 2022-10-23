@@ -7,7 +7,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.IbadanDisco
 {
     public interface IIbadanDiscoPaymentsService
     {
-        Task<BillPaymentsResponse> IbadanDiscoPostpaidAsync(IbadanDiscoRequest paymentRequest, CancellationToken cancellationToken);
-        Task<BillPaymentsResponse> IbadanDiscoPrepaidAsync(IbadanDiscoRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> IbadanDiscoPostpaidAsync(IbadanDiscoPostpaidRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> IbadanDiscoPrepaidAsync(IbadanDiscoPrepaidRequest paymentRequest, CancellationToken cancellationToken);
     }
 }

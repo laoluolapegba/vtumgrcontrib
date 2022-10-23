@@ -7,7 +7,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Kedco
 {
     public interface IKedcoPaymentsService
     {
-        Task<BillPaymentsResponse> KedcoPostpaidAsync(KedcoRequest paymentRequest, CancellationToken cancellationToken);
-        Task<BillPaymentsResponse> KedcoPrepaidAsync(KedcoRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> KedcoPostpaidAsync(KedcoElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> KedcoPrepaidAsync(KedcoElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken);
     }
 }

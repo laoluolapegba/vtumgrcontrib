@@ -41,7 +41,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Kedco
 
 
         #region Kedco
-        public async Task<BillPaymentsResponse> KedcoPrepaidAsync(KedcoRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> KedcoPrepaidAsync(KedcoElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside KedcoPrepaidAsync service request");
@@ -125,7 +125,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Kedco
         }
 
 
-        public async Task<BillPaymentsResponse> KedcoPostpaidAsync(KedcoRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> KedcoPostpaidAsync(KedcoElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside KedcoPostpaidAsync service request");

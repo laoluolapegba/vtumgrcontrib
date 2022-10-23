@@ -8,7 +8,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Kaduna
 {
     public interface IKadunaPaymentsService
     {
-        Task<BillPaymentsResponse> KadunaPostpaidAsync(KadunaRequest paymentRequest, CancellationToken cancellationToken);
-        Task<BillPaymentsResponse> KadunaPrepaidAsync(KadunaRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> KadunaPostpaidAsync(KadunaElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken);
+        Task<BillPaymentsResponse> KadunaPrepaidAsync(KadunaElectricPrepaidRequest paymentRequest, CancellationToken cancellationToken);
     }
 }

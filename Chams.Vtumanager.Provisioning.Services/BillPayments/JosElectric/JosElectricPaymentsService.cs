@@ -42,7 +42,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.JosElectric
 
 
         #region JosElectric
-        public async Task<BillPaymentsResponse> JosElectricPrepaidAsync(JosElectricRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> JosElectricPrepaidAsync(JosElectricPrePaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside JosElectricPrepaidAsync service request");
@@ -126,7 +126,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.JosElectric
         }
 
 
-        public async Task<BillPaymentsResponse> JosElectricPostpaidAsync(JosElectricRequest paymentRequest, CancellationToken cancellationToken)
+        public async Task<BillPaymentsResponse> JosElectricPostpaidAsync(JosElectricPostPaidRequest paymentRequest, CancellationToken cancellationToken)
         {
 
             _logger.LogInformation($"Inside JosElectricPostpaidAsync service request");

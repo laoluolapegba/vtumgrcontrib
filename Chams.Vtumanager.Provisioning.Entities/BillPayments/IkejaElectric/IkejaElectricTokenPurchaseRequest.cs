@@ -15,7 +15,7 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments.IkejaElectric
 
         public class IkejaElectricTokenPurchaseDetails
         {
-            public string accountNumber { get; set; }
+            public string meterNumber { get; set; }
             public decimal amount { get; set; }
             public string phoneNumber { get; set; }
             public string email { get; set; }
