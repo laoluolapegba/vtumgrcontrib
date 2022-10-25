@@ -37,6 +37,9 @@ using Chams.Vtumanager.Provisioning.Entities.BillPayments.Smile;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.Spectranet;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.Startimes;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.Waec;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy;
+using static Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy.ProxyCornerStoneCarModels;
+using static Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy.ProxyEkoPrepaid;
 
 namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
 {
@@ -530,31 +533,229 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
             return result;
         }
 
-        public async Task<BillPaymentsResponse> ProxyAsync(ProxyRequest proxyRequest, CancellationToken cancellationToken)
+        public async Task<ProxyResponse> ProxyAsync(ProxyRequest proxyRequest, CancellationToken cancellationToken)
         {
 
-            _logger.LogInformation($"Inside BillerPayAsync service request");
+            _logger.LogInformation($"Inside ProxyAsync service request with service id: {proxyRequest.serviceId}");
+            string requestBodyString = string.Empty;
+            object requestBodyObj = null;
 
-            BillPaymentsResponse result = new BillPaymentsResponse();
+            switch (proxyRequest.serviceId)
+            {
+                //var dto =_mapper.Map<DestinationDto>(SourceDto);
+                case "CIA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyAbujaPrepaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CIB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyAbujaPostpaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "ANB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyValidateSmileBundleCustomer>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AWA":
+                    if(proxyRequest.details.smartCardNumber != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyStartimes>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyStartimesGetBundle>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    
+                    break;
+                case "BCA":
+                    if(proxyRequest.details.vehicleManufacter != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyCornerStoneCarModels>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else if (proxyRequest.details.policy != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyCornerSton3rdpartyInsuranceQuotation>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else if (proxyRequest.details.policyId != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyCornerStoneGetPolicyDetails>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyCornerstone>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    
+                    break;
+                case "AQA":
+                    if (proxyRequest.details.number != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyMultichoiceValidateSmartcardNo>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else if (proxyRequest.details.invoicePeriod != null && proxyRequest.details.number != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyMultichoiceGetBouquet>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else if (proxyRequest.details.primaryProductCode != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyMultichoiceProductAddon>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyMultichoice>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    break;
+                case "AQC":
+                    if (proxyRequest.details.number != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyMultichoiceValidateSmartcardNo>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else if (proxyRequest.details.invoicePeriod != null && proxyRequest.details.number != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyMultichoiceGetBouquet>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else if (proxyRequest.details.primaryProductCode != null)
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyMultichoiceProductAddon>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    else
+                    {
+                        requestBodyObj = _mapper.Map<ProxyRequest, ProxyMultichoice>(proxyRequest);
+                        requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    }
+                    break;
+                case "BIA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyPortharcoutPrepaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "BIB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyPortharcoutPostpaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "BAA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyEkoPrepaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AVA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyEkoPostpaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CKA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyJosPrepaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CKB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyJosPostpaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "APA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyIkejaPostpaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "APB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyIkejaPrepaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AUB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyIbadanPrepaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AUA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyIbadanPostpaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AVB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyKedcoPrepaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AVC":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyKedcoPostpaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CDA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyKadunaPrepaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CDB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyKadunaPostpaid>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "ASA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyWAECPIN>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "AOA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyBulkSMS>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "ANA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxySmileRecharge>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "BGA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxySpectranetPIN>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "BGB":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxySpectranetValidateAcctNo>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CLA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyCarpaddy>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                case "CPA":
+                    requestBodyObj = _mapper.Map<ProxyRequest, ProxyShowmaxVouchers>(proxyRequest);
+                    requestBodyString = JsonConvert.SerializeObject(requestBodyObj);
+                    break;
+                
+                default:
+                    break;
+            }
+
+            ProxyResponse result = new ProxyResponse();
 
             string gatewayURL = _configuration["BaxiBillsAPI:URL"];
-
             var httpClient = _httpFactory.CreateClient("BaxiBillsAPI");
-
             string baxi_Username = _configuration["BaxiBillsAPI:BAXI_USERNAME"];
             string BAXI_SEC_TOKEN = _configuration["BaxiBillsAPI:BAXI_SEC_TOKEN"];
+            string serveletPath = _configuration["BaxiBillsAPI:ServletPath"] + "/proxy"; ;
+
+            _logger.LogInformation($"baxiusername :  {baxi_Username}");
+            _logger.LogInformation($"BAXI_SEC_TOKEN :  {BAXI_SEC_TOKEN}");
+            _logger.LogInformation($"serveletPath :  {serveletPath}");
 
 
-            string jsonRequest = JsonConvert.SerializeObject(proxyRequest); //  JsonConvert.SerializeObject(dstvRequest);
+            _logger.LogInformation($"requestBody :  {requestBodyString}");
 
-            string sha256 = sha256hash(jsonRequest);
+            string sha256 = sha256hash(requestBodyString);
 
+            //_logger.LogInformation($"sha256 :  {sha256}");
 
             string hashedPayload = HexString2B64String(sha256);
-            //Console.WriteLine("hashedPayload=" + hashedPayload);
-            var x_mspdate = DateTime.UtcNow; // DateTime.Now.ToString("R"); Wed, 17 Aug 2022 21:14:00 GMT
-            Int32 unixTimestamp = (int)x_mspdate.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-            string serveletPath = _configuration["BaxiBillsAPI:ServletPath"];
+
+            //_logger.LogInformation($"hashedPayload :  {hashedPayload}");
+
+            var x_mspdate = DateTime.Now.ToString("R");  //"Wed, 12 Oct 2022 16:26:36 GMT"; //  // Thu, 06 Oct 2022 19:49:43 GMT  //DateTime.UtcNow; 
+
+            _logger.LogInformation($"x_mspdate :  {x_mspdate}");
+
+            DateTime x = DateTime.Parse(x_mspdate);
+
+            var unixTimestamp = ((DateTimeOffset)x).ToUnixTimeSeconds();
+
+
 
             StringBuilder strToSign = new StringBuilder();
             strToSign.Append("POST");
@@ -564,22 +765,24 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
             strToSign.Append(unixTimestamp);
             strToSign.Append(hashedPayload);
 
-            //var requestData = "POST/rest/consumer/v2/exchange16607235533RvQHdls/XuKe4a28q8HeK2xDZTYd7oo1YPCUedRsGM=";
-            //POST/rest/consumer/v2/exchange16607238733RvQHdls/XuKe4a28q8HeK2xDZTYd7oo1YPCUedRsGM=
+
 
             string signature = HexString2B64String(ComputeHMAC_SHA1(strToSign.ToString(), BAXI_SEC_TOKEN));
 
-            string authHeader = "Baxi" + " " + baxi_Username + ":" + signature;  //Baxi baxi_ZN1GmmLtE:mmKFvIJUA9ZEQyFoIJlrFYpR3gU=
-            //authHeader = "Baxi baxi_ZN1GmmLtE:+tcdGZB7tqwXrnRsgLRcMVW5Ydg=";
+            _logger.LogInformation($"signature :  {signature}");
 
-            httpClient.DefaultRequestHeaders.Add("Authorization", authHeader); //[{"key":"x-msp-date","value":"{{x-msp-date}}","type":"text"}]
-            httpClient.DefaultRequestHeaders.Add("x-msp-date", x_mspdate.ToString("R")); // x_mspdate.ToString("R"));
+            string authHeader = "Baxi" + " " + baxi_Username + ":" + signature;
+
+            _logger.LogInformation($"authHeader :  {authHeader}");
+
+            httpClient.DefaultRequestHeaders.Add("Authorization", authHeader); 
+            httpClient.DefaultRequestHeaders.Add("x-msp-date", x_mspdate); 
 
 
             var httpRequest = new HttpRequestMessage(HttpMethod.Post, gatewayURL + "/proxy");
-            _logger.LogInformation($"Calling BillerPayAsync  {httpRequest.RequestUri}");
+            _logger.LogInformation($"Calling ProxyAsync  {httpRequest.RequestUri}");
 
-            using (var httpContent = CreateHttpContent(proxyRequest))
+            using (var httpContent = CreateHttpContent(requestBodyObj))
             {
                 httpRequest.Content = httpContent;
 
@@ -590,21 +793,21 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
                     //response.EnsureSuccessStatusCode();
                     if (!response.IsSuccessStatusCode)
                     {
-                        _logger.LogInformation($"api call BillerPayAsync returned with statusCode {response.StatusCode} reason: {response.ReasonPhrase}");
+                        _logger.LogInformation($"api call ProxyAsync returned with statusCode {response.StatusCode} reason: {response.ReasonPhrase}");
                         var errorStream = await response.Content.ReadAsStringAsync();
 
                         //var validationErrors = errorStream.ReadAndDeserializeFromJson();
-                        _logger.LogWarning($"api call BillerPayAsync returned with status code: {response.StatusCode} validationErrors: -- {errorStream} --");
+                        _logger.LogWarning($"api call ProxyAsync returned with status code: {response.StatusCode} validationErrors: -- {errorStream} --");
                         //var dstverror = JsonConvert.DeserializeObject<DstvError>(errorStream.ToString());
 
-                        result = JsonConvert.DeserializeObject<BillPaymentsResponse>(errorStream.ToString());
+                        result = JsonConvert.DeserializeObject<ProxyResponse>(errorStream.ToString());
 
                     }
                     if (response.IsSuccessStatusCode)
                     {
                         string contentStream = await response.Content.ReadAsStringAsync();
-                        _logger.LogInformation($"api call BillerPayAsync returned with contentstream  {contentStream}");
-                        result = JsonConvert.DeserializeObject<BillPaymentsResponse>(contentStream);
+                        _logger.LogInformation($"api call ProxyAsync returned with contentstream  {contentStream}");
+                        result = JsonConvert.DeserializeObject<ProxyResponse>(contentStream);
                     }
 
                 }

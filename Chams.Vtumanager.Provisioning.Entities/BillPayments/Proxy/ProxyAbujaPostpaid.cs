@@ -7,10 +7,10 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
     public class ProxyAbujaPostpaid
     {
 
-        public ProxyDetails details { get; set; }
+        public AbujaPostpaidProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
-        public class ProxyDetails
+        public class AbujaPostpaidProxyDetails
         {
             public string customerReference { get; set; }
             public string customerReferenceType { get; set; }

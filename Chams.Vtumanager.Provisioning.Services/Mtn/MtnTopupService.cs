@@ -153,20 +153,20 @@ IHttpClientFactory clientFactory)
             {
 
                 var sb = new System.Text.StringBuilder(584);
-                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
-                sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://hostif.vtm.prism.co.za/xsd"">");
-                sb.AppendLine(@"   <soapenv:Header />");
-                sb.AppendLine(@"   <soapenv:Body>");
-                sb.AppendLine(@"      <xsd:vend>");
-                sb.AppendLine(@"         <xsd:origMsisdn>" + _settings.PartnerMsisdn + "</xsd:origMsisdn>");
-                sb.AppendLine(@"         <xsd:destMsisdn>" + pinlessRechargeRequest.Msisdn + "</xsd:destMsisdn>");
-                sb.AppendLine(@"         <xsd:amount>" + pinlessRechargeRequest.Amount + "</xsd:amount>");
-                sb.AppendLine(@"         <xsd:sequence>" + pinlessRechargeRequest.transId + "</xsd:sequence>");
-                sb.AppendLine(@"         <xsd:tariffTypeId>1</xsd:tariffTypeId>");
-                sb.AppendLine(@"         <xsd:serviceproviderId>1</xsd:serviceproviderId>");
-                sb.AppendLine(@"      </xsd:vend>");
-                sb.AppendLine(@"   </soapenv:Body>");
-                sb.AppendLine(@"</soapenv:Envelope>");
+                sb.Append(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
+                sb.Append(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://hostif.vtm.prism.co.za/xsd"">");
+                sb.Append(@"   <soapenv:Header />");
+                sb.Append(@"   <soapenv:Body>");
+                sb.Append(@"      <xsd:vend>");
+                sb.Append(@"         <xsd:origMsisdn>" + _settings.PartnerMsisdn + "</xsd:origMsisdn>");
+                sb.Append(@"         <xsd:destMsisdn>" + pinlessRechargeRequest.Msisdn + "</xsd:destMsisdn>");
+                sb.Append(@"         <xsd:amount>" + pinlessRechargeRequest.Amount + "</xsd:amount>");
+                sb.Append(@"         <xsd:sequence>" + pinlessRechargeRequest.transId + "</xsd:sequence>");
+                sb.Append(@"         <xsd:tariffTypeId>1</xsd:tariffTypeId>");
+                sb.Append(@"         <xsd:serviceproviderId>1</xsd:serviceproviderId>");
+                sb.Append(@"      </xsd:vend>");
+                sb.Append(@"   </soapenv:Body>");
+                sb.Append(@"</soapenv:Envelope>");
 
 
                 _logger.LogInformation($"MTN AirtimeRecharge soap request = {sb.ToString()}");  //
@@ -246,20 +246,20 @@ IHttpClientFactory clientFactory)
             {
 
                 var sb = new System.Text.StringBuilder(584);
-                sb.AppendLine(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
-                sb.AppendLine(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://hostif.vtm.prism.co.za/xsd"">");
-                sb.AppendLine(@"   <soapenv:Header />");
-                sb.AppendLine(@"   <soapenv:Body>");
-                sb.AppendLine(@"      <xsd:vend>");
-                sb.AppendLine(@"         <xsd:origMsisdn>" + _settings.PartnerMsisdn + "</xsd:origMsisdn>");
-                sb.AppendLine(@"         <xsd:destMsisdn>" + pinlessRechargeRequest.Msisdn + "</xsd:destMsisdn>");
-                sb.AppendLine(@"         <xsd:amount>" + pinlessRechargeRequest.Amount + "</xsd:amount>");
-                sb.AppendLine(@"         <xsd:sequence>" + pinlessRechargeRequest.transId + "</xsd:sequence>");
-                sb.AppendLine(@"         <xsd:tariffTypeId>" + pinlessRechargeRequest.ProductCode + "</xsd:tariffTypeId>");
-                sb.AppendLine(@"         <xsd:serviceproviderId>1</xsd:serviceproviderId>");
-                sb.AppendLine(@"      </xsd:vend>");
-                sb.AppendLine(@"   </soapenv:Body>");
-                sb.AppendLine(@"</soapenv:Envelope>");
+                sb.Append(@"<?xml version=""1.0"" encoding=""UTF-8""?>");
+                sb.Append(@"<soapenv:Envelope xmlns:soapenv=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns:xsd=""http://hostif.vtm.prism.co.za/xsd"">");
+                sb.Append(@"   <soapenv:Header />");
+                sb.Append(@"   <soapenv:Body>");
+                sb.Append(@"      <xsd:vend>");
+                sb.Append(@"         <xsd:origMsisdn>" + _settings.PartnerMsisdn + "</xsd:origMsisdn>");
+                sb.Append(@"         <xsd:destMsisdn>" + pinlessRechargeRequest.Msisdn + "</xsd:destMsisdn>");
+                sb.Append(@"         <xsd:amount>" + pinlessRechargeRequest.Amount + "</xsd:amount>");
+                sb.Append(@"         <xsd:sequence>" + pinlessRechargeRequest.transId + "</xsd:sequence>");
+                sb.Append(@"         <xsd:tariffTypeId>" + pinlessRechargeRequest.ProductCode + "</xsd:tariffTypeId>");
+                sb.Append(@"         <xsd:serviceproviderId>1</xsd:serviceproviderId>");
+                sb.Append(@"      </xsd:vend>");
+                sb.Append(@"   </soapenv:Body>");
+                sb.Append(@"</soapenv:Envelope>");
 
 
 

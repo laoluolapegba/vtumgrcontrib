@@ -7,11 +7,11 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
     public class ProxyEkoPrepaid
     {
 
-        public ProxyDetails details { get; set; }
+        public EkoPrepaidProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
 
-        public class ProxyDetails
+        public class EkoPrepaidProxyDetails
         {
             public string meterNumber { get; set; }
             

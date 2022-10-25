@@ -88,7 +88,7 @@ namespace Chams.Vtumanager.Provisioning.Services.NineMobileEvc
                 sb.AppendLine(@"<com:parameters name="""">");
                 sb.AppendLine(@"<com:parameter name=""RechargeType"">" + rechargeType + "</com:parameter>");
                 sb.AppendLine(@"<com:parameter name=""MSISDN"">" + pinlessRechargeRequest.Msisdn + "</com:parameter>");
-                sb.AppendLine(@"<com:parameter name=""Amount"">" + pinlessRechargeRequest.Amount + "</com:parameter>");
+                sb.AppendLine(@"<com:parameter name=""Amount"">" + pinlessRechargeRequest.Amount * 100 + "</com:parameter>");
                 sb.AppendLine(@"<com:parameter name=""Channel_ID"">" + _settings.pinlessRecharge.Channel_ID + "</com:parameter>");
                 sb.AppendLine(@"</com:parameters>");
                 sb.AppendLine(@"<com:result>");

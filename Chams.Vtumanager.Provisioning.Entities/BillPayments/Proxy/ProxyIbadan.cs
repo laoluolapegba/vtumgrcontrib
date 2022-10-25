@@ -7,11 +7,11 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
     public class ProxyIbadanPrepaid
     {
 
-        public ProxyDetails details { get; set; }
+        public IbadanPrepaidProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
 
-        public class ProxyDetails
+        public class IbadanPrepaidProxyDetails
         {
             public string customerReference { get; set; }
             
@@ -22,11 +22,11 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
     public class ProxyIbadanPostpaid
     {
 
-        public ProxyDetails details { get; set; }
+        public IbadanPostpaidProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
 
-        public class ProxyDetails
+        public class IbadanPostpaidProxyDetails
         {
             public string customerReference { get; set; }
 

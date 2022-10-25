@@ -27,7 +27,5 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
         }
 
 
-        
-
     }
 }

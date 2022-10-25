@@ -7,11 +7,11 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
     public class ProxyKedcoPrepaid
     {
 
-        public ProxyDetails details { get; set; }
+        public KedcoPrepaidProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
 
-        public class ProxyDetails
+        public class KedcoPrepaidProxyDetails
         {
             public string customerReference { get; set; }
             
@@ -22,11 +22,11 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
     public class ProxyKedcoPostpaid
     {
 
-        public ProxyDetails details { get; set; }
+        public KedcoPostpaidProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
 
-        public class ProxyDetails
+        public class KedcoPostpaidProxyDetails
         {
             public string customerReference { get; set; }
 

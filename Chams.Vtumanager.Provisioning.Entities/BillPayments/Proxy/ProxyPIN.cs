@@ -43,14 +43,30 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
         }
 
     }
-    public class ProxyCarpaddy
+    public class ProxySpectranetValidateAcctNo
     {
 
-        public ProxyDetails details { get; set; }
+        public SpectranetValidateProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
 
-        public class ProxyDetails
+        public class SpectranetValidateProxyDetails
+        {
+            public string accountNumber { get; set; }
+            public string requestType { get; set; }
+
+        }
+
+    }
+    
+    public class ProxyCarpaddy
+    {
+
+        public CarpaddyProxyDetails details { get; set; }
+        public string serviceId { get; set; }
+
+
+        public class CarpaddyProxyDetails
         {
             public string registrationNumber { get; set; }
             
@@ -61,11 +77,11 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
     public class ProxySmileRecharge
     {
 
-        public ProxyDetails details { get; set; }
+        public SmileRechargeProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
 
-        public class ProxyDetails
+        public class SmileRechargeProxyDetails
         {
             public string customerAccountId { get; set; }
             public string requestType { get; set; }

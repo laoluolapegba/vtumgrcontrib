@@ -7,11 +7,11 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
     public class ProxyJosPrepaid
     {
 
-        public ProxyDetails details { get; set; }
+        public JosPrepaidProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
 
-        public class ProxyDetails
+        public class JosPrepaidProxyDetails
         {
             public string customerNumber { get; set; }
             

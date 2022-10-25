@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments;
 using Chams.Vtumanager.Provisioning.Entities.BillPayments.AbujaDisco;
+using Chams.Vtumanager.Provisioning.Entities.BillPayments.ProxyResponses;
 using Chams.Vtumanager.Provisioning.Entities.Common;
 using Chams.Vtumanager.Provisioning.Entities.ViewModels;
 using Chams.Vtumanager.Provisioning.Services.BillPayments;
 using Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco;
+using Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy;
 using Chams.Vtumanager.Provisioning.Services.QueService;
 using Chams.Vtumanager.Provisioning.Services.TransactionRecordService;
 using Microsoft.AspNetCore.Authorization;
@@ -20,6 +22,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Chams.Vtumanager.Provisioning.Entities.BillPayments.ProxyResponse;
+//using static Chams.Vtumanager.Provisioning.Entities.BillPayments.ProxyResponses.ProxyIkejaResponse;
 
 namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest
 {
@@ -191,10 +195,30 @@ namespace Chams.Vtumanager.Provisioning.Api.Controllers.v1.rest
                     }
                     var apiRsponse = await _billspaymentService.ProxyAsync(proxyRequest, cancellation);
 
-                    return Ok(new
+                    _logger.LogInformation($"mapping {proxyRequest.serviceId} back to response model .apiRsponse : { JsonConvert.SerializeObject(apiRsponse) }");
+                    switch (proxyRequest.serviceId)
                     {
-                        apiRsponse
-                    });
+                        case "APB":
+                            _logger.LogInformation($"case APB  ");
+                            ProxyIkejaResponseDetails ikejarsp = _mapper.Map<ProxyResponseDetails, ProxyIkejaResponseDetails>(apiRsponse.details);
+                            _logger.LogInformation($"ikj response : {JsonConvert.SerializeObject(ikejarsp)} ");
+                            return Ok(
+                                
+                                ikejarsp
+                                
+                            );
+                            break;
+                        default:
+                            return Ok(new
+                            {
+                                apiRsponse
+                            }); ;
+                    }
+                    
+                    //return Ok(new
+                    //{
+                    //    apiRsponse
+                    //});
                 }
                 else
                 {

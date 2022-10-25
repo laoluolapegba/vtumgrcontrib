@@ -9,7 +9,7 @@ namespace Chams.Vtumanager.Provisioning.Services.BillPayments.AbujaDisco
     public interface IBillerPaymentsService
     {
         Task<BillPaymentsResponse> BillerPayAsync(BillpaymentRequest paymentRequest, CancellationToken cancellationToken);
-        Task<BillPaymentsResponse> ProxyAsync(ProxyRequest proxyRequest, CancellationToken cancellationToken);
+        Task<ProxyResponse> ProxyAsync(ProxyRequest proxyRequest, CancellationToken cancellationToken);
         Task<List<ServiceListResponse>> ServiceListAsync();
     }
 }

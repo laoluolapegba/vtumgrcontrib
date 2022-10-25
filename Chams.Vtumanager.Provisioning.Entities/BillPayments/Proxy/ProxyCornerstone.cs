@@ -1,41 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
+using static Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy.ProxyValidateSmileBundleCustomer;
 
-namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
+namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
 {
-    public class ProxyRequest
+    public class ProxyCornerstone
     {
-        public ProxyRequestDetails details { get; set; }
+
+        public CornerstoneProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
-        public class ProxyRequestDetails
+        public class CornerstoneProxyDetails
         {
+            
             public string requestType { get; set; }
-            public string accountType { get; set; }
-            public string customerReference { get; set; }
-            public string customerReferenceType { get; set; }
-            public string customerAccountId { get; set; }
-            public string customerNumber { get; set; }
-            public string accountNumber { get; set; }
-            public string smartCardNumber { get; set; }
+        }
 
-            public string meterNumber { get; set; }
-            public Policy policy { get; set; }
-            public string phone { get; set; }
-            public string registrationNumber { get; set; }
+    }
+    public class ProxyCornerStoneCarModels
+    {
+
+        public CornerStoneCarModelsProxyDetails details { get; set; }
+        public string serviceId { get; set; }
+
+        public class CornerStoneCarModelsProxyDetails
+        {
             public string vehicleManufacter { get; set; }
-            public string policyId { get; set; }
-            public Int64? number { get; set; }
-            public int? invoicePeriod { get; set; }
-            public string primaryProductCode { get; set; }
+            public string requestType { get; set; }
+        }
 
-            public string returnCode { get; set; }
-            public int customerType { get; set; }
-            public int billAmount { get; set; }
-            public float balance { get; set; }
-            public string returnMessage { get; set; }
-            public string customerName { get; set; }
+    }
+    public class ProxyCornerStoneGetPolicyDetails
+    {
+
+        public GetPolicyDetailsProxyDetails details { get; set; }
+        public string serviceId { get; set; }
+
+        public class GetPolicyDetailsProxyDetails
+        {
+            public string policyId { get; set; }
+            public string requestType { get; set; }
+        }
+
+    }
+    public class ProxyCornerSton3rdpartyInsuranceQuotation
+    {
+
+        public CornerSton3rdpartyInsuranceQuotationProxyDetails details { get; set; }
+        public string serviceId { get; set; }
+
+        public class CornerSton3rdpartyInsuranceQuotationProxyDetails
+        {
+            public Policy policy { get; set; }
+            public string requestType { get; set; }
         }
         public class Policy
         {
@@ -72,8 +91,5 @@ namespace Chams.Vtumanager.Provisioning.Entities.BillPayments
 
     }
 
-
-
-    
 
 }

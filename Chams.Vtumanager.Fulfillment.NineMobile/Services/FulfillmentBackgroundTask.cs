@@ -108,6 +108,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                         transId = item.transref,
                         ProductCode = item.productid
                     };
+                    bool isSuccess = false;
                     ///Check balance
 
                     _logger.LogInformation($"Checking current stock balance for partner:{item.PartnerId} telco: {item.serviceproviderid}");
@@ -146,6 +147,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                         {
                                             if (mtnenv1.body.vendResponse.responseCode == 0 && mtnenv1.body.vendResponse.statusId == "0")
                                             {
+                                                isSuccess = true;
                                                 externaltransref = mtnenv1.body.vendResponse.txRefId;
                                                 await UpdateTaskStatusAsync(item.RecordId,
                                                     mtnenv1.body.vendResponse.responseCode.ToString(),
@@ -176,6 +178,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                         {
                                             if (mtnenv1.body.vendResponse.responseCode == 0 && mtnenv1.body.vendResponse.statusId == "0")
                                             {
+                                                isSuccess = true;
                                                 externaltransref = mtnenv1.body.vendResponse.txRefId;
                                                 await UpdateTaskStatusAsync(item.RecordId,
                                                     mtnenv1.body.vendResponse.responseCode.ToString(),
@@ -245,6 +248,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     {
                                         if (rechargeResponseEnvelope.TXNSTATUS == (int)PretupsErrorCodes.RequestSuccessfullyProcessed)
                                         {
+                                            isSuccess = true;
                                             externaltransref = rechargeResponseEnvelope.TXNID;
                                             await UpdateTaskStatusAsync(item.RecordId,
                                                 rechargeResponseEnvelope.TXNSTATUS.ToString(),
@@ -275,6 +279,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     {
                                         if (rechargeResponseEnvelope1.TXNSTATUS == (int)PretupsErrorCodes.RequestSuccessfullyProcessed)
                                         {
+                                            isSuccess = true;
                                             externaltransref = rechargeResponseEnvelope1.EXTREFNUM;
                                             await UpdateTaskStatusAsync(item.RecordId,
                                                 rechargeResponseEnvelope1.TXNSTATUS.ToString(),
@@ -307,6 +312,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                     {
                                         if (gloAirtimeResultEnvelope.Body.VendResponse.ResponseCode == 0 && gloAirtimeResultEnvelope.Body.VendResponse.StatusId == "00")
                                         {
+                                            isSuccess = true;
                                             externaltransref = gloAirtimeResultEnvelope.Body.VendResponse.TxRefId;
                                             await UpdateTaskStatusAsync(item.RecordId,
                                                 gloAirtimeResultEnvelope.Body.VendResponse.ResponseCode.ToString(),
@@ -340,7 +346,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                         if (gloDataResultEnvelope1.Body.requestTopupResponse.@return.resultCode == 0 )
                                         {
                                             externaltransref = gloDataResultEnvelope1.Body.requestTopupResponse.@return.ersReference;
-
+                                            isSuccess = true;
                                             await UpdateTaskStatusAsync(item.RecordId,
                                                 gloDataResultEnvelope1.Body.requestTopupResponse.@return.resultCode.ToString(),
                                                 gloDataResultEnvelope1.Body.requestTopupResponse.@return.resultDescription,
@@ -371,6 +377,7 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                                 {
                                     if (env1.Body.SDF_Data.result.statusCode == "0")
                                     {
+                                        isSuccess = true;
                                         externaltransref = env1.Body.SDF_Data.result.instanceId.ToString();
                                         await UpdateTaskStatusAsync(item.RecordId,
                                             env1.Body.SDF_Data.result.statusCode.ToString(),
@@ -396,6 +403,13 @@ namespace Chams.Vtumanager.Provisioning.Hangfire.Services
                             default:
                                 break;
                         }
+
+                        //Debit the dealer
+                        if(isSuccess)
+                        {
+                            await _transactionRecordingService.StockSales(item.PartnerId, item.serviceproviderid, item.transamount, item.transref);
+                        }
+                        
                         successCount++;
                         _logger.LogInformation($"End processing request {pinlessRechargeRequest.transId} ");
                     }

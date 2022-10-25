@@ -289,7 +289,27 @@ namespace Chams.Vtumanager.Provisioning.Services.TransactionRecordService
 
             return balances;
         }
+        public async Task<bool> StockSales(int partnerId, int serviceproviderId, decimal txnAmt, string transref)
+        {
+            bool retstatus = false;
+            _logger.LogInformation($"Start debit stock master for partnerId: {partnerId}, serviceprovider: {serviceproviderId}");
+            //Decrease the QOH
+            try
+            {
+                int qty = (int)txnAmt;
+                StockMaster stockObj = _stockmasterRepo.GetQueryable(a => a.PartnerId == partnerId && a.ServiceProviderId == serviceproviderId).FirstOrDefault();
+                stockObj.QuantityOnHand = stockObj.QuantityOnHand - qty;
 
+                await _stockmasterRepo.UpdateAsync(stockObj);
+                retstatus = true;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Failed to debit partner for txn ID: {transref}");
+            }            
+            
+            return retstatus;
+        }
         public async Task<bool> PurchaseStock(StockPurchaseOrder stockPurchaseRequest, bool addCommision)
         {
             int rowcount = 0;

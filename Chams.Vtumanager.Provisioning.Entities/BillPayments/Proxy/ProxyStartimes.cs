@@ -6,35 +6,32 @@ using static Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy.ProxyVali
 
 namespace Chams.Vtumanager.Provisioning.Services.BillPayments.Proxy
 {
-    public class ProxyValidateSmileBundleCustomer
+    public class ProxyStartimes
     {
 
-        public SmileBundleProxyDetails details { get; set; }
+        public StartimesProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
-        public class SmileBundleProxyDetails
+        public class StartimesProxyDetails
         {
-            public string customerAccountId { get; set; }
+            public string smartCardNumber { get; set; }
             public string requestType { get; set; }
         }
 
-        
-
     }
-    public class ProxySmileGetBundles
+    public class ProxyStartimesGetBundle
     {
 
-        public SmileGetBundlesProxyDetails details { get; set; }
+        public StartimesGetBundleProxyDetails details { get; set; }
         public string serviceId { get; set; }
 
-        public class SmileGetBundlesProxyDetails
+        public class StartimesGetBundleProxyDetails
         {
-            public string customerAccountId { get; set; }
+            
             public string requestType { get; set; }
         }
 
-
-
     }
+
 
 }
